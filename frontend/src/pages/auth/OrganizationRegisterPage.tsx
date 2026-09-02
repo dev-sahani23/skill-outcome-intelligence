@@ -2,6 +2,7 @@ import type { RegistrationFormProps } from "../../types/auth.types";
 import AuthLayout from "./components/AuthLayout";
 import Input from "../../components/ui/Input";
 import FormField from "../../components/ui/FormField";
+import Button from "../../components/ui/Button";
 
 const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -10,13 +11,13 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
   };
 
   const heroContent = (
-    <div className="mb-12">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-8">
-        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+    <div className="mb-8 lg:mb-12">
+      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-6 sm:mb-8">
+        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-[pulse_2s_ease-in-out_infinite]"></span>
         Personalized onboarding
       </div>
 
-      <h1 className="text-4xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-6">
+      <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4 sm:mb-6">
         Set up your
         <br />
         <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-blue-400">
@@ -26,7 +27,7 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
         profile.
       </h1>
 
-      <p className="text-lg text-slate-300 leading-relaxed max-w-xl">
+      <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl">
         Fill in your details to create the right account and start using the
         platform for tracking outcomes and impact.
       </p>
@@ -39,27 +40,36 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
       hideHeroOnMobile
       formMaxWidth="xl"
     >
-      <button
-        type="button"
-        className="text-sm text-slate-400 hover:text-white transition-colors mb-6 flex items-center gap-1"
-        onClick={onBack}
-      >
-        ← Back
-      </button>
+      <div className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
+        <Button
+          type="button"
+          variant="secondary"
+          className="mb-6 text-sm"
+          onClick={onBack}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
+            <path d="M19 12H5" />
+            <path d="M11 18l-6-6 6-6" />
+          </svg>
+          Back
+        </Button>
+      </div>
 
-      <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium mb-4">
-        Organization / Admin
-      </span>
+      <div className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+        <span className="inline-flex items-center px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-xs font-medium mb-4">
+          Organization / Admin
+        </span>
 
-      <h2 className="text-2xl font-semibold text-white mb-2">
-        Create organization account
-      </h2>
-      <p className="text-slate-400 text-sm mb-8">
-        Set up your organization dashboard and governance controls.
-      </p>
+        <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">
+          Create organization account
+        </h2>
+        <p className="text-slate-400 text-sm mb-6 sm:mb-8">
+          Set up your organization dashboard and governance controls.
+        </p>
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-8">
+      <form onSubmit={handleSubmit} className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-6 sm:mb-8">
           <FormField
             label="Organization name"
             htmlFor="org-name"
@@ -132,12 +142,9 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
           </FormField>
         </div>
 
-        <button
-          type="submit"
-          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-xl py-3.5 flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-600/25"
-        >
+        <Button type="submit" fullWidth>
           <span>Create organization account</span>
-        </button>
+        </Button>
       </form>
     </AuthLayout>
   );
