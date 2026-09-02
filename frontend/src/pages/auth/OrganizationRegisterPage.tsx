@@ -1,8 +1,8 @@
 import type { RegistrationFormProps } from "../../types/auth.types";
 import AuthLayout from "./components/AuthLayout";
-import Input from "../../components/ui/Input";
+import { Input } from "../../components/ui/Input";
 import FormField from "../../components/ui/FormField";
-import Button from "../../components/ui/Button";
+import { Button } from "../../components/ui/Button";
 
 const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

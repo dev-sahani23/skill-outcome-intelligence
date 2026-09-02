@@ -67,10 +67,15 @@ const AuthLayout = ({
           className={`flex-1 flex flex-col justify-center items-center lg:items-end w-full ${formWidthClass} lg:max-w-none mx-auto lg:ml-auto pb-8 sm:pb-12 lg:pb-0 pt-4 sm:pt-8 lg:pt-0`}
         >
           <div
-            className={`w-full ${formWidthClass} p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl bg-slate-900/70 border border-white/10 backdrop-blur-xl shadow-2xl shadow-black/50 animate-slide-in-right hover:border-white/15 transition-colors duration-500 overflow-y-auto max-h-[calc(100vh-2rem)] lg:max-h-[calc(100vh-4rem)]`}
+            className={`w-full ${formWidthClass} p-5 sm:p-8 lg:p-10 rounded-2xl sm:rounded-3xl bg-slate-900/40 border border-white/10 backdrop-blur-2xl shadow-2xl shadow-black/80 ring-1 ring-white/5 animate-slide-in-right hover:border-indigo-500/30 hover:shadow-indigo-500/10 transition-all duration-700 overflow-y-auto max-h-[calc(100vh-2rem)] lg:max-h-[calc(100vh-4rem)] relative group/form-panel`}
             style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
           >
-            {children}
+            {/* Subtle glow effect behind the form */}
+            <div className="absolute inset-0 bg-linear-to-tr from-indigo-500/5 via-transparent to-purple-500/5 opacity-0 group-hover/form-panel:opacity-100 transition-opacity duration-700 rounded-2xl sm:rounded-3xl pointer-events-none"></div>
+            
+            <div className="relative z-10">
+              {children}
+            </div>
           </div>
         </section>
       </main>
