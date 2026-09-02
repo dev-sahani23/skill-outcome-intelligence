@@ -1,13 +1,48 @@
 import type { RegistrationFormProps } from "../../types/auth.types";
 import AuthLayout from "./components/AuthLayout";
-import Input from "../../components/ui/Input";
+import { Input } from "../../components/ui/Input";
 import FormField from "../../components/ui/FormField";
-import Button from "../../components/ui/Button";
+import { Button } from "../../components/ui/Button";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../../lib/auth";
 
 const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [qualification, setQualification] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Trainee registration submitted");
+    setError("");
+    
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await auth.register({
+        role: "TRAINEE",
+        fullName,
+        phone,
+        email,
+        qualification,
+        password,
+      });
+      navigate("/dashboard/trainee");
+    } catch (err: any) {
+      setError(err.message || "Failed to create account");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const heroContent = (
@@ -69,12 +104,20 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
       </div>
 
       <form onSubmit={handleSubmit} className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+        {error && (
+          <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-6 sm:mb-8">
           <FormField label="Full name" htmlFor="trainee-name">
             <Input
               id="trainee-name"
               type="text"
               placeholder="Enter your full name"
+              value={fullName}
+              onChange={(e: any) => setFullName(e.target.value)}
+              required
             />
           </FormField>
 
@@ -83,6 +126,9 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="trainee-phone"
               type="tel"
               placeholder="+91 98765 43210"
+              value={phone}
+              onChange={(e: any) => setPhone(e.target.value)}
+              required
             />
           </FormField>
 
@@ -95,6 +141,9 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="trainee-email"
               type="email"
               placeholder="name@example.com"
+              value={email}
+              onChange={(e: any) => setEmail(e.target.value)}
+              required
             />
           </FormField>
 
@@ -107,6 +156,9 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="trainee-qualification"
               type="text"
               placeholder="e.g. Diploma in Computer Science"
+              value={qualification}
+              onChange={(e: any) => setQualification(e.target.value)}
+              required
             />
           </FormField>
 
@@ -115,6 +167,10 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="trainee-password"
               type="password"
               placeholder="Create a password"
+              value={password}
+              onChange={(e: any) => setPassword(e.target.value)}
+              required
+              minLength={6}
             />
           </FormField>
 
@@ -126,12 +182,16 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="trainee-confirm-password"
               type="password"
               placeholder="Repeat your password"
+              value={confirmPassword}
+              onChange={(e: any) => setConfirmPassword(e.target.value)}
+              required
+              minLength={6}
             />
           </FormField>
         </div>
 
-        <Button type="submit" fullWidth>
-          <span>Create trainee account</span>
+        <Button type="submit" fullWidth disabled={isLoading}>
+          <span>{isLoading ? "Creating account..." : "Create trainee account"}</span>
         </Button>
       </form>
     </AuthLayout>

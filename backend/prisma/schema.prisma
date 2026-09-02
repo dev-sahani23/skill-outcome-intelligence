@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  TRAINEE
+  PROVIDER
+  GOVERNMENT_ADMIN
+}
+
+model User {
+  id               String   @id @default(uuid())
+  email            String   @unique
+  passwordHash     String
+  role             Role
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  traineeProfile   TraineeProfile?
+  providerProfile  ProviderProfile?
+  adminProfile     AdminProfile?
+
+  @@map("users")
+}
+
+model TraineeProfile {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName      String
+  phone         String?
+  qualification String?
+  district      String?
+  consentGiven  Boolean  @default(false)
+  
+  enrollments   Enrollment[]
+  outcomes      EmploymentOutcome[]
+  followUps     FollowUp[]
+
+  @@map("trainee_profiles")
+}
+
+model ProviderProfile {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  instituteName String
+  contactPerson String?
+  phone         String?
+  
+  programs      TrainingProgram[]
+
+  @@map("provider_profiles")
+}
+
+model AdminProfile {
+  id            String   @id @default(uuid())
+  userId        String   @unique
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName      String?
+  department    String?
+
+  @@map("admin_profiles")
+}
+
+model TrainingProgram {
+  id                String   @id @default(uuid())
+  providerId        String
+  provider          ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  name              String
+  description       String?
+  durationMonths    Int?
+  
+  enrollments       Enrollment[]
+
+  @@map("training_programs")
+}
+
+model Enrollment {
+  id                String   @id @default(uuid())
+  traineeId         String
+  trainee           TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  programId         String
+  program           TrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  status            EnrollmentStatus @default(ENROLLED)
+  enrolledAt        DateTime @default(now())
+  completedAt       DateTime?
+
+  @@map("enrollments")
+}
+
+enum EnrollmentStatus {
+  ENROLLED
+  COMPLETED
+  DROPPED
+}
+
+model EmploymentOutcome {
+  id                String   @id @default(uuid())
+  traineeId         String
+  trainee           TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  type              OutcomeType
+  employerName      String?
+  designation       String?
+  monthlyWage       Float?
+  retentionMonths   Int?
+  skillGapIdentified String?
+  nonPlacementReason String?
+  isVerified        Boolean  @default(false)
+  reportedAt        DateTime @default(now())
+
+  @@map("employment_outcomes")
+}
+
+enum OutcomeType {
+  PLACED
+  SELF_EMPLOYED
+  APPRENTICESHIP
+  UNEMPLOYED
+}
+
+model FollowUp {
+  id                String   @id @default(uuid())
+  traineeId         String
+  trainee           TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  notes             String
+  conductedBy       String? 
+  createdAt         DateTime @default(now())
+
+  @@map("follow_ups")
+}

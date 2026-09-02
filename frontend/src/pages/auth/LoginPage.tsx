@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from "react";
 import AuthLayout from "./components/AuthLayout";
 import AuthBranding from "./components/AuthBranding";
-import Input from "../../components/ui/Input";
-import Button from "../../components/ui/Button";
+import { Input } from "../../components/ui/Input";
+import { Button } from "../../components/ui/Button";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../../lib/auth";
 
 type LoginPageProps = {
   onNavigateToRegister: () => void;
@@ -69,10 +71,28 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
   const [rememberMe, setRememberMe] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log({ email, password, rememberMe });
+    setError("");
+    setIsLoading(true);
+    
+    try {
+      const res = await auth.login({ email, password });
+      // The response has user and accessToken. Role decides dashboard
+      const role = res.user?.role;
+      if (role === "TRAINEE") navigate("/dashboard/trainee");
+      else if (role === "PROVIDER") navigate("/dashboard/provider");
+      else if (role === "GOVERNMENT_ADMIN") navigate("/dashboard/admin");
+      else navigate("/dashboard/trainee"); // fallback
+    } catch (err: any) {
+      setError(err.message || "Invalid email or password");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const heroContent = (
@@ -168,6 +188,11 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
       </div>
 
       <form onSubmit={handleSubmit}>
+        {error && (
+          <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
         <div className="mb-5 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
           <label
             htmlFor="email"
@@ -175,15 +200,20 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           >
             Email address
           </label>
-          <Input
-            id="email"
-            type="email"
-            placeholder="name@organization.gov.in"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            icon={MailIcon}
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 [&>svg]:w-5 [&>svg]:h-5">
+              {MailIcon}
+            </div>
+            <Input
+              id="email"
+              type="email"
+              placeholder="name@organization.gov.in"
+              value={email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              required
+              className="pl-10"
+            />
+          </div>
         </div>
 
         <div className="mb-5 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
@@ -204,16 +234,23 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
             </button>
           </div>
 
-          <Input
-            id="password"
-            type={showPassword ? "text" : "password"}
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            icon={LockIcon}
-            trailing={passwordToggle}
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 [&>svg]:w-5 [&>svg]:h-5">
+              {LockIcon}
+            </div>
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+              required
+              className="pl-10 pr-10"
+            />
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+              {passwordToggle}
+            </div>
+          </div>
         </div>
 
         <div className="flex items-center justify-between mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: "0.25s" }}>
@@ -242,9 +279,9 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         </div>
 
         <div className="animate-fade-in-up" style={{ animationDelay: "0.3s" }}>
-          <Button type="submit" fullWidth>
-            <span>Sign in to dashboard</span>
-            {ArrowRightIcon}
+          <Button type="submit" fullWidth disabled={isLoading}>
+            <span>{isLoading ? "Signing in..." : "Sign in to dashboard"}</span>
+            {!isLoading && ArrowRightIcon}
           </Button>
         </div>
       </form>

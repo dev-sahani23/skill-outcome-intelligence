@@ -1,13 +1,50 @@
 import type { RegistrationFormProps } from "../../types/auth.types";
 import AuthLayout from "./components/AuthLayout";
-import Input from "../../components/ui/Input";
+import { Input } from "../../components/ui/Input";
 import FormField from "../../components/ui/FormField";
-import Button from "../../components/ui/Button";
+import { Button } from "../../components/ui/Button";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { auth } from "../../lib/auth";
 
 const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [instituteName, setInstituteName] = useState("");
+  const [contactPerson, setContactPerson] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [programs, setPrograms] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("Provider registration submitted");
+    setError("");
+    
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await auth.register({
+        role: "PROVIDER",
+        instituteName,
+        fullName: contactPerson, // maps to fullName in schema
+        phone,
+        email,
+        programs,
+        password,
+      });
+      navigate("/dashboard/provider");
+    } catch (err: any) {
+      setError(err.message || "Failed to create account");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const heroContent = (
@@ -69,6 +106,11 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
       </div>
 
       <form onSubmit={handleSubmit} className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+        {error && (
+          <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            {error}
+          </div>
+        )}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-6 sm:mb-8">
           <FormField
             label="Provider / institute name"
@@ -79,6 +121,9 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="provider-name"
               type="text"
               placeholder="Enter your institute name"
+              value={instituteName}
+              onChange={(e: any) => setInstituteName(e.target.value)}
+              required
             />
           </FormField>
 
@@ -87,6 +132,9 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="provider-contact"
               type="text"
               placeholder="Name of contact person"
+              value={contactPerson}
+              onChange={(e: any) => setContactPerson(e.target.value)}
+              required
             />
           </FormField>
 
@@ -95,6 +143,9 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="provider-phone"
               type="tel"
               placeholder="+91 98765 43210"
+              value={phone}
+              onChange={(e: any) => setPhone(e.target.value)}
+              required
             />
           </FormField>
 
@@ -107,6 +158,9 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="provider-email"
               type="email"
               placeholder="provider@institute.org"
+              value={email}
+              onChange={(e: any) => setEmail(e.target.value)}
+              required
             />
           </FormField>
 
@@ -119,6 +173,8 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="provider-programs"
               type="text"
               placeholder="e.g. Digital Skills, Placement Program"
+              value={programs}
+              onChange={(e: any) => setPrograms(e.target.value)}
             />
           </FormField>
 
@@ -127,6 +183,10 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="provider-password"
               type="password"
               placeholder="Create a password"
+              value={password}
+              onChange={(e: any) => setPassword(e.target.value)}
+              required
+              minLength={6}
             />
           </FormField>
 
@@ -138,12 +198,16 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
               id="provider-confirm-password"
               type="password"
               placeholder="Repeat your password"
+              value={confirmPassword}
+              onChange={(e: any) => setConfirmPassword(e.target.value)}
+              required
+              minLength={6}
             />
           </FormField>
         </div>
 
-        <Button type="submit" fullWidth>
-          <span>Create provider account</span>
+        <Button type="submit" fullWidth disabled={isLoading}>
+          <span>{isLoading ? "Creating account..." : "Create provider account"}</span>
         </Button>
       </form>
     </AuthLayout>
