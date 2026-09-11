@@ -7,6 +7,7 @@ import { errorHandler } from "./middleware/errorHandler";
 import authRoutes from "./modules/auth/auth.routes";
 import courseRoutes from "./modules/course/course.routes";
 import outcomeRoutes from "./modules/outcome/outcome.routes";
+import enrollmentRoutes from "./modules/enrollment/enrollment.routes";
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/courses", courseRoutes);
 app.use("/api/outcomes", outcomeRoutes);
+app.use("/api/enrollments", enrollmentRoutes);
 
 // Health check
 app.get("/health", (req, res) => {

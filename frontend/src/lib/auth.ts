@@ -28,4 +28,8 @@ export const auth = {
   getMe: async () => {
     return api.get("/auth/me");
   },
+
+  recordTrainingDetails: async (data: any) => {
+    return api.post("/enrollments/record-details", data);
+  },
 };
