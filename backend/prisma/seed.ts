@@ -66,7 +66,49 @@ async function main() {
   });
   console.log("Created Training Programs");
 
-  // 5. Create Trainees, Enrollments, and Outcomes
+  // 5. Create Default Test Trainee
+  const demoTrainee = await prisma.user.create({
+    data: {
+      email: "trainee@example.com",
+      passwordHash: defaultPassword,
+      role: Role.TRAINEE,
+      traineeProfile: {
+        create: {
+          fullName: "Aarav Sharma",
+          phone: "9876500001",
+          district: "Pune",
+          qualification: "B.Tech Computer Science",
+          consentGiven: true,
+        }
+      }
+    },
+    include: { traineeProfile: true }
+  });
+
+  await prisma.enrollment.create({
+    data: {
+      traineeId: demoTrainee.traineeProfile!.id,
+      programId: program1.id,
+      status: EnrollmentStatus.COMPLETED,
+      enrolledAt: new Date(new Date().setMonth(new Date().getMonth() - 6)),
+      completedAt: new Date(new Date().setMonth(new Date().getMonth() - 1)),
+    }
+  });
+
+  await prisma.employmentOutcome.create({
+    data: {
+      traineeId: demoTrainee.traineeProfile!.id,
+      type: OutcomeType.PLACED,
+      employerName: "Tata Consultancy Services",
+      designation: "Junior Full Stack Developer",
+      monthlyWage: 36000,
+      retentionMonths: 5,
+      isVerified: true,
+    }
+  });
+  console.log(`Created Default Demo Trainee: ${demoTrainee.email}`);
+
+  // 6. Create Additional Trainees, Enrollments, and Outcomes
   const numTrainees = 20;
   for (let i = 1; i <= numTrainees; i++) {
     const district = districts[i % districts.length];

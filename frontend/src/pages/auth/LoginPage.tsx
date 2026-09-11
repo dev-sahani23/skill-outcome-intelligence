@@ -66,33 +66,88 @@ const ArrowRightIcon = (
   </svg>
 );
 
+const DEMO_ACCOUNTS = [
+  {
+    roleName: "Government Admin",
+    shortRole: "Admin",
+    email: "admin@maharashtra.gov.in",
+    password: "password123",
+    badge: "Govt Admin",
+    portal: "State Oversight Portal",
+    borderColor: "border-amber-500/40 hover:border-amber-400",
+    bgColor: "from-amber-500/15 via-slate-900/90 to-slate-900/90",
+    badgeColor: "bg-amber-500/20 text-amber-300 border border-amber-500/30",
+    icon: (
+      <svg className="w-4 h-4 text-amber-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M12 2l8 4v6c0 5.25-3.5 10-8 11-4.5-1-8-5.75-8-11V6l8-4z" />
+      </svg>
+    ),
+  },
+  {
+    roleName: "Training Provider",
+    shortRole: "Provider",
+    email: "provider@example.com",
+    password: "password123",
+    badge: "Institute",
+    portal: "Provider & Course Portal",
+    borderColor: "border-blue-500/40 hover:border-blue-400",
+    bgColor: "from-blue-500/15 via-slate-900/90 to-slate-900/90",
+    badgeColor: "bg-blue-500/20 text-blue-300 border border-blue-500/30",
+    icon: (
+      <svg className="w-4 h-4 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+      </svg>
+    ),
+  },
+  {
+    roleName: "Candidate / Trainee",
+    shortRole: "Trainee",
+    email: "trainee@example.com",
+    password: "password123",
+    badge: "Student",
+    portal: "Trainee Dashboard",
+    borderColor: "border-emerald-500/40 hover:border-emerald-400",
+    bgColor: "from-emerald-500/15 via-slate-900/90 to-slate-900/90",
+    badgeColor: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30",
+    icon: (
+      <svg className="w-4 h-4 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+        <circle cx="12" cy="7" r="4" />
+      </svg>
+    ),
+  },
+];
+
 const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("admin@maharashtra.gov.in");
+  const [password, setPassword] = useState<string>("password123");
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleLoginWithCredentials = async (loginEmail: string, loginPass: string) => {
     setError("");
     setIsLoading(true);
-    
     try {
-      const res = await auth.login({ email, password });
-      // The response has user and accessToken. Role decides dashboard
+      const res = await auth.login({ email: loginEmail, password: loginPass });
       const role = res.user?.role;
       if (role === "TRAINEE") navigate("/dashboard/trainee");
       else if (role === "PROVIDER") navigate("/dashboard/provider");
       else if (role === "GOVERNMENT_ADMIN") navigate("/dashboard/admin");
-      else navigate("/dashboard/trainee"); // fallback
+      else navigate("/dashboard/trainee");
     } catch (err: any) {
       setError(err.message || "Invalid email or password");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    await handleLoginWithCredentials(email, password);
   };
 
   const heroContent = (
@@ -185,6 +240,73 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           <span className="text-indigo-400 font-medium"> SkillTrack </span>
           dashboard.
         </p>
+      </div>
+
+      {/* Quick Test / Demo Accounts */}
+      <div
+        className="mb-6 p-4 rounded-xl bg-slate-900/90 border border-slate-700/70 shadow-lg backdrop-blur-md animate-fade-in-up"
+        style={{ animationDelay: "0.12s" }}
+      >
+        <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center gap-2">
+            <span className="flex h-2 w-2 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+            </span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-200">
+              Demo Test Accounts
+            </span>
+          </div>
+          <span className="text-[11px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded font-mono border border-slate-700/50">
+            pwd: password123
+          </span>
+        </div>
+
+        <p className="text-xs text-slate-400 mb-3">
+          Click any role below to autofill and test its role-specific dashboard:
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+          {DEMO_ACCOUNTS.map((acc) => {
+            const isSelected = email === acc.email;
+            return (
+              <button
+                key={acc.shortRole}
+                type="button"
+                onClick={() => {
+                  setEmail(acc.email);
+                  setPassword(acc.password);
+                  setError("");
+                }}
+                className={`relative flex flex-col items-start p-2.5 rounded-lg border transition-all duration-200 text-left bg-gradient-to-b ${acc.bgColor} ${acc.borderColor} ${
+                  isSelected
+                    ? "ring-2 ring-indigo-400/80 shadow-md shadow-indigo-500/10 border-indigo-400"
+                    : "opacity-85 hover:opacity-100 hover:scale-[1.02]"
+                }`}
+              >
+                <div className="flex items-center justify-between w-full mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    {acc.icon}
+                    <span className="text-xs font-semibold text-white">
+                      {acc.shortRole}
+                    </span>
+                  </div>
+                  {isSelected && (
+                    <span className="text-[10px] text-indigo-400 font-bold">
+                      ✓ Active
+                    </span>
+                  )}
+                </div>
+                <span className="text-[10px] text-slate-300 font-mono truncate w-full mb-1">
+                  {acc.email}
+                </span>
+                <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${acc.badgeColor}`}>
+                  {acc.badge}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <form onSubmit={handleSubmit}>
