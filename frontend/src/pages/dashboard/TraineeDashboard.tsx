@@ -24,13 +24,6 @@ export default function TraineeDashboard() {
     auth.getMe().then(res => {
       setUser(res.user);
     }).catch(console.error);
-
-    // Show modal 2.5 seconds after mounting
-    const timer = setTimeout(() => {
-      setShowModal(true);
-    }, 2500);
-
-    return () => clearTimeout(timer);
   }, []);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
@@ -83,15 +76,18 @@ export default function TraineeDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900 border-slate-800">
+          <Card
+            className="bg-slate-900 border-slate-800 cursor-pointer hover:bg-slate-800 transition-colors shadow-lg shadow-indigo-900/10 group"
+            onClick={() => setShowModal(true)}
+          >
             <CardHeader className="pb-2">
-              <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2">
-                <Award className="w-4 h-4 text-purple-400" /> Completed Courses
+              <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2 group-hover:text-indigo-300 transition-colors">
+                <Award className="w-4 h-4 text-purple-400" /> Training Record Validation
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-white">0</div>
-              <p className="text-xs text-slate-500 mt-1">Ready for next challenge</p>
+              <div className="text-xl font-bold text-slate-200">Pending</div>
+              <p className="text-xs text-amber-500 mt-1">Click to validate</p>
             </CardContent>
           </Card>
 
