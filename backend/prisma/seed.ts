@@ -66,6 +66,16 @@ async function main() {
   });
   console.log("Created Training Programs");
 
+  // 4a. Create a District
+  const puneDistrict = await prisma.district.create({
+    data: {
+      name: "Pune",
+      state: "Maharashtra",
+      avgWageBaseline: 30000,
+      avgLayoffRateBaseline: 2.5
+    }
+  });
+
   // 5. Create Default Test Trainee
   const demoTrainee = await prisma.user.create({
     data: {
@@ -76,9 +86,22 @@ async function main() {
         create: {
           fullName: "Aarav Sharma",
           phone: "9876500001",
-          district: "Pune",
+          districtId: puneDistrict.id,
+          district: "Pune", // fallback
           qualification: "B.Tech Computer Science",
           consentGiven: true,
+          contacts: {
+            create: [
+              { contactType: "SELF", name: "Aarav Sharma", phone: "9876500001", priorityOrder: 1 },
+              { contactType: "GUARDIAN", name: "Ramesh Sharma", phone: "9876500002", relationship: "Father", priorityOrder: 2 },
+              { contactType: "LOCAL_ANCHOR", name: "Pune Tech Hub", phone: "9876500003", relationship: "Community Center", priorityOrder: 3 }
+            ]
+          },
+          consentRecords: {
+            create: [
+              { consentType: "data_sharing", consentVersion: "v1" }
+            ]
+          }
         }
       }
     },
@@ -95,17 +118,52 @@ async function main() {
     }
   });
 
-  await prisma.employmentOutcome.create({
+  const employer = await prisma.employer.create({
+    data: {
+      name: "Tata Consultancy Services",
+      sector: "IT",
+      isVerified: true,
+      districtId: puneDistrict.id
+    }
+  });
+
+  const outcome = await prisma.employmentOutcome.create({
     data: {
       traineeId: demoTrainee.traineeProfile!.id,
-      type: OutcomeType.PLACED,
-      employerName: "Tata Consultancy Services",
+      type: OutcomeType.FORMAL_EMPLOYMENT,
+      employerName: employer.name,
+      employerId: employer.id,
       designation: "Junior Full Stack Developer",
       monthlyWage: 36000,
       retentionMonths: 5,
       isVerified: true,
+      districtId: puneDistrict.id
     }
   });
+
+  // WageRecord history
+  await prisma.wageRecord.createMany({
+    data: [
+      { outcomeId: outcome.id, recordedDate: new Date(new Date().setMonth(new Date().getMonth() - 5)), salaryAmount: 30000 },
+      { outcomeId: outcome.id, recordedDate: new Date(new Date().setMonth(new Date().getMonth() - 1)), salaryAmount: 36000 }
+    ]
+  });
+
+  // CourseRating
+  await prisma.courseRating.create({
+    data: {
+      programId: program1.id,
+      ratingPeriodStart: new Date(new Date().setFullYear(new Date().getFullYear() - 1)),
+      ratingPeriodEnd: new Date(),
+      weightedPlacementScore: 85.5,
+      relativeLayoffScore: 90.0,
+      relevanceScore: 88.0,
+      wageProgressionScore: 92.5,
+      sampleSize: 150,
+      finalScore: 89.0
+    }
+  });
+
   console.log(`Created Default Demo Trainee: ${demoTrainee.email}`);
 
   // 6. Create Additional Trainees, Enrollments, and Outcomes
@@ -149,7 +207,7 @@ async function main() {
       await prisma.employmentOutcome.create({
         data: {
           traineeId: traineeUser.traineeProfile!.id,
-          type: OutcomeType.PLACED,
+          type: OutcomeType.FORMAL_EMPLOYMENT,
           employerName: `Tech Corp ${district}`,
           designation: "Software Engineer",
           monthlyWage: 25000 + (Math.random() * 20000), // Random wage between 25k and 45k

@@ -12,17 +12,162 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// =============================================================================
+// ENUMS
+// =============================================================================
+
 enum Role {
   TRAINEE
   PROVIDER
   GOVERNMENT_ADMIN
 }
 
+// NEW
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+  PREFER_NOT_TO_SAY
+}
+
+enum EnrollmentStatus {
+  ENROLLED
+  IN_PROGRESS // NEW
+  COMPLETED
+  DROPPED
+}
+
+// CHANGED: PLACED split into FORMAL_EMPLOYMENT / INFORMAL_EMPLOYMENT so the
+// PS's distinct outcome categories (formal vs informal vs gig) are queryable.
+enum OutcomeType {
+  FORMAL_EMPLOYMENT   // was PLACED
+  INFORMAL_EMPLOYMENT // NEW
+  APPRENTICESHIP
+  SELF_EMPLOYED
+  UNEMPLOYED
+}
+
+// NEW — reachability graph
+enum ContactType {
+  SELF
+  GUARDIAN
+  LOCAL_ANCHOR
+  EMPLOYER
+}
+
+// NEW — reachability graph escalation state
+enum CascadeStage {
+  PRIMARY_PENDING
+  GUARDIAN_PENDING
+  ANCHOR_PENDING
+  RESOLVED
+  UNREACHABLE
+}
+
+// NEW
+enum FollowUpStage {
+  AT_CERTIFICATION
+  DAY_30
+  MONTH_3
+  MONTH_6
+  MONTH_12
+  MONTH_24
+}
+
+// NEW
+enum FollowUpChannel {
+  SMS
+  WHATSAPP
+  EMAIL
+  WEB
+  MOBILE_APP
+  ASSISTED_CALL
+}
+
+// NEW
+enum FollowUpStatus {
+  PENDING
+  SENT
+  RESPONDED
+  ESCALATED
+  UNREACHABLE
+}
+
+// NEW
+enum ValidationStatus {
+  VERIFIED
+  PARTIALLY_VERIFIED
+  UNVERIFIED
+}
+
+// NEW
+enum RelevanceLevel {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+// NEW
+enum PlacementStatus {
+  ACTIVE
+  LEFT
+  TERMINATED
+  COMPLETED
+}
+
+// NEW
+enum AttritionReason {
+  COMPANY_SHUTDOWN
+  MASS_LAYOFF
+  SKILL_MISMATCH
+  POOR_WORKING_CONDITIONS
+  LOW_SALARY
+  NO_CAREER_PROGRESSION
+  VOLUNTARY_BETTER_JOB
+  OTHER
+}
+
+// NEW
+enum ReasonSource {
+  AI_CLASSIFIED
+  SELF_REPORTED
+  EMPLOYER_REPORTED
+}
+
+// NEW
+enum SustainabilityStatus {
+  GROWING
+  STABLE
+  DECLINING
+  CLOSED
+}
+
+// NEW
+enum AnomalyFlagType {
+  PLACEMENT_VARIANCE
+  RESPONSE_RATE_OUTLIER
+  WAGE_CLUSTERING
+}
+
+// NEW
+enum FlagStatus {
+  OPEN
+  UNDER_REVIEW
+  DISMISSED
+  CONFIRMED
+}
+
+// =============================================================================
+// CORE / AUTH
+// =============================================================================
+
 model User {
   id               String   @id @default(uuid())
   email            String   @unique
   passwordHash     String
   role             Role
+  isActive         Boolean  @default(true) // NEW
+  lastLoginAt      DateTime? // NEW
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
@@ -30,7 +175,30 @@ model User {
   providerProfile  ProviderProfile?
   adminProfile     AdminProfile?
 
+  validationsDone  Validation[]           @relation("ValidatedBy")          // NEW
+  anomalyReviews   ProviderAnomalyFlag[]  @relation("ReviewedBy")           // NEW
+  auditEntries     AuditLog[]                                              // NEW
+
   @@map("users")
+}
+
+// NEW — reference table for district-normalized comparisons (course ratings,
+// wage baselines) discussed for fair provider-to-provider comparison.
+model District {
+  id                       String   @id @default(uuid())
+  name                     String
+  state                    String   @default("Maharashtra")
+  avgWageBaseline          Float?
+  avgLayoffRateBaseline    Float?
+
+  trainees                 TraineeProfile[]
+  providers                ProviderProfile[]
+  employers                Employer[]
+  outcomes                 EmploymentOutcome[]
+  skillGapReports          SkillGapReport[]
+
+  @@unique([name, state])
+  @@map("districts")
 }
 
 model TraineeProfile {
@@ -40,12 +208,34 @@ model TraineeProfile {
   fullName      String
   phone         String?
   qualification String?
-  district      String?
-  consentGiven  Boolean  @default(false)
-  
+  district      String?  // kept as free-text label for backward compatibility
+
+  dob           DateTime?  // NEW — needed for age checks + demographic analytics
+  gender        Gender?    // NEW — demographic analytics the PS asks for
+
+  districtRef   District?  @relation(fields: [districtId], references: [id]) // NEW
+  districtId    String?                                                     // NEW
+
+  // NEW — government ID linkage. Aadhaar is never stored in plaintext:
+  // only a salted/HMAC hash (for dedup + cross-programme identity matching)
+  // and the last 4 digits (for display/verification UI) are persisted.
+  // Hashing happens in the application layer before this record is written —
+  // see the master prompt below for the required utility.
+  aadhaarHash   String?  @unique
+  aadhaarLast4  String?
+  uanNumber     String?  @unique // EPFO Universal Account Number — enables
+                                 // passive employment/wage signals without
+                                 // relying on self-reported follow-ups
+
+  consentGiven  Boolean  @default(false) // kept as a quick-check flag;
+                                          // source of truth is ConsentRecord[]
+
   enrollments   Enrollment[]
   outcomes      EmploymentOutcome[]
   followUps     FollowUp[]
+  contacts      Contact[]        // NEW — reachability graph
+  consentRecords ConsentRecord[] // NEW — full consent history
+  attritionRecords AttritionRecord[] // NEW
 
   @@map("trainee_profiles")
 }
@@ -57,8 +247,15 @@ model ProviderProfile {
   instituteName String
   contactPerson String?
   phone         String?
-  
+
+  registrationNo String? @unique // NEW
+  isVerified     Boolean @default(false) // NEW
+
+  districtRef    District? @relation(fields: [districtId], references: [id]) // NEW
+  districtId     String?                                                     // NEW
+
   programs      TrainingProgram[]
+  anomalyFlags  ProviderAnomalyFlag[] // NEW
 
   @@map("provider_profiles")
 }
@@ -73,6 +270,10 @@ model AdminProfile {
   @@map("admin_profiles")
 }
 
+// =============================================================================
+// TRAINING & ENROLLMENT
+// =============================================================================
+
 model TrainingProgram {
   id                String   @id @default(uuid())
   providerId        String
@@ -80,12 +281,15 @@ model TrainingProgram {
   name              String
   description       String?
   durationMonths    Int?
-  
-  // Added fields mapped to the flowchart requirements
-  certificationName String?  // Name of cert given by program
-  skills            String[] // Native Postgres array - highly efficient for mapping skills
-  
+
+  certificationName String?
+  skills            String[]
+
+  sector            String? // NEW — needed for skill-gap matching against job-market demand
+  skillCategory     String? // NEW
+
   enrollments       Enrollment[]
+  courseRatings     CourseRating[] // NEW
 
   @@map("training_programs")
 }
@@ -100,7 +304,8 @@ model Enrollment {
   enrolledAt        DateTime @default(now())
   completedAt       DateTime?
 
-  // Added fields to track trainee-level achievements from the popup
+  attendancePct     Float?   // NEW
+
   trainingNumber    String?
   batchNumber       String?
   enrollmentNumber  String?
@@ -111,10 +316,27 @@ model Enrollment {
   @@map("enrollments")
 }
 
-enum EnrollmentStatus {
-  ENROLLED
-  COMPLETED
-  DROPPED
+// =============================================================================
+// EMPLOYERS & OUTCOMES
+// =============================================================================
+
+// NEW — proper Employer entity so verification/validation can attach to a
+// real employer record instead of a free-text name, and so the same employer
+// resolves across multiple trainees' outcomes.
+model Employer {
+  id             String   @id @default(uuid())
+  name           String
+  sector         String?
+  registrationNo String?  @unique
+  isVerified     Boolean  @default(false)
+  contactPhone   String?
+
+  districtRef    District? @relation(fields: [districtId], references: [id])
+  districtId     String?
+
+  outcomes       EmploymentOutcome[]
+
+  @@map("employers")
 }
 
 model EmploymentOutcome {
@@ -122,32 +344,239 @@ model EmploymentOutcome {
   traineeId         String
   trainee           TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
   type              OutcomeType
-  employerName      String?
+
+  employerName       String?   // free-text, always available (self-reported)
+  employerRef        Employer? @relation(fields: [employerId], references: [id]) // NEW — verified link once matched
+  employerId         String?                                                     // NEW
+
   designation       String?
   monthlyWage       Float?
   retentionMonths   Int?
+
+  joiningDate       DateTime? // NEW
+  endDate           DateTime? // NEW
+
+  districtRef       District? @relation(fields: [districtId], references: [id]) // NEW
+  districtId        String?                                                     // NEW
+  trainingRelevance RelevanceLevel?  // NEW
+  status            PlacementStatus @default(ACTIVE) // NEW
+
+  // NEW — apprenticeship / self-employment specific government IDs
+  napsNumber           String? // National Apprenticeship Promotion Scheme ID — only for type = APPRENTICESHIP
+  udyamRegistrationNo  String? // Udyam registration — only for type = SELF_EMPLOYED
+  businessActivity     String? // for SELF_EMPLOYED
+  sustainability       SustainabilityStatus? // for SELF_EMPLOYED
+
+  // Kept for backward compatibility / quick free-text display.
+  // Structured, model-driven versions are AttritionRecord below.
   skillGapIdentified String?
   nonPlacementReason String?
+
   isVerified        Boolean  @default(false)
   reportedAt        DateTime @default(now())
+
+  wageRecords       WageRecord[]       // NEW
+  validations       Validation[]       // NEW
+  attritionRecords  AttritionRecord[]  // NEW
 
   @@map("employment_outcomes")
 }
 
-enum OutcomeType {
-  PLACED
-  SELF_EMPLOYED
-  APPRENTICESHIP
-  UNEMPLOYED
+// NEW — wage/retention progression over time, instead of a single snapshot value
+model WageRecord {
+  id           String   @id @default(uuid())
+  outcomeId    String
+  outcome      EmploymentOutcome @relation(fields: [outcomeId], references: [id], onDelete: Cascade)
+  recordedDate DateTime
+  salaryAmount Float
+  source       String   @default("self_reported") // self_reported | employer_verified | epfo_signal
+  createdAt    DateTime @default(now())
+
+  @@unique([outcomeId, recordedDate])
+  @@map("wage_records")
 }
 
-model FollowUp {
-  id                String   @id @default(uuid())
-  traineeId         String
-  trainee           TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
-  notes             String
-  conductedBy       String? 
-  createdAt         DateTime @default(now())
+// NEW — employer verification / confidence scoring layer
+model Validation {
+  id               String   @id @default(uuid())
+  outcomeId        String
+  outcome          EmploymentOutcome @relation(fields: [outcomeId], references: [id], onDelete: Cascade)
+  validationType   String   // employer_verification | document_evidence | consistency_check
+  status           ValidationStatus @default(UNVERIFIED)
+  confidenceScore  Float    @default(0)
+  evidenceUrl      String?
+  validatedById    String?
+  validatedBy      User?    @relation("ValidatedBy", fields: [validatedById], references: [id])
+  validatedAt      DateTime @default(now())
 
+  @@map("validations")
+}
+
+// NEW — structured non-placement / attrition reasoning (AI-classified or reported)
+model AttritionRecord {
+  id              String   @id @default(uuid())
+  outcomeId       String?
+  outcome         EmploymentOutcome? @relation(fields: [outcomeId], references: [id], onDelete: Cascade)
+  traineeId       String
+  trainee         TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  exitDate        DateTime?
+  reasonCode      AttritionReason
+  reasonSource    ReasonSource @default(AI_CLASSIFIED)
+  confidenceScore Float?
+  recordedAt      DateTime @default(now())
+
+  @@map("attrition_records")
+}
+
+// =============================================================================
+// REACHABILITY GRAPH + CONSENT
+// =============================================================================
+
+// NEW — alternate contacts so a stale trainee phone number doesn't kill outcome
+// tracking. Cascade order: SELF -> GUARDIAN -> LOCAL_ANCHOR.
+model Contact {
+  id              String   @id @default(uuid())
+  traineeId       String
+  trainee         TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  contactType     ContactType
+  name            String
+  phone           String
+  relationship    String?  // e.g. "mother", "SHG coordinator"
+  priorityOrder   Int      // 1 = first attempted
+  isActive        Boolean  @default(true)
+  lastVerifiedAt  DateTime?
+  createdAt       DateTime @default(now())
+
+  cascadeLogs     CascadeLog[]
+
+  @@unique([traineeId, priorityOrder])
+  @@map("contacts")
+}
+
+// NEW — versioned, revocable consent trail (DPDP-style), replacing a single boolean
+model ConsentRecord {
+  id             String   @id @default(uuid())
+  traineeId      String
+  trainee        TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  consentType    String   // data_sharing | employer_verification | follow_up_contact
+  consentVersion String   @default("v1")
+  grantedAt      DateTime @default(now())
+  revokedAt      DateTime?
+
+  @@map("consent_records")
+}
+
+// =============================================================================
+// FOLLOW-UPS
+// =============================================================================
+
+model FollowUp {
+  id            String   @id @default(uuid())
+  traineeId     String
+  trainee       TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+
+  stage         FollowUpStage   // NEW — replaces free-text-only follow-up
+  scheduledDate DateTime        // NEW
+  channelUsed   FollowUpChannel? // NEW
+  status        FollowUpStatus  @default(PENDING) // NEW
+  responseData  Json?           // NEW — {employmentStatus, salary, employer, relevance, jobChange, reason}
+  completedAt   DateTime?       // NEW
+
+  notes         String?  // kept — free-text notes from assisted calls
+  conductedBy   String?
+  createdAt     DateTime @default(now())
+
+  cascadeLogs   CascadeLog[] // NEW
+
+  @@unique([traineeId, stage])
   @@map("follow_ups")
+}
+
+// NEW — records every escalation attempt in the reachability cascade
+model CascadeLog {
+  id                String   @id @default(uuid())
+  followUpId        String
+  followUp          FollowUp @relation(fields: [followUpId], references: [id], onDelete: Cascade)
+  contactId         String
+  contact           Contact  @relation(fields: [contactId], references: [id])
+  attemptNumber     Int
+  cascadeStage      CascadeStage
+  attemptedAt       DateTime @default(now())
+  responseReceived  Boolean  @default(false)
+  responseAt        DateTime?
+
+  @@map("cascade_logs")
+}
+
+// =============================================================================
+// INTELLIGENCE / ACCOUNTABILITY LAYER
+// =============================================================================
+
+// NEW — explainable, component-level course rating (see the weighted formula
+// discussed earlier: placement + layoff-relative + relevance + wage progression)
+model CourseRating {
+  id                       String   @id @default(uuid())
+  programId                String
+  program                  TrainingProgram @relation(fields: [programId], references: [id], onDelete: Cascade)
+  ratingPeriodStart        DateTime
+  ratingPeriodEnd          DateTime
+  weightedPlacementScore   Float?
+  relativeLayoffScore      Float?
+  relevanceScore           Float?
+  wageProgressionScore     Float?
+  sampleSize               Int
+  confidenceDiscount       Float    @default(0)
+  finalScore               Float
+  calculatedAt             DateTime @default(now())
+
+  @@unique([programId, ratingPeriodStart, ratingPeriodEnd])
+  @@map("course_ratings")
+}
+
+// NEW — provider accountability: statistical anomaly flags, not just a leaderboard
+model ProviderAnomalyFlag {
+  id             String   @id @default(uuid())
+  providerId     String
+  provider       ProviderProfile @relation(fields: [providerId], references: [id], onDelete: Cascade)
+  flagType       AnomalyFlagType
+  zScore         Float?
+  detail         String?
+  status         FlagStatus @default(OPEN)
+  flaggedAt      DateTime @default(now())
+  reviewedById   String?
+  reviewedBy     User?    @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt     DateTime?
+
+  @@map("provider_anomaly_flags")
+}
+
+// NEW — curriculum-vs-market skill gap tracking
+model SkillGapReport {
+  id           String   @id @default(uuid())
+  sector       String
+  skillName    String
+  districtRef  District? @relation(fields: [districtId], references: [id])
+  districtId   String?
+  demandScore  Float?
+  supplyScore  Float?
+  // NOTE: Prisma's schema DSL has no native "STORED generated column" like
+  // Postgres GENERATED ALWAYS AS. Compute gapScore (demandScore - supplyScore)
+  // in the service layer when writing this row, rather than in the DB.
+  gapScore     Float?
+  generatedAt  DateTime @default(now())
+
+  @@map("skill_gap_reports")
+}
+
+// NEW — who changed what, for government audit requirements
+model AuditLog {
+  id           String   @id @default(uuid())
+  actorUserId  String?
+  actor        User?    @relation(fields: [actorUserId], references: [id])
+  action       String
+  entityType   String
+  entityId     String
+  occurredAt   DateTime @default(now())
+
+  @@map("audit_logs")
 }
