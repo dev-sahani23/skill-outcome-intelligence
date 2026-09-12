@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import 'dotenv/config';
-import { defineConfig } from 'prisma/config';
+import { defineConfig, env } from 'prisma/config';
 
 export default defineConfig({
   // earlyAccess: true,
@@ -8,5 +8,8 @@ export default defineConfig({
   migrations: {
     path: 'prisma/migrations',
   },
+  datasource: {
+    url: env('DATABASE_URL'),
+  }
 });
 
