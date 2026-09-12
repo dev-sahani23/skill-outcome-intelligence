@@ -3,17 +3,36 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useEffect, useState } from "react";
 import { auth } from "../../lib/auth";
-import { BookOpen, Briefcase, TrendingUp, User, Award, MapPin, X } from "lucide-react";
+import { Briefcase, TrendingUp, User, Award, MapPin, X } from "lucide-react";
 
 export default function TraineeDashboard() {
   const [user, setUser] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showEmploymentModal, setShowEmploymentModal] = useState(false);
+  const [employmentStatus, setEmploymentStatus] = useState("Pending");
+  const [statusUpdatedText, setStatusUpdatedText] = useState("Please update status");
+
+  const [enrolledCourses, setEnrolledCourses] = useState<any[]>([]);
+
+  // Employment Details Form State
+  const [showEmploymentDetailsModal, setShowEmploymentDetailsModal] = useState(false);
+  const [employmentOutcome, setEmploymentOutcome] = useState<any>(null);
+  const [empFormData, setEmpFormData] = useState({
+    consent: false,
+    basicDetails: "",
+    aadhaarNo: "",
+    UANNo: "",
+    companyName: "",
+    udhyamNo: "",
+    napsNo: ""
+  });
 
   // Popup form state
   const [formData, setFormData] = useState({
     trainingNumber: "",
     batchNumber: "",
     enrollmentNumber: "",
+    provider: "",
     isCertified: false,
     certificateId: "",
     skills: ""
@@ -31,12 +50,29 @@ export default function TraineeDashboard() {
     setIsSubmitting(true);
     try {
       await auth.recordTrainingDetails(formData);
+      setEnrolledCourses(prev => [...prev, formData]);
       setShowModal(false);
+      setFormData({
+        trainingNumber: "",
+        batchNumber: "",
+        enrollmentNumber: "",
+        provider: "",
+        isCertified: false,
+        certificateId: "",
+        skills: ""
+      });
     } catch (error) {
       console.error("Failed to submit details", error);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleEmpFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmploymentOutcome({ status: employmentStatus, ...empFormData });
+    setShowEmploymentDetailsModal(false);
+    setStatusUpdatedText("Status updated");
   };
 
   const fullName = user?.traineeProfile?.fullName || user?.email || "Trainee";
@@ -64,15 +100,16 @@ export default function TraineeDashboard() {
 
         {/* Profile Overview (Mock Stats) */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+
           <Card className="bg-slate-900 border-slate-800">
             <CardHeader className="pb-2">
               <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-indigo-400" /> Active Enrollments
+                <MapPin className="w-4 h-4 text-rose-400" /> Location
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-3xl font-bold text-white">1</div>
-              <p className="text-xs text-emerald-400 mt-1">+1 this month</p>
+              <div className="text-xl font-bold text-slate-200">{user?.traineeProfile?.district || "Not Set"}</div>
+              <p className="text-xs text-slate-500 mt-1">Registered District</p>
             </CardContent>
           </Card>
 
@@ -91,27 +128,60 @@ export default function TraineeDashboard() {
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900 border-slate-800">
+          <Card
+            className="bg-slate-900 border-slate-800 cursor-pointer hover:bg-slate-800 transition-colors shadow-lg shadow-indigo-900/10 group"
+            onClick={() => setShowEmploymentModal(true)}
+          >
             <CardHeader className="pb-2">
-              <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2">
+              <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2 group-hover:text-blue-300 transition-colors">
                 <Briefcase className="w-4 h-4 text-blue-400" /> Employment Status
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold text-slate-200">Pending</div>
-              <p className="text-xs text-amber-400 mt-1">Please update status</p>
+              <div className="text-xl font-bold text-slate-200">{employmentStatus}</div>
+              <p className={`text-xs mt-1 ${employmentStatus === "Pending" ? "text-amber-400" : "text-emerald-400"}`}>
+                {statusUpdatedText}
+              </p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900 border-slate-800">
+          <Card
+            className={`bg-slate-900 border-slate-800 ${employmentStatus !== 'Pending' && employmentStatus !== 'Unemployed' && !employmentOutcome ? 'cursor-pointer hover:bg-slate-800 transition-colors shadow-lg shadow-purple-900/10 group' : ''}`}
+            onClick={() => {
+              if (employmentStatus !== 'Pending' && employmentStatus !== 'Unemployed' && !employmentOutcome) {
+                setShowEmploymentDetailsModal(true);
+              }
+            }}
+          >
             <CardHeader className="pb-2">
-              <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-rose-400" /> Location
+              <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2 group-hover:text-purple-300 transition-colors">
+                <Briefcase className="w-4 h-4 text-purple-400" /> Employment Record
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-xl font-bold text-slate-200">{user?.traineeProfile?.district || "Not Set"}</div>
-              <p className="text-xs text-slate-500 mt-1">Registered District</p>
+              {employmentOutcome ? (
+                <>
+                  <div className="text-lg font-bold text-slate-200 truncate">
+                    {employmentOutcome.status === 'Employed' && `UAN: ${employmentOutcome.UANNo}`}
+                    {employmentOutcome.status === 'Self-Employed' && `${employmentOutcome.companyName}`}
+                    {employmentOutcome.status === 'Apprenticeship' && `NAPS: ${employmentOutcome.napsNo}`}
+                    {employmentOutcome.status === 'Unemployed' && "N/A"}
+                  </div>
+                  <p className="text-xs text-emerald-400 mt-1">Details matched</p>
+                </>
+              ) : employmentStatus !== 'Pending' ? (
+                <>
+                  <div className="text-xl font-bold text-slate-200">{employmentStatus}</div>
+                  <p className={`text-xs mt-1 ${employmentStatus === 'Unemployed' ? 'text-emerald-400' : 'text-amber-500'}`}>
+                    {employmentStatus === 'Unemployed' ? 'No specifics needed' : 'Click to add specifics'}
+                  </p>
+                </>
+              ) : (
+                <>
+                  <div className="text-xl font-bold text-slate-200">Pending</div>
+                  <p className="text-xs text-slate-500 mt-1">Awaiting specifics</p>
+                </>
+              )}
             </CardContent>
           </Card>
         </div>
@@ -123,17 +193,26 @@ export default function TraineeDashboard() {
               <CardTitle className="text-lg text-slate-200">Current Enrollments</CardTitle>
             </CardHeader>
             <CardContent className="pt-6">
-              <div className="p-4 border border-slate-800 rounded-lg mb-4 bg-slate-950/50 hover:bg-slate-800/80 transition-colors">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-semibold text-slate-200">Advanced Web Development</h3>
-                    <p className="text-sm text-slate-400 mt-1">Provider: Tech Academy</p>
+              {enrolledCourses.length > 0 ? (
+                enrolledCourses.map((course, idx) => (
+                  <div key={idx} className="p-4 border border-slate-800 rounded-lg mb-4 bg-slate-950/50 hover:bg-slate-800/80 transition-colors">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-semibold text-slate-200">{course.trainingNumber || "Advanced Web Development"}</h3>
+                        <p className="text-sm text-slate-400 mt-1">Provider: {course.provider || "N/A"}</p>
+                      </div>
+                      <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                        Enrolled
+                      </span>
+                    </div>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
-                    Enrolled
-                  </span>
+                ))
+              ) : (
+                <div className="text-center py-6 text-slate-400 mb-4 border border-dashed border-slate-700 rounded-lg bg-slate-900/50">
+                  <p>No active enrollments</p>
+                  <p className="text-xs mt-1">Complete Training Record Validation to see courses here.</p>
                 </div>
-              </div>
+              )}
               <Button className="w-full bg-slate-800 hover:bg-slate-700 text-white border border-slate-700">
                 Browse More Courses
               </Button>
@@ -150,7 +229,7 @@ export default function TraineeDashboard() {
                 <p className="text-sm text-slate-400 max-w-[280px]">
                   Help the government track skill impact by updating your latest employment outcome.
                 </p>
-                <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-900/20 transition-all border-none">
+                <Button className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-900/20 transition-all border-none" onClick={() => setShowEmploymentModal(true)}>
                   Report Employment / Wage Update
                 </Button>
               </div>
@@ -210,6 +289,17 @@ export default function TraineeDashboard() {
               </div>
 
               <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300">Provider</label>
+                <Input
+                  required
+                  placeholder="e.g. Tech Academy"
+                  value={formData.provider}
+                  onChange={e => setFormData({ ...formData, provider: e.target.value })}
+                  className="bg-slate-950 border-slate-800 text-white"
+                />
+              </div>
+
+              <div className="space-y-2">
                 <label className="text-sm font-medium text-slate-300">Acquired Skills (comma separated)</label>
                 <Input
                   placeholder="e.g. React, Node.js, Leadership"
@@ -253,6 +343,171 @@ export default function TraineeDashboard() {
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Saving..." : "Save Training Details"}
+              </Button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Employment Status Modal */}
+      {showEmploymentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setShowEmploymentModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-2xl font-bold text-white mb-2">Update Employment Status</h2>
+            <p className="text-sm text-slate-400 mb-6">
+              Please select your current employment status.
+            </p>
+
+            <div className="space-y-3">
+              {['Employed', 'Self-Employed', 'Apprenticeship', 'Unemployed'].map((status) => (
+                <button
+                  key={status}
+                  onClick={() => {
+                    setEmploymentStatus(status);
+                    setShowEmploymentModal(false);
+                    setStatusUpdatedText("Status updated");
+                    if (status === 'Unemployed') {
+                      setEmploymentOutcome({ status: 'Unemployed' });
+                    } else {
+                      setEmploymentOutcome(null);
+                      setEmpFormData({
+                        consent: false,
+                        basicDetails: "",
+                        aadhaarNo: "",
+                        UANNo: "",
+                        companyName: "",
+                        udhyamNo: "",
+                        napsNo: ""
+                      });
+                    }
+                  }}
+                  className="w-full text-left px-4 py-3 bg-slate-950 border border-slate-800 hover:border-indigo-500 hover:bg-slate-800/80 rounded-xl text-slate-200 transition-all font-medium"
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Specific Employment Details Form */}
+      {showEmploymentDetailsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl shadow-2xl p-6 relative animate-in fade-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setShowEmploymentDetailsModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h2 className="text-2xl font-bold text-white mb-2">{employmentStatus} Details</h2>
+            <p className="text-sm text-slate-400 mb-6">
+              Please enter your supplementary {employmentStatus.toLowerCase()} information.
+            </p>
+
+            <form onSubmit={handleEmpFormSubmit} className="space-y-4">
+
+              <div className="flex items-start gap-3 p-3 bg-slate-950/50 border border-slate-800 rounded-lg">
+                <input
+                  type="checkbox"
+                  id="consent"
+                  required
+                  checked={empFormData.consent}
+                  onChange={e => setEmpFormData({ ...empFormData, consent: e.target.checked })}
+                  className="w-4 h-4 mt-0.5 rounded border-slate-700 bg-slate-950 text-indigo-600 focus:ring-indigo-600 focus:ring-offset-slate-900"
+                />
+                <label htmlFor="consent" className="text-sm font-medium text-slate-300">
+                  I give my consent to store and process my employment information for tracking and verification purposes.
+                </label>
+              </div>
+
+              {employmentStatus === 'Employed' && (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">Basic Details (Role/Department)</label>
+                    <Input
+                      required
+                      placeholder="e.g. Software Engineer"
+                      value={empFormData.basicDetails}
+                      onChange={e => setEmpFormData({ ...empFormData, basicDetails: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-300">Aadhaar Number</label>
+                      <Input
+                        required
+                        placeholder="AAAA BBBB CCCC"
+                        value={empFormData.aadhaarNo}
+                        onChange={e => setEmpFormData({ ...empFormData, aadhaarNo: e.target.value })}
+                        className="bg-slate-950 border-slate-800 text-white"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-sm font-medium text-slate-300">UAN Number</label>
+                      <Input
+                        required
+                        placeholder="Enter UAN"
+                        value={empFormData.UANNo}
+                        onChange={e => setEmpFormData({ ...empFormData, UANNo: e.target.value })}
+                        className="bg-slate-950 border-slate-800 text-white"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {employmentStatus === 'Self-Employed' && (
+                <>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">Company Name</label>
+                    <Input
+                      required
+                      placeholder="e.g. Acme Corp"
+                      value={empFormData.companyName}
+                      onChange={e => setEmpFormData({ ...empFormData, companyName: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-slate-300">Udhyam Registration Number</label>
+                    <Input
+                      required
+                      placeholder="Enter Udhyam Reg No"
+                      value={empFormData.udhyamNo}
+                      onChange={e => setEmpFormData({ ...empFormData, udhyamNo: e.target.value })}
+                      className="bg-slate-950 border-slate-800 text-white"
+                    />
+                  </div>
+                </>
+              )}
+
+              {employmentStatus === 'Apprenticeship' && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-slate-300">NAPS Number</label>
+                  <Input
+                    required
+                    placeholder="Enter NAPS No"
+                    value={empFormData.napsNo}
+                    onChange={e => setEmpFormData({ ...empFormData, napsNo: e.target.value })}
+                    className="bg-slate-950 border-slate-800 text-white"
+                  />
+                </div>
+              )}
+
+              <Button
+                type="submit"
+                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white mt-6"
+              >
+                Save Details
               </Button>
             </form>
           </div>
