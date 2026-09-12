@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { env } from "../config/env";
 
 /**
  * Validates that the input is exactly 12 digits.
@@ -35,7 +36,7 @@ export const hashGovtId = (rawId: string): string => {
     throw new Error("Invalid government ID format");
   }
 
-  const pepper = process.env.GOVT_ID_HASH_PEPPER;
+  const pepper = env.GOVT_ID_HASH_PEPPER;
   if (!pepper) {
     throw new Error("Server configuration error");
   }

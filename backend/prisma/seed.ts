@@ -9,6 +9,9 @@ async function main() {
 
   // 1. Clean existing data (optional, but good for idempotency)
   await prisma.user.deleteMany();
+  await prisma.district.deleteMany();
+  await prisma.employer.deleteMany();
+  await prisma.skillGapReport.deleteMany();
 
   const defaultPassword = await hashPassword("password123");
 
