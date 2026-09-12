@@ -1,20 +1,13 @@
 import type { RegistrationFormProps } from "../../types/auth.types";
 import AuthLayout from "./components/AuthLayout";
-import { Input } from "../../components/ui/Input";
-import FormField from "../../components/ui/FormField";
 import { Button } from "../../components/ui/Button";
 
 const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    console.log("Organization registration submitted");
-  };
-
   const heroContent = (
     <div className="mb-8 lg:mb-12">
       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-6 sm:mb-8">
         <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-[pulse_2s_ease-in-out_infinite]"></span>
-        Personalized onboarding
+        Government / Admin Access
       </div>
 
       <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4 sm:mb-6">
@@ -28,8 +21,7 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
       </h1>
 
       <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl">
-        Fill in your details to create the right account and start using the
-        platform for tracking outcomes and impact.
+        Government admin accounts are provisioned internally by the platform administrators to ensure security and compliance.
       </p>
     </div>
   );
@@ -61,91 +53,64 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
         </span>
 
         <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">
-          Create organization account
+          Government Admin Access
         </h2>
-        <p className="text-slate-400 text-sm mb-6 sm:mb-8">
+        <p className="text-slate-400 text-sm mb-8">
           Set up your organization dashboard and governance controls.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-6 sm:mb-8">
-          <FormField
-            label="Organization name"
-            htmlFor="org-name"
-            fullWidth
-          >
-            <Input
-              id="org-name"
-              type="text"
-              placeholder="Enter organization name"
-            />
-          </FormField>
+      {/* Provisioning Notice */}
+      <div className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+        <div className="p-6 rounded-2xl bg-indigo-500/5 border border-indigo-500/20 space-y-4">
+          {/* Shield icon */}
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-indigo-500/10">
+              <svg className="w-6 h-6 text-indigo-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+                <path d="M12 2l8 4v6c0 5.25-3.5 10-8 11-4.5-1-8-5.75-8-11V6l8-4z" />
+                <path d="M9 12l2 2 4-4" />
+              </svg>
+            </div>
+            <p className="text-white font-semibold text-base">Secure Provisioning Required</p>
+          </div>
 
-          <FormField label="Admin name" htmlFor="org-admin">
-            <Input
-              id="org-admin"
-              type="text"
-              placeholder="Name of admin"
-            />
-          </FormField>
+          <p className="text-slate-300 text-sm leading-relaxed">
+            Government Admin accounts are <strong className="text-white">not self-registered</strong>. They are created and verified internally by platform administrators to maintain data integrity and prevent unauthorized access to sensitive skilling intelligence data.
+          </p>
 
-          <FormField label="Department" htmlFor="org-dept">
-            <Input
-              id="org-dept"
-              type="text"
-              placeholder="e.g. Skill Development"
-            />
-          </FormField>
+          <div className="space-y-2 text-sm text-slate-400">
+            <p className="font-medium text-slate-300">To request access:</p>
+            <ol className="list-decimal list-inside space-y-1 ml-1">
+              <li>Contact your departmental IT administrator</li>
+              <li>Request onboarding to the SkillTrack platform</li>
+              <li>Your credentials will be provisioned and shared securely</li>
+            </ol>
+          </div>
 
-          <FormField
-            label="Official email"
-            htmlFor="org-email"
-            fullWidth
-          >
-            <Input
-              id="org-email"
-              type="email"
-              placeholder="admin@organization.gov.in"
-            />
-          </FormField>
-
-          <FormField
-            label="Organization website"
-            htmlFor="org-website"
-            fullWidth
-          >
-            <Input
-              id="org-website"
-              type="text"
-              placeholder="https://your-organization.org"
-            />
-          </FormField>
-
-          <FormField label="Password" htmlFor="org-password">
-            <Input
-              id="org-password"
-              type="password"
-              placeholder="Create a password"
-            />
-          </FormField>
-
-          <FormField
-            label="Confirm password"
-            htmlFor="org-confirm-password"
-          >
-            <Input
-              id="org-confirm-password"
-              type="password"
-              placeholder="Repeat your password"
-            />
-          </FormField>
+          <div className="pt-2">
+            <a
+              href="mailto:admin@skilltrack.gov.in"
+              className="inline-flex items-center gap-2 text-sm text-indigo-400 hover:text-indigo-300 transition-colors font-medium"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <rect x="3" y="5" width="18" height="14" rx="2" />
+                <path d="M3 7l9 6 9-6" />
+              </svg>
+              admin@skilltrack.gov.in
+            </a>
+          </div>
         </div>
 
-        <Button type="submit" fullWidth>
-          <span>Create organization account</span>
+        <Button
+          type="button"
+          variant="secondary"
+          fullWidth
+          className="mt-6 text-sm"
+          onClick={onBack}
+        >
+          Back to login
         </Button>
-      </form>
+      </div>
     </AuthLayout>
   );
 };

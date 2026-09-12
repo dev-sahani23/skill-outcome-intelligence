@@ -1,31 +1,73 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { X, BookOpen, Users, TrendingUp } from "lucide-react";
+import { auth } from "../../lib/auth";
 
 export default function ProviderDashboard() {
   const [showModal, setShowModal] = useState(false);
   const [showManageCourses, setShowManageCourses] = useState(false);
   const [courses, setCourses] = useState<any[]>([]);
+  const [enrollments, setEnrollments] = useState<any[]>([]);
+  const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+  const [isLoadingEnrollments, setIsLoadingEnrollments] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
+  const [createError, setCreateError] = useState("");
 
-  const mockEnrollments = [
-    { trainee: "John Doe", course: "Advanced Data Science", date: "2026-09-12", status: "Enrolled" },
-    { trainee: "Sarah Smith", course: "Frontend Web Development", date: "2026-09-11", status: "Completed" },
-    { trainee: "Rahul Sharma", course: "Advanced Data Science", date: "2026-09-10", status: "In Progress" },
-  ];
   const [formData, setFormData] = useState({
     name: "",
-    id: "",
-    batches: ""
+    description: "",
+    durationMonths: "",
+    sector: "",
   });
 
-  const handleCreateCourse = (e: React.FormEvent) => {
+  // Load provider's courses from the DB
+  useEffect(() => {
+    auth.getMyCourses()
+      .then((data: any) => {
+        setCourses(Array.isArray(data) ? data : []);
+      })
+      .catch(console.error)
+      .finally(() => setIsLoadingCourses(false));
+  }, []);
+
+  // Load enrollments for this provider's courses
+  useEffect(() => {
+    auth.getProviderEnrollments()
+      .then((data: any) => {
+        setEnrollments(data?.enrollments ?? []);
+      })
+      .catch(console.error)
+      .finally(() => setIsLoadingEnrollments(false));
+  }, []);
+
+  const handleCreateCourse = async (e: React.FormEvent) => {
     e.preventDefault();
-    setCourses([...courses, formData]);
-    setShowModal(false);
-    setFormData({ name: "", id: "", batches: "" });
+    setIsCreating(true);
+    setCreateError("");
+    try {
+      const newCourse = await auth.createCourse({
+        name: formData.name,
+        description: formData.description || undefined,
+        durationMonths: formData.durationMonths ? parseInt(formData.durationMonths) : undefined,
+        sector: formData.sector || undefined,
+      });
+      setCourses(prev => [newCourse, ...prev]);
+      setShowModal(false);
+      setFormData({ name: "", description: "", durationMonths: "", sector: "" });
+    } catch (err: any) {
+      setCreateError(err.message || "Failed to create course");
+    } finally {
+      setIsCreating(false);
+    }
   };
+
+  // Count of placed trainees across this provider's enrollments
+  const completedCount = enrollments.filter(e => e.status === "COMPLETED").length;
+  const placementRate = enrollments.length > 0
+    ? Math.round((completedCount / enrollments.length) * 100)
+    : 0;
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 md:p-8 space-y-8 text-slate-100 relative">
@@ -45,29 +87,41 @@ export default function ProviderDashboard() {
           onClick={() => setShowManageCourses(true)}
         >
           <CardHeader className="pb-2">
-            <CardTitle className="text-slate-400 text-sm font-medium group-hover:text-indigo-400 transition-colors">Active Courses</CardTitle>
+            <CardTitle className="text-slate-400 text-sm font-medium group-hover:text-indigo-400 transition-colors flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-indigo-400" /> Active Courses
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white">{courses.length}</div>
+            <div className="text-3xl font-bold text-white">
+              {isLoadingCourses ? "—" : courses.length}
+            </div>
             <p className="text-xs text-indigo-400 mt-1">Click to manage courses</p>
           </CardContent>
         </Card>
 
         <Card className="bg-slate-900 border-slate-800">
           <CardHeader className="pb-2">
-            <CardTitle className="text-slate-400 text-sm font-medium">Total Trainees</CardTitle>
+            <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2">
+              <Users className="w-4 h-4 text-blue-400" /> Total Trainees
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white">{mockEnrollments.length}</div>
+            <div className="text-3xl font-bold text-white">
+              {isLoadingEnrollments ? "—" : enrollments.length}
+            </div>
           </CardContent>
         </Card>
 
         <Card className="bg-slate-900 border-slate-800">
           <CardHeader className="pb-2">
-            <CardTitle className="text-slate-400 text-sm font-medium">Avg Placement Rate</CardTitle>
+            <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2">
+              <TrendingUp className="w-4 h-4 text-emerald-400" /> Completion Rate
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-400">0%</div>
+            <div className="text-3xl font-bold text-blue-400">
+              {isLoadingEnrollments ? "—" : `${placementRate}%`}
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -78,22 +132,39 @@ export default function ProviderDashboard() {
             <CardTitle className="text-lg text-slate-200">Recent Trainee Enrollments</CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
-            <div className="space-y-4">
-              {mockEnrollments.map((enrollment, idx) => (
-                <div key={idx} className="flex justify-between items-start p-4 border border-slate-800 rounded-lg mb-4 bg-slate-950/50 hover:bg-slate-800/80 transition-colors">
-                  <div>
-                    <h3 className="font-semibold text-slate-200">{enrollment.trainee}</h3>
-                    <p className="text-sm text-slate-400 mt-1">Course: {enrollment.course} • Date: {enrollment.date}</p>
-                  </div>
-                  <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${enrollment.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' :
-                    enrollment.status === 'In Progress' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' :
-                      'bg-purple-500/10 text-purple-400 border border-purple-500/20'
+            {isLoadingEnrollments ? (
+              <div className="text-center py-6 text-slate-500">Loading enrollments...</div>
+            ) : enrollments.length === 0 ? (
+              <div className="text-center py-6 text-slate-400 border border-dashed border-slate-700 rounded-lg bg-slate-900/50">
+                <p>No trainees enrolled yet.</p>
+                <p className="text-xs mt-1">Trainees who submit training records will appear here.</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {enrollments.slice(0, 10).map((enrollment: any, idx: number) => (
+                  <div key={idx} className="flex justify-between items-start p-4 border border-slate-800 rounded-lg mb-4 bg-slate-950/50 hover:bg-slate-800/80 transition-colors">
+                    <div>
+                      <h3 className="font-semibold text-slate-200">
+                        {enrollment.trainee?.fullName || enrollment.trainee?.user?.email || "Unknown"}
+                      </h3>
+                      <p className="text-sm text-slate-400 mt-1">
+                        Course: {enrollment.program?.name || "—"} •{" "}
+                        {new Date(enrollment.enrolledAt).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      enrollment.status === 'COMPLETED'
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : enrollment.status === 'IN_PROGRESS'
+                        ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
+                        : 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
                     }`}>
-                    {enrollment.status}
-                  </span>
-                </div>
-              ))}
-            </div>
+                      {enrollment.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -113,9 +184,15 @@ export default function ProviderDashboard() {
               Enter the configuration details for your new training program.
             </p>
 
+            {createError && (
+              <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+                {createError}
+              </div>
+            )}
+
             <form onSubmit={handleCreateCourse} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-slate-300">Training Name</label>
+                <label className="text-sm font-medium text-slate-300">Training Name *</label>
                 <Input
                   required
                   placeholder="e.g. Advanced Data Science"
@@ -125,26 +202,34 @@ export default function ProviderDashboard() {
                 />
               </div>
 
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-slate-300">Description</label>
+                <Input
+                  placeholder="Brief description of the program"
+                  value={formData.description}
+                  onChange={e => setFormData({ ...formData, description: e.target.value })}
+                  className="bg-slate-950 border-slate-800 text-white"
+                />
+              </div>
+
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-300">Training ID</label>
+                  <label className="text-sm font-medium text-slate-300">Duration (months)</label>
                   <Input
-                    required
-                    placeholder="e.g. DS-405"
-                    value={formData.id}
-                    onChange={e => setFormData({ ...formData, id: e.target.value })}
+                    type="number"
+                    min="1"
+                    placeholder="e.g. 6"
+                    value={formData.durationMonths}
+                    onChange={e => setFormData({ ...formData, durationMonths: e.target.value })}
                     className="bg-slate-950 border-slate-800 text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-slate-300">Total Batches</label>
+                  <label className="text-sm font-medium text-slate-300">Sector</label>
                   <Input
-                    required
-                    type="number"
-                    min="1"
-                    placeholder="e.g. 3"
-                    value={formData.batches}
-                    onChange={e => setFormData({ ...formData, batches: e.target.value })}
+                    placeholder="e.g. IT, Healthcare"
+                    value={formData.sector}
+                    onChange={e => setFormData({ ...formData, sector: e.target.value })}
                     className="bg-slate-950 border-slate-800 text-white"
                   />
                 </div>
@@ -153,8 +238,9 @@ export default function ProviderDashboard() {
               <Button
                 type="submit"
                 className="w-full bg-indigo-600 hover:bg-indigo-700 text-white mt-6 border-none"
+                disabled={isCreating}
               >
-                Create Course
+                {isCreating ? "Creating..." : "Create Course"}
               </Button>
             </form>
           </div>
@@ -177,13 +263,18 @@ export default function ProviderDashboard() {
             </p>
 
             <div className="overflow-y-auto pr-2 flex-grow">
-              {courses.length > 0 ? (
+              {isLoadingCourses ? (
+                <div className="text-center py-8 text-slate-500">Loading courses...</div>
+              ) : courses.length > 0 ? (
                 <div className="space-y-4">
-                  {courses.map((course, idx) => (
+                  {courses.map((course: any, idx: number) => (
                     <div key={idx} className="flex justify-between items-center p-4 border border-slate-800 rounded-lg bg-slate-950/50 hover:bg-slate-800/80 transition-colors">
                       <div>
                         <h3 className="font-semibold text-slate-200">{course.name}</h3>
-                        <p className="text-sm text-slate-400 mt-1">ID: {course.id} • Batches: {course.batches}</p>
+                        <p className="text-sm text-slate-400 mt-1">
+                          {course.sector ? `Sector: ${course.sector} • ` : ""}
+                          {course.durationMonths ? `${course.durationMonths} months` : "Duration not set"}
+                        </p>
                       </div>
                       <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         Active

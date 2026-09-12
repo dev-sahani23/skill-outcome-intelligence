@@ -1,15 +1,36 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useEffect, useState } from "react";
+import { auth } from "../../lib/auth";
 
-const placementData = [
-  { name: "Pune", Placed: 1200 },
-  { name: "Mumbai", Placed: 3000 },
-  { name: "Nagpur", Placed: 800 },
-  { name: "Nashik", Placed: 400 },
+const FALLBACK_PLACEMENT_DATA = [
+  { name: "Pune", Placed: 0 },
+  { name: "Mumbai", Placed: 0 },
+  { name: "Nagpur", Placed: 0 },
+  { name: "Nashik", Placed: 0 },
 ];
 
 export default function OrgDashboard() {
+  const [stats, setStats] = useState<{
+    totalEnrolled: number;
+    placementRate: number;
+    avgWage: number;
+    districtPlacements: { name: string; Placed: number }[];
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    auth.getAdminStats()
+      .then((data: any) => setStats(data))
+      .catch(console.error)
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  const placementData = stats?.districtPlacements?.length
+    ? stats.districtPlacements
+    : FALLBACK_PLACEMENT_DATA;
+
   return (
     <div className="min-h-screen bg-slate-950 p-6 md:p-8 space-y-8 text-slate-100 relative">
       <div className="flex flex-col md:flex-row justify-between md:items-center bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl gap-4">
@@ -26,14 +47,18 @@ export default function OrgDashboard() {
             <CardTitle className="text-slate-200">District-wise Placements</CardTitle>
           </CardHeader>
           <CardContent className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={placementData}>
-                <XAxis dataKey="name" stroke="#94a3b8" />
-                <YAxis stroke="#94a3b8" />
-                <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", color: "#f1f5f9" }} />
-                <Bar dataKey="Placed" fill="#818cf8" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full text-slate-500">Loading chart...</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={placementData}>
+                  <XAxis dataKey="name" stroke="#94a3b8" />
+                  <YAxis stroke="#94a3b8" />
+                  <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", color: "#f1f5f9" }} />
+                  <Bar dataKey="Placed" fill="#818cf8" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            )}
           </CardContent>
         </Card>
 
@@ -62,16 +87,34 @@ export default function OrgDashboard() {
       {/* Key Metrics */}
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="bg-slate-900 border-slate-800 shadow-lg">
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-slate-400">Total Enrolled</CardTitle></CardHeader>
-          <CardContent><div className="text-3xl font-bold text-white">12,345</div></CardContent>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">Total Enrolled</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-white">
+              {isLoading ? "—" : stats?.totalEnrolled?.toLocaleString() ?? "0"}
+            </div>
+          </CardContent>
         </Card>
         <Card className="bg-slate-900 border-slate-800 shadow-lg">
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-slate-400">Placement Rate</CardTitle></CardHeader>
-          <CardContent><div className="text-3xl font-bold text-white">68%</div></CardContent>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">Placement Rate</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-white">
+              {isLoading ? "—" : `${stats?.placementRate ?? 0}%`}
+            </div>
+          </CardContent>
         </Card>
         <Card className="bg-slate-900 border-slate-800 shadow-lg">
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-medium text-slate-400">Avg Wage Progression</CardTitle></CardHeader>
-          <CardContent><div className="text-3xl font-bold text-emerald-400">+15%</div></CardContent>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-slate-400">Avg Monthly Wage</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-emerald-400">
+              {isLoading ? "—" : stats?.avgWage ? `₹${stats.avgWage.toLocaleString()}` : "N/A"}
+            </div>
+          </CardContent>
         </Card>
       </div>
     </div>

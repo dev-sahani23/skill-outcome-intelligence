@@ -13,12 +13,10 @@ const request = async (endpoint: string, options: RequestOptions = {}) => {
   
   const headers = new Headers(options.headers || {});
   
-  // Set default content type for JSON bodies
   if (options.data && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
 
-  // Attach auth token if available
   const token = getAuthToken();
   if (token && !headers.has("Authorization")) {
     headers.set("Authorization", `Bearer ${token}`);
@@ -33,12 +31,10 @@ const request = async (endpoint: string, options: RequestOptions = {}) => {
     config.body = JSON.stringify(options.data);
   }
   
-  // To send cookies for refresh token, etc.
   config.credentials = "include";
 
   const response = await fetch(url, config);
   
-  // For 204 No Content
   if (response.status === 204) {
     return null;
   }
@@ -61,6 +57,9 @@ export const api = {
     
   put: (endpoint: string, data?: any, options?: Omit<RequestOptions, "method" | "data">) => 
     request(endpoint, { ...options, method: "PUT", data }),
+
+  patch: (endpoint: string, data?: any, options?: Omit<RequestOptions, "method" | "data">) => 
+    request(endpoint, { ...options, method: "PATCH", data }),
     
   delete: (endpoint: string, options?: Omit<RequestOptions, "method" | "data">) => 
     request(endpoint, { ...options, method: "DELETE" }),

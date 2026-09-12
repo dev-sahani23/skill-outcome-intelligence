@@ -6,7 +6,10 @@ import { createCourseSchema } from "./course.schema";
 
 const router = Router();
 
-router.get("/", courseController.getAll);
+// Public - any authenticated user can browse courses
+router.get("/", requireAuth, courseController.getAll);
+
+// Provider-specific
 router.get("/my-courses", requireAuth, requireRole(["PROVIDER"]), courseController.getMyCourses);
 router.post("/", requireAuth, requireRole(["PROVIDER"]), validateRequest(createCourseSchema), courseController.create);
 

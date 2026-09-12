@@ -1,5 +1,5 @@
 import { api, setAuthToken, removeAuthToken } from "./api";
-// Define basic types locally to avoid cross-project import issues
+
 export type LoginInput = any;
 export type RegisterInput = any;
 
@@ -29,7 +29,50 @@ export const auth = {
     return api.get("/auth/me");
   },
 
+  // ─── Training & Enrollments ───────────────────────────────────────────────
   recordTrainingDetails: async (data: any) => {
     return api.post("/enrollments/record-details", data);
+  },
+
+  getMyEnrollments: async () => {
+    return api.get("/enrollments/my-enrollments");
+  },
+
+  getProviderEnrollments: async () => {
+    return api.get("/enrollments/provider-enrollments");
+  },
+
+  // ─── Courses ─────────────────────────────────────────────────────────────
+  getMyCourses: async () => {
+    return api.get("/courses/my-courses");
+  },
+
+  createCourse: async (data: { name: string; description?: string; durationMonths?: number; sector?: string }) => {
+    return api.post("/courses", data);
+  },
+
+  // ─── Employment Outcomes ─────────────────────────────────────────────────
+  reportOutcome: async (data: {
+    type: string;
+    employerName?: string;
+    designation?: string;
+    monthlyWage?: number;
+    aadhaarNo?: string;
+    uanNumber?: string;
+    napsNumber?: string;
+    udyamRegistrationNo?: string;
+    businessActivity?: string;
+    nonPlacementReason?: string;
+  }) => {
+    return api.post("/outcomes", data);
+  },
+
+  getMyOutcomes: async () => {
+    return api.get("/outcomes/my-outcomes");
+  },
+
+  // ─── Admin ───────────────────────────────────────────────────────────────
+  getAdminStats: async () => {
+    return api.get("/admin/stats");
   },
 };

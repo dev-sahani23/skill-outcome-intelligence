@@ -10,12 +10,25 @@ export const createOutcome = async (userId: string, input: CreateOutcomeInput) =
     throw { statusCode: 404, message: "Trainee profile not found" };
   }
 
-  return prisma.employmentOutcome.create({
+  // Pull out non-DB fields before spreading into the Prisma create call
+  const { aadhaarNo, uanNumber, ...outcomeData } = input;
+
+  const outcome = await prisma.employmentOutcome.create({
     data: {
       traineeId: trainee.id,
-      ...input,
+      ...outcomeData,
     },
   });
+
+  // Persist UAN on the trainee's profile (permanent, person-level identifier)
+  if (uanNumber) {
+    await prisma.traineeProfile.update({
+      where: { id: trainee.id },
+      data: { uanNumber },
+    });
+  }
+
+  return outcome;
 };
 
 export const getMyOutcomes = async (userId: string) => {

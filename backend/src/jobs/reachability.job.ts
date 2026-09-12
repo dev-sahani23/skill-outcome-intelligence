@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma";
+import type { Contact } from "@prisma/client";
 
 const CASCADE_DELAY_DAYS = 5;
 
@@ -58,7 +59,7 @@ export const runReachabilityCascade = async () => {
       
       const lastCascade = followUp.cascadeLogs[0];
       if (lastCascade) {
-        const lastContactIndex = contacts.findIndex(c => c.id === lastCascade.contactId);
+        const lastContactIndex = contacts.findIndex((c: Contact) => c.id === lastCascade.contactId);
         if (lastContactIndex !== -1 && lastContactIndex + 1 < contacts.length) {
           nextContact = contacts[lastContactIndex + 1];
           attemptNumber = lastCascade.attemptNumber + 1;
