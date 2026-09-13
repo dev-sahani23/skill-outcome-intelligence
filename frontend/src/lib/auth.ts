@@ -29,6 +29,18 @@ export const auth = {
     return api.get("/auth/me");
   },
 
+  sendOtp: async (data: { email: string }) => {
+    return api.post("/auth/forgot-password/send-otp", data);
+  },
+
+  verifyOtp: async (data: { email: string; otp: string }) => {
+    return api.post("/auth/forgot-password/verify-otp", data);
+  },
+
+  resetPassword: async (data: { resetToken: string; newPassword: string }) => {
+    return api.post("/auth/forgot-password/reset-password", data);
+  },
+
   // ─── Training & Enrollments ───────────────────────────────────────────────
   recordTrainingDetails: async (data: any) => {
     return api.post("/enrollments/record-details", data);

@@ -42,7 +42,20 @@ const request = async (endpoint: string, options: RequestOptions = {}) => {
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data.message || data.error || "An error occurred");
+    const error: any = new Error(data.message || data.error || "An error occurred");
+    error.status = response.status;
+    error.data = data;
+    error.code = data.code;
+    
+    // Global interceptor for mandatory password change
+    if (error.code === "PASSWORD_CHANGE_REQUIRED") {
+      // Don't redirect if we're already on the change-password page
+      if (window.location.pathname !== "/change-password") {
+        window.location.href = "/change-password";
+      }
+    }
+    
+    throw error;
   }
 
   return data;
