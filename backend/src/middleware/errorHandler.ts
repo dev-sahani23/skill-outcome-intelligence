@@ -8,8 +8,15 @@ export const errorHandler = (
 ) => {
   console.error(err);
   
-  const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal server error";
+  let statusCode = err.statusCode || 500;
+  let message = err.message || "Internal server error";
+
+  // Handle Prisma unique constraint violations
+  if (err.code === "P2002") {
+    statusCode = 400;
+    const target = err.meta?.target || "field";
+    message = `Unique constraint failed on the ${target}. This record already exists.`;
+  }
   
   res.status(statusCode).json({ error: message });
 };
