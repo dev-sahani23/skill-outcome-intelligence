@@ -37,6 +37,21 @@ app.get("/health", (req, res) => {
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
+// Enforce production security check for Mock SMS and Twilio configs
+if (process.env.NODE_ENV === "production") {
+  if (process.env.MOCK_EMAIL === "true") {
+    console.error("CRITICAL ERROR: Refusing to boot. MOCK_EMAIL is set to true in a production environment!");
+    process.exit(1);
+  }
+
+  const required = ["GMAIL_USER", "GMAIL_APP_PASSWORD"];
+  const missing = required.filter(k => !process.env[k]);
+  if (missing.length) {
+    console.error(`CRITICAL ERROR: Refusing to boot. Missing env vars: ${missing.join(", ")}`);
+    process.exit(1);
+  }
+}
+
 app.listen(env.PORT, () => {
   console.log(`Server is running on port http://localhost:${env.PORT}`);
 });

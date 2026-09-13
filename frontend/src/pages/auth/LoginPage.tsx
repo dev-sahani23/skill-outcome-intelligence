@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react";
+import { useState, useEffect, type FormEvent } from "react";
 import AuthLayout from "./components/AuthLayout";
 import AuthBranding from "./components/AuthBranding";
 import { Input } from "../../components/ui/Input";
@@ -134,13 +134,26 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [forgotPasswordOpen, setForgotPasswordOpen] = useState<boolean>(false);
-  const [forgotPasswordStep, setForgotPasswordStep] = useState<"phone" | "otp" | "success">("phone");
-  const [forgotPasswordPhone, setForgotPasswordPhone] = useState<string>("");
+  const [forgotPasswordStep, setForgotPasswordStep] = useState<"email" | "otp" | "reset" | "success">("email");
+  const [forgotPasswordEmail, setForgotPasswordEmail] = useState<string>("");
+  const [otpTargetEmail, setOtpTargetEmail] = useState<string>("");
   const [forgotPasswordOtp, setForgotPasswordOtp] = useState<string>("");
   const [forgotPasswordError, setForgotPasswordError] = useState<string>("");
   const [forgotPasswordLoading, setForgotPasswordLoading] = useState<boolean>(false);
+  const [resendCooldown, setResendCooldown] = useState<number>(0);
+  const [resetToken, setResetToken] = useState<string>("");
+  const [newPassword, setNewPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    if (resendCooldown > 0) {
+      timer = setTimeout(() => setResendCooldown((prev) => prev - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
 
   const handleLoginWithCredentials = async (loginEmail: string, loginPass: string) => {
     setError("");
@@ -164,41 +177,104 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
     await handleLoginWithCredentials(email, password);
   };
 
-  const handleSendOtp = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSendOtp = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setForgotPasswordError("");
-    if (!forgotPasswordPhone) {
-      setForgotPasswordError("Please enter your phone number");
+    
+    const targetEmail = forgotPasswordStep === "otp" && otpTargetEmail ? otpTargetEmail : forgotPasswordEmail.trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(targetEmail)) {
+      setForgotPasswordError("Please enter a valid email address");
       return;
     }
+    
     setForgotPasswordLoading(true);
-    setTimeout(() => {
-      setForgotPasswordLoading(false);
+    try {
+      await auth.sendOtp({ email: targetEmail });
+      setOtpTargetEmail(targetEmail);
       setForgotPasswordStep("otp");
-    }, 1000);
+      setResendCooldown(30);
+    } catch (err: any) {
+      if (!err.status && err.message === "Failed to fetch") {
+        setForgotPasswordError("Couldn't reach the server, check your connection");
+      } else if (err.status === 429) {
+        if (err.message.includes("15 minutes")) {
+           setForgotPasswordError("Too many OTP requests from this email address, please try again after 15 minutes");
+        } else {
+           setForgotPasswordError(err.message || "Please wait before requesting another OTP");
+        }
+      } else {
+        setForgotPasswordError(err.message || "Failed to send OTP. Please try again.");
+      }
+    } finally {
+      setForgotPasswordLoading(false);
+    }
   };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setForgotPasswordError("");
-    if (!forgotPasswordOtp) {
-      setForgotPasswordError("Please enter the OTP");
+    
+    const cleanOtp = forgotPasswordOtp.trim();
+    if (!/^\d{6}$/.test(cleanOtp)) {
+      setForgotPasswordError("OTP must be exactly 6 digits");
       return;
     }
+    
     setForgotPasswordLoading(true);
-    setTimeout(() => {
+    try {
+      const result = await auth.verifyOtp({ email: otpTargetEmail, otp: cleanOtp });
+      setResetToken(result.resetToken);
+      setForgotPasswordStep("reset");
+    } catch (err: any) {
+      if (!err.status && err.message === "Failed to fetch") {
+        setForgotPasswordError("Couldn't reach the server, check your connection");
+      } else if (err.code === "OTP_ATTEMPTS_EXCEEDED") {
+        setForgotPasswordStep("email");
+        setForgotPasswordOtp("");
+        setForgotPasswordError("Too many failed attempts. Please request a new OTP.");
+      } else {
+        setForgotPasswordError(err.message || "Invalid OTP. Please try again.");
+      }
+    } finally {
       setForgotPasswordLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotPasswordError("");
+
+    if (newPassword.length < 6) {
+      setForgotPasswordError("Password must be at least 6 characters");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setForgotPasswordError("Passwords do not match");
+      return;
+    }
+
+    setForgotPasswordLoading(true);
+    try {
+      await auth.resetPassword({ resetToken, newPassword });
       setForgotPasswordStep("success");
-    }, 1000);
+    } catch (err: any) {
+      setForgotPasswordError(err.message || "Failed to reset password. The link may have expired.");
+    } finally {
+      setForgotPasswordLoading(false);
+    }
   };
 
   const handleCloseForgotPassword = () => {
     setForgotPasswordOpen(false);
     setTimeout(() => {
-      setForgotPasswordStep("phone");
-      setForgotPasswordPhone("");
+      setForgotPasswordStep("email");
+      setForgotPasswordEmail("");
+      setOtpTargetEmail("");
       setForgotPasswordOtp("");
       setForgotPasswordError("");
+      setResetToken("");
+      setNewPassword("");
+      setConfirmPassword("");
     }, 300);
   };
 
@@ -288,9 +364,10 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           {XIcon}
         </button>
         <h3 className="text-xl font-semibold text-white mb-2">
-          {forgotPasswordStep === "phone" && "Forgot Password"}
+          {forgotPasswordStep === "email" && "Forgot Password"}
           {forgotPasswordStep === "otp" && "Verify OTP"}
-          {forgotPasswordStep === "success" && "Success!"}
+          {forgotPasswordStep === "reset" && "Set New Password"}
+          {forgotPasswordStep === "success" && "Password Reset!"}
         </h3>
         {forgotPasswordError && (
           <div className="mb-4 text-sm text-red-400 p-3 bg-red-500/10 rounded border border-red-500/20">
@@ -298,18 +375,18 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           </div>
         )}
 
-        {forgotPasswordStep === "phone" && (
+        {forgotPasswordStep === "email" && (
           <form onSubmit={handleSendOtp}>
             <p className="text-slate-400 text-sm mb-5">
-              Enter your phone number to receive a temporary OTP to reset your password.
+              Enter your email address to receive a temporary OTP to reset your password.
             </p>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-300 mb-2">Phone Number</label>
+              <label className="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
               <Input
-                type="tel"
-                placeholder="e.g. 9876543210"
-                value={forgotPasswordPhone}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForgotPasswordPhone(e.target.value)}
+                type="email"
+                placeholder="e.g. name@example.com"
+                value={forgotPasswordEmail}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForgotPasswordEmail(e.target.value)}
               />
             </div>
             <Button type="submit" fullWidth disabled={forgotPasswordLoading}>
@@ -321,13 +398,14 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         {forgotPasswordStep === "otp" && (
           <form onSubmit={handleVerifyOtp}>
             <p className="text-slate-400 text-sm mb-5">
-              We have sent an OTP to <strong className="text-white">{forgotPasswordPhone}</strong>. Enter it below.
+              We have sent an OTP to <strong className="text-white">{otpTargetEmail}</strong>. Enter it below.
             </p>
             <div className="mb-6">
               <label className="block text-sm font-medium text-slate-300 mb-2">OTP Code</label>
               <Input
                 type="text"
-                placeholder="Enter OTP"
+                maxLength={6}
+                placeholder="Enter 6-digit OTP"
                 value={forgotPasswordOtp}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => setForgotPasswordOtp(e.target.value)}
               />
@@ -335,13 +413,59 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
             <Button type="submit" fullWidth disabled={forgotPasswordLoading}>
               {forgotPasswordLoading ? "Verifying..." : "Verify OTP"}
             </Button>
+            <div className="mt-4 text-center">
+              <button 
+                type="button" 
+                disabled={resendCooldown > 0 || forgotPasswordLoading}
+                onClick={() => handleSendOtp()}
+                className={`text-sm font-medium transition-colors ${resendCooldown > 0 ? "text-slate-500 cursor-not-allowed" : "text-indigo-400 hover:text-indigo-300"}`}
+              >
+                {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : "Resend OTP"}
+              </button>
+            </div>
+          </form>
+        )}
+
+        {forgotPasswordStep === "reset" && (
+          <form onSubmit={handleResetPassword} className="animate-fade-in">
+            <p className="text-slate-400 text-sm mb-5">
+              OTP verified! Choose a strong new password for <strong className="text-white">{otpTargetEmail}</strong>.
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate-300 mb-2">New Password</label>
+              <Input
+                type="password"
+                placeholder="Min. 6 characters"
+                value={newPassword}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
+              />
+            </div>
+            <div className="mb-6">
+              <label className="block text-sm font-medium text-slate-300 mb-2">Confirm New Password</label>
+              <Input
+                type="password"
+                placeholder="Re-enter your new password"
+                value={confirmPassword}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+              />
+            </div>
+            <Button type="submit" fullWidth disabled={forgotPasswordLoading}>
+              {forgotPasswordLoading ? "Resetting..." : "Reset Password"}
+            </Button>
           </form>
         )}
 
         {forgotPasswordStep === "success" && (
           <div className="animate-fade-in">
-            <p className="text-emerald-400 text-sm mb-6 bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/20">
-              OTP Verified Successfully. You can now use your temporary credentials or follow the link sent to your phone to finish resetting your password.
+            <div className="flex justify-center mb-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+            <p className="text-emerald-400 text-sm mb-6 bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/20 text-center">
+              Your password has been reset successfully! You can now log in with your new password.
             </p>
             <Button type="button" fullWidth onClick={handleCloseForgotPassword}>
               Back to Login

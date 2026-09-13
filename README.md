@@ -481,6 +481,17 @@ skill-outcome-intelligence/
 
 ---
 
+## Testing OTP Flow
+
+To test the OTP (One-Time Password) flow for password resets (including enumeration checks and rate limits), ensure your backend server is running and then execute the test script:
+
+```bash
+cd backend
+npm run test:otp
+```
+
+---
+
 ## Security Notes
 
 - **Aadhaar** is **never stored in plaintext**. Only an HMAC-SHA256 hash (with server-side pepper) and the last 4 digits are persisted.
