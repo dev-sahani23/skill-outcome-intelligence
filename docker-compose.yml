@@ -19,18 +19,6 @@ services:
       - redis_data:/data
     restart: unless-stopped
 
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    image: skill-outcome-intelligence-backend:latest
-    ports:
-      - "5000:5000"
-    depends_on:
-      - postgres
-      - redis
-    restart: unless-stopped
-
 volumes:
   postgres_data:
   redis_data:
