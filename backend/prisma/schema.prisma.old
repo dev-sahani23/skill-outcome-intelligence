@@ -165,7 +165,6 @@ model User {
   email            String   @unique
   passwordHash     String
   role             Role
-  mustChangePassword Boolean @default(false)
   isActive         Boolean  @default(true) // NEW
   lastLoginAt      DateTime? // NEW
   createdAt        DateTime @default(now())
