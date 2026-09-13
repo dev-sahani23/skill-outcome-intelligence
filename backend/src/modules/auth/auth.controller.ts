@@ -56,3 +56,39 @@ export const getMe = async (req: Request, res: Response, next: NextFunction) => 
     next(error);
   }
 };
+
+export const sendOtp = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await authService.sendOtp(req.body);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyOtp = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await authService.verifyOtp(req.body);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const changePassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await authService.changePassword(req.user!.id, req.body);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await authService.resetPassword(req.body);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
