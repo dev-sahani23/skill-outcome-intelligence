@@ -18,5 +18,10 @@ export const errorHandler = (
     message = `Unique constraint failed on the ${target}. This record already exists.`;
   }
   
-  res.status(statusCode).json({ error: message });
+  const response: any = { error: message };
+  if (err.errorCode) {
+    response.code = err.errorCode;
+  }
+  
+  res.status(statusCode).json(response);
 };

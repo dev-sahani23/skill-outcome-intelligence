@@ -9,7 +9,14 @@ export const requireAuth = (req: Request, res: Response, next: NextFunction) => 
     }
 
     const token = authHeader.split(" ")[1];
-    const payload = verifyToken<{ id: string; role: any }>(token);
+    const payload = verifyToken<{ id: string; role: any; mustChangePassword?: boolean }>(token);
+    
+    // Check for mandatory password change
+    // Allow if it's the change-password route itself or logout
+    const isExemptRoute = req.path === "/change-password" || req.path === "/logout";
+    if (payload.mustChangePassword && !isExemptRoute) {
+      return res.status(403).json({ error: "You must change your temporary password before continuing", code: "PASSWORD_CHANGE_REQUIRED" });
+    }
     
     req.user = payload;
     next();
