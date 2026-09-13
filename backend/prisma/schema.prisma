@@ -205,7 +205,7 @@ model TraineeProfile {
   userId        String   @unique
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   fullName      String
-  phone         String?
+  phone         String?  @unique
   qualification String?
   district      String?  // kept as free-text label for backward compatibility
 
@@ -232,6 +232,7 @@ model TraineeProfile {
   enrollments   Enrollment[]
   outcomes      EmploymentOutcome[]
   followUps     FollowUp[]
+  followUpsByPhone FollowUp[] @relation("FollowUpTraineePhone")
   contacts      Contact[]        // NEW — reachability graph
   consentRecords ConsentRecord[] // NEW — full consent history
   attritionRecords AttritionRecord[] // NEW
@@ -245,7 +246,7 @@ model ProviderProfile {
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   instituteName String
   contactPerson String?
-  phone         String?
+  phone         String?  @unique
 
   registrationNo String? @unique // NEW
   isVerified     Boolean @default(false) // NEW
@@ -255,6 +256,7 @@ model ProviderProfile {
 
   programs      TrainingProgram[]
   anomalyFlags  ProviderAnomalyFlag[] // NEW
+  followUps     FollowUp[]
 
   @@map("provider_profiles")
 }
@@ -484,6 +486,12 @@ model FollowUp {
   notes         String?  // kept — free-text notes from assisted calls
   conductedBy   String?
   createdAt     DateTime @default(now())
+
+  traineePhone  String?
+  traineeByPhone TraineeProfile? @relation("FollowUpTraineePhone", fields: [traineePhone], references: [phone])
+  
+  providerPhone String?
+  providerProfile ProviderProfile? @relation(fields: [providerPhone], references: [phone])
 
   cascadeLogs   CascadeLog[] // NEW
 
