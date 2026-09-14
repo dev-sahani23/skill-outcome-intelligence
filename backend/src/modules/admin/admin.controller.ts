@@ -75,3 +75,32 @@ export const getStats = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getSkillAssessments = async (req: Request, res: Response) => {
+  try {
+    const assessments = await prisma.skillAssessment.findMany({
+      where: { status: "COMPLETED" },
+      select: {
+        id: true,
+        skillGapScore: true,
+        verificationConfidence: true,
+        retentionRiskSignal: true,
+        completedAt: true,
+        trainee: {
+          select: {
+            id: true,
+            fullName: true,
+            district: true
+          }
+        }
+      },
+      orderBy: { completedAt: "desc" },
+      take: 100
+    });
+    
+    return res.status(200).json({ assessments });
+  } catch (error: any) {
+    console.error("Error fetching skill assessments:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};

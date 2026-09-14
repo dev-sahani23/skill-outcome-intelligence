@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth, requireRole } from "../../middleware/auth";
-import { postSkillGapReport, getStats } from "./admin.controller";
+import { postSkillGapReport, getStats, getSkillAssessments } from "./admin.controller";
 
 const router = Router();
 
@@ -9,5 +9,8 @@ router.post("/skill-gap", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), postSk
 
 // Stats are readable by any authenticated admin
 router.get("/stats", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getStats);
+
+// Skill Assessments aggregate view
+router.get("/skill-assessments", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getSkillAssessments);
 
 export default router;
