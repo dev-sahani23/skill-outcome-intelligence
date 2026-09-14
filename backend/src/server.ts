@@ -10,6 +10,7 @@ import outcomeRoutes from "./modules/outcome/outcome.routes";
 import enrollmentRoutes from "./modules/enrollment/enrollment.routes";
 import traineeRoutes from "./modules/trainee/trainee.routes";
 import adminRoutes from "./modules/admin/admin.routes";
+import { prisma } from "./lib/prisma";
 
 const app = express();
 
@@ -52,6 +53,20 @@ if (process.env.NODE_ENV === "production") {
   }
 }
 
-app.listen(env.PORT, () => {
-  console.log(`Server is running on port http://localhost:${env.PORT}`);
-});
+const startServer = async () => {
+  try {
+    // Explicitly connect to the database to ensure it's up before serving requests
+    await prisma.$connect();
+    console.log("🚀 Connected to the PostgreSQL database successfully.");
+    
+    app.listen(env.PORT, () => {
+      console.log(`Server is running on port http://localhost:${env.PORT}`);
+    });
+  } catch (error) {
+    console.error("❌ Failed to connect to the database. Make sure your Docker container is running.");
+    console.error(error);
+    process.exit(1);
+  }
+};
+
+startServer();
