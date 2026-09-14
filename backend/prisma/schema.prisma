@@ -237,6 +237,7 @@ model TraineeProfile {
   contacts      Contact[]        // NEW — reachability graph
   consentRecords ConsentRecord[] // NEW — full consent history
   attritionRecords AttritionRecord[] // NEW
+  skillAssessments SkillAssessment[] // NEW
 
   @@map("trainee_profiles")
 }
@@ -314,6 +315,7 @@ model Enrollment {
   skillsAcquired    String[]
   isCertified       Boolean  @default(false)
   certificateId     String?
+  skillAssessments  SkillAssessment[]
 
   @@map("enrollments")
 }
@@ -587,4 +589,43 @@ model AuditLog {
   occurredAt   DateTime @default(now())
 
   @@map("audit_logs")
+}
+
+// NEW — AI-powered skill verification and gap-analysis
+enum SkillAssessmentStatus {
+  INTAKE_SUBMITTED
+  QUESTIONS_GENERATED
+  COMPLETED
+  FAILED
+}
+
+model SkillAssessment {
+  id                    String   @id @default(uuid())
+  traineeId             String
+  trainee               TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  enrollmentId          String?  // link to a specific course if claimed
+  enrollment            Enrollment? @relation(fields: [enrollmentId], references: [id])
+
+  claimedSkills         String[]
+  claimedCertifications Json     // [{name, issuer, year}]
+  claimedProjects       Json     // [{title, description}]
+  claimedCourses        Json     // [{name, provider, govtOrPrivate}] — for courses outside this platform
+
+  generatedQuestions    Json?    // [{id, question, targetSkill, difficulty}]
+  answers               Json?    // [{questionId, answerText}]
+
+  analysisResult        Json?    // full structured Groq output
+  skillGapScore         Float?   // 0-100, higher = bigger gap
+  verificationConfidence Float?  // 0-1, model's confidence in its own judgment
+  retentionRiskSignal   Float?   // 0-1 — clearly named as a RISK SIGNAL, feeds into AttritionRecord analysis
+
+  status                SkillAssessmentStatus @default(INTAKE_SUBMITTED)
+  groqModel             String   @default("openai/gpt-oss-120b")
+  rawGroqResponseQuestions Json? // store raw response for audit/debugging
+  rawGroqResponseAnalysis  Json?
+
+  createdAt             DateTime @default(now())
+  completedAt            DateTime?
+
+  @@map("skill_assessments")
 }
