@@ -4,8 +4,10 @@ import { Input } from "@/components/ui/Input";
 import { useEffect, useState } from "react";
 import { auth } from "../../lib/auth";
 import { Briefcase, TrendingUp, User, Award, MapPin, X, CheckCircle } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function TraineeDashboard() {
+  const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
   const [showEmploymentModal, setShowEmploymentModal] = useState(false);
@@ -307,6 +309,26 @@ export default function TraineeDashboard() {
                   onClick={() => setShowEmploymentModal(true)}
                 >
                   Report Employment / Wage Update
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-slate-900 border-slate-800 shadow-lg md:col-span-2 lg:col-span-1">
+            <CardHeader className="border-b border-slate-800 pb-4">
+              <CardTitle className="text-lg text-slate-200">AI Skill Verification</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <div className="flex flex-col items-center justify-center text-center space-y-4 py-4">
+                <Award className="w-12 h-12 text-slate-600 mb-2" />
+                <p className="text-sm text-slate-400 max-w-[280px]">
+                  Validate your skills with our AI assessment and improve your employability profile.
+                </p>
+                <Button
+                  className="w-full bg-purple-600 hover:bg-purple-700 text-white shadow-md shadow-purple-900/20 transition-all border-none"
+                  onClick={() => navigate('/trainee/skill-verification')}
+                >
+                  Start Skill Verification
                 </Button>
               </div>
             </CardContent>
