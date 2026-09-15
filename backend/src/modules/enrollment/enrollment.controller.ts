@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../../lib/prisma";
+import { scheduleFollowUpsForTrainee } from "../../jobs/scheduleFollowUps";
 
 /**
  * POST /enrollments/record-details
@@ -43,6 +44,11 @@ export const recordTrainingDetails = async (req: Request, res: Response, next: N
                 }
             }
         });
+
+        if (enrollment.status === "COMPLETED") {
+            // Fire-and-forget background job
+            scheduleFollowUpsForTrainee(enrollment.traineeId, new Date()).catch(console.error);
+        }
 
         res.status(201).json({ message: "Training details recorded successfully", enrollment });
     } catch (error) {
