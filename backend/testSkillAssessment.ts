@@ -59,7 +59,7 @@ async function testMockedGroq() {
   try {
     // 1. Test RateLimitError backoff
     let rateLimitCalls = 0;
-    groq.chat.completions.create = async () => {
+    groq.chat.completions.create = (async () => {
       rateLimitCalls++;
       if (rateLimitCalls === 1) {
         const err = new Groq.RateLimitError(429, {}, "Rate limited", {
@@ -70,7 +70,7 @@ async function testMockedGroq() {
       return {
         choices: [{ message: { content: JSON.stringify({ questions: [] }) } }],
       } as any;
-    };
+    }) as any;
 
     const start = Date.now();
     await generateVerificationQuestions({
@@ -85,7 +85,7 @@ async function testMockedGroq() {
 
     // 2. Test JSON Schema violation immediate retry
     let schemaErrorCalls = 0;
-    groq.chat.completions.create = async (options: any) => {
+    groq.chat.completions.create = (async (options: any) => {
       schemaErrorCalls++;
       if (schemaErrorCalls === 1) {
         throw new Groq.BadRequestError(
@@ -103,7 +103,7 @@ async function testMockedGroq() {
       return {
         choices: [{ message: { content: JSON.stringify({ questions: [] }) } }],
       } as any;
-    };
+    }) as any;
 
     await generateVerificationQuestions({
       claimedSkills: ["Test"],
