@@ -252,7 +252,7 @@ export default function SkillVerification() {
                         </span>
                       </div>
 
-                      {!isVerified && (
+                      {result.status === "gap" && (
                         <div className="mt-3 text-sm text-slate-400 flex items-start gap-2">
                           <AlertCircle className={`w-4 h-4 mt-0.5 shrink-0 ${iconColor}`} />
                           <span><strong className="text-slate-300">Reasoning:</strong> {result.reasoning}</span>
