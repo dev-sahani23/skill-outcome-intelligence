@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatINR, formatDate } from "../../utils/formatters";
 import { Button } from "@/components/ui/Button";
 import { ArrowLeft, Loader2, AlertCircle, ShieldCheck, Download, MapPin, Briefcase } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -90,7 +91,7 @@ export default function OutcomePassport() {
   const fullName = user?.traineeProfile?.fullName || "Trainee";
   const district = user?.traineeProfile?.district || "Unknown District";
   const courseName = enrollment.program?.name || enrollment.trainingNumber || "Certified Course";
-  const certDate = enrollment.completedAt ? new Date(enrollment.completedAt).toLocaleDateString() : "N/A";
+  const certDate = enrollment.completedAt ? formatDate(enrollment.completedAt) : "N/A";
   const verificationHash = enrollment.certificateId;
   const verifyUrl = `${window.location.origin}/verify/${verificationHash}`;
 
@@ -150,6 +151,9 @@ export default function OutcomePassport() {
                   <Briefcase className="w-3.5 h-3.5" /> Employment Status
                 </p>
                 <p className="font-semibold text-emerald-400 text-sm sm:text-base">{getOutcomeText()}</p>
+                {outcome?.monthlyWage && (
+                  <p className="text-slate-300 font-medium text-xs mt-1">Wage: {formatINR(outcome.monthlyWage)}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-3">
