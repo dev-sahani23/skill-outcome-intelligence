@@ -104,3 +104,65 @@ export const getSkillAssessments = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const updateAnomalyFlag = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+    const { status } = req.body;
+    
+    // req.user is set by requireAuth middleware
+    const userId = (req as any).user?.id;
+
+    if (!["DISMISSED", "CONFIRMED"].includes(status)) {
+      return res.status(400).json({ error: "Invalid status" });
+    }
+
+    const flag = await prisma.providerAnomalyFlag.update({
+      where: { id },
+      data: {
+        status,
+        reviewedById: userId,
+        reviewedAt: new Date(),
+      }
+    });
+
+    return res.status(200).json({ flag });
+  } catch (error: any) {
+    console.error("Error updating anomaly flag:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getAnomalyFlags = async (req: Request, res: Response) => {
+  try {
+    const flags = await prisma.providerAnomalyFlag.findMany({
+      include: {
+        provider: { select: { instituteName: true, user: { select: { email: true } } } },
+        reviewedBy: { select: { email: true } }
+      },
+      orderBy: { flaggedAt: 'desc' }
+    });
+    return res.status(200).json({ flags });
+  } catch (error: any) {
+    console.error("Error fetching anomaly flags:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
+export const getTrainees = async (req: Request, res: Response) => {
+  try {
+    const trainees = await prisma.traineeProfile.findMany({
+      include: {
+        user: { select: { email: true } },
+        enrollments: { select: { id: true, status: true, program: { select: { name: true, provider: { select: { instituteName: true } } } } } },
+        skillAssessments: { select: { skillGapScore: true }, orderBy: { createdAt: 'desc' }, take: 1 }
+      },
+      orderBy: { user: { createdAt: 'desc' } }
+    });
+    return res.status(200).json({ trainees });
+  } catch (error: any) {
+    console.error("Error fetching trainees:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+

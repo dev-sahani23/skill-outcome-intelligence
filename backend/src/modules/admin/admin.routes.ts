@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth, requireRole } from "../../middleware/auth";
-import { postSkillGapReport, getStats, getSkillAssessments } from "./admin.controller";
+import { postSkillGapReport, getStats, getSkillAssessments, updateAnomalyFlag, getAnomalyFlags, getTrainees } from "./admin.controller";
 
 const router = Router();
 
@@ -12,5 +12,12 @@ router.get("/stats", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getStats);
 
 // Skill Assessments aggregate view
 router.get("/skill-assessments", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getSkillAssessments);
+
+// Trainees and Anomaly Flags
+router.get("/trainees", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getTrainees);
+router.get("/anomaly-flags", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getAnomalyFlags);
+
+// Update Anomaly Flag
+router.patch("/anomaly-flags/:id", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), updateAnomalyFlag);
 
 export default router;

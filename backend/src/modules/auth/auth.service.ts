@@ -95,7 +95,12 @@ export const getUserById = async (id: string) => {
   const user = await prisma.user.findUnique({
     where: { id },
     include: {
-      traineeProfile: true,
+      traineeProfile: {
+        include: {
+          followUps: { orderBy: { scheduledDate: "desc" }, take: 1 },
+          skillAssessments: { orderBy: { createdAt: "desc" }, take: 1 }
+        }
+      },
       providerProfile: true,
       adminProfile: true,
     }
