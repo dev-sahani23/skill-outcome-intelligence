@@ -2,8 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useEffect, useState } from "react";
-import { X, BookOpen, Users, TrendingUp } from "lucide-react";
+import { X, BookOpen, Users, TrendingUp, Star } from "lucide-react";
 import { auth } from "../../lib/auth";
+import { formatDate } from "../../utils/formatters";
 
 export default function ProviderDashboard() {
   const [showModal, setShowModal] = useState(false);
@@ -72,7 +73,7 @@ export default function ProviderDashboard() {
     <div className="min-h-screen bg-slate-950 p-6 md:p-8 space-y-8 text-slate-100 relative">
       <div className="flex flex-col md:flex-row justify-between md:items-center bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-[#2f9e44]">Provider Dashboard</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Provider Dashboard</h1>
           <p className="text-slate-400 mt-2">Manage your training programs and track trainee enrollments.</p>
         </div>
         <Button className="bg-[#2f9e44] hover:bg-[#2b8a3e] text-white shadow-md shadow-green-900/20 transition-all border-none" onClick={() => setShowModal(true)}>
@@ -80,28 +81,28 @@ export default function ProviderDashboard() {
         </Button>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card
-          className="bg-slate-900 border-slate-800 cursor-pointer hover:bg-slate-800 transition-colors shadow-lg shadow-green-900/10 group"
+          className="bg-slate-900 border-slate-800 cursor-pointer hover:bg-slate-800 transition-colors shadow-lg shadow-purple-900/10 group"
           onClick={() => window.location.href = '/dashboard/provider/courses'}
         >
           <CardHeader className="pb-2">
-            <CardTitle className="text-slate-400 text-sm font-medium group-hover:text-[#2f9e44] transition-colors flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-[#2f9e44]" /> Active Courses
+            <CardTitle className="text-slate-400 text-sm font-medium group-hover:text-purple-400 transition-colors flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-purple-400" /> Active Courses
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-white">
               {isLoadingCourses ? "—" : courses.length}
             </div>
-            <p className="text-xs text-[#2f9e44] mt-1">Click to view/manage courses</p>
+            <p className="text-xs text-purple-400 mt-1">Click to view/manage courses</p>
           </CardContent>
         </Card>
 
         <Card className="bg-slate-900 border-slate-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2">
-              <Users className="w-4 h-4 text-blue-400" /> Total Trainees
+              <Users className="w-4 h-4 text-purple-400" /> Total Trainees
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -114,21 +115,36 @@ export default function ProviderDashboard() {
         <Card className="bg-slate-900 border-slate-800">
           <CardHeader className="pb-2">
             <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-emerald-400" /> Completion Rate
+              <TrendingUp className="w-4 h-4 text-purple-400" /> Completion Rate
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-blue-400">
+            <div className="text-3xl font-bold text-white">
               {isLoadingEnrollments ? "—" : `${placementRate}%`}
             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-slate-900 border-slate-800">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-slate-400 text-sm font-medium flex items-center gap-2">
+              <Star className="w-4 h-4 text-purple-400" /> Average Rating
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-white">
+              {isLoadingCourses ? "—" : "82.5"}
+            </div>
+            <p className="text-xs text-slate-500 mt-1">Provider Score</p>
           </CardContent>
         </Card>
       </div>
 
       <div className="mt-8">
         <Card className="bg-slate-900 border-slate-800 shadow-lg">
-          <CardHeader className="border-b border-slate-800 pb-4">
+          <CardHeader className="border-b border-slate-800 pb-4 flex flex-row justify-between items-center">
             <CardTitle className="text-lg text-slate-200">Recent Trainee Enrollments</CardTitle>
+            <a href="/dashboard/provider/trainees" className="text-sm text-indigo-400 hover:text-indigo-300">View All &rarr;</a>
           </CardHeader>
           <CardContent className="pt-6">
             {isLoadingEnrollments ? (
@@ -146,9 +162,12 @@ export default function ProviderDashboard() {
                       <h3 className="font-semibold text-slate-200">
                         {enrollment.trainee?.fullName || enrollment.trainee?.user?.email || "Unknown"}
                       </h3>
-                      <p className="text-sm text-slate-400 mt-1">
-                        Course: {enrollment.program?.name || "—"} •{" "}
-                        {new Date(enrollment.enrolledAt).toLocaleDateString()}
+                      <p className="text-sm text-slate-400 mt-1 flex items-center gap-2">
+                        <span>Course: {enrollment.program?.name || "—"}</span>
+                        <span>•</span>
+                        <span>{enrollment.trainee?.district || "Unknown District"}</span>
+                        <span>•</span>
+                        <span>{formatDate(enrollment.enrolledAt)}</span>
                       </p>
                     </div>
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
