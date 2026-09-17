@@ -3,6 +3,7 @@ import { requireAuth, requireRole } from "../../middleware/auth";
 import { verifyKyc, createContact, getContacts, updateContact } from "./trainee.controller";
 import { updateLocation } from "./trainee.location";
 import { startAssessment, submitAssessment, getAssessment } from "./skillAssessment.controller";
+import { createTrainingRecord, getTrainingRecords } from "./trainingRecord.controller";
 import { validateRequest } from "../../middleware/validate";
 import { startAssessmentSchema, submitAssessmentSchema } from "./skillAssessment.schema";
 import rateLimit from "express-rate-limit";
@@ -57,5 +58,9 @@ router.get(
   requireRole(["TRAINEE"]),
   getAssessment
 );
+
+// Training Records — self-reported training history with Cloudinary certificate uploads
+router.post("/training-records", requireAuth, requireRole(["TRAINEE"]), createTrainingRecord);
+router.get("/training-records", requireAuth, requireRole(["TRAINEE"]), getTrainingRecords);
 
 export default router;

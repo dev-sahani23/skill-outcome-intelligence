@@ -80,7 +80,15 @@ export const getMyEnrollments = async (req: Request, res: Response, next: NextFu
             orderBy: { enrolledAt: "desc" }
         });
 
-        res.status(200).json({ enrollments });
+        // Deduplicate by programId
+        const seenPrograms = new Set<string>();
+        const deduplicatedEnrollments = enrollments.filter(env => {
+            if (seenPrograms.has(env.programId)) return false;
+            seenPrograms.add(env.programId);
+            return true;
+        });
+
+        res.status(200).json({ enrollments: deduplicatedEnrollments });
     } catch (error) {
         next(error);
     }
@@ -113,7 +121,15 @@ export const getProviderEnrollments = async (req: Request, res: Response, next: 
             orderBy: { enrolledAt: "desc" }
         });
 
-        res.status(200).json({ enrollments });
+        // Deduplicate by traineeId for recent enrollments view
+        const seenTrainees = new Set<string>();
+        const deduplicatedEnrollments = enrollments.filter(env => {
+            if (seenTrainees.has(env.traineeId)) return false;
+            seenTrainees.add(env.traineeId);
+            return true;
+        });
+
+        res.status(200).json({ enrollments: deduplicatedEnrollments });
     } catch (error) {
         next(error);
     }
