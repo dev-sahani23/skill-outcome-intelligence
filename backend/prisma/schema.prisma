@@ -314,10 +314,33 @@ model Enrollment {
   enrollmentNumber  String?
   skillsAcquired    String[]
   isCertified       Boolean  @default(false)
-  certificateId     String?
+  certificateId     String?  // Internal UUID hash used for Outcome Passport QR — do NOT store Cloudinary publicId here
   skillAssessments  SkillAssessment[]
+  certification     Certification?   // Cloudinary document + formal cert metadata
 
   @@map("enrollments")
+}
+
+// Formal certification record created when a trainee submits a completed training
+// with an uploaded certificate. Separate from Enrollment.certificateId (internal QR hash).
+model Certification {
+  id                  String     @id @default(uuid())
+  enrollmentId        String     @unique
+  enrollment          Enrollment @relation(fields: [enrollmentId], references: [id], onDelete: Cascade)
+
+  certificateNumber   String     @unique  // CERT-{year}-{6 digits}, collision-guarded at service layer
+  certificationName   String?
+  issuingAuthority    String
+  issuedDate          DateTime
+  verificationHash    String     @unique  // SHA-256(traineeId + programName + issuedDate)
+
+  // Cloudinary storage
+  certificatePublicId String?   // Cloudinary public_id — verified via cloudinaryService.verifyUpload()
+  certificateUrl      String?   // Cloudinary secure_url
+
+  createdAt           DateTime   @default(now())
+
+  @@map("certifications")
 }
 
 // =============================================================================
