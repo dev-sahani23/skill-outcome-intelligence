@@ -31,8 +31,18 @@ export async function scheduleFollowUpsForTrainee(traineeId: string, certificati
       const scheduledDate = new Date(certificationDate);
       scheduledDate.setDate(scheduledDate.getDate() + s.delayDays);
 
-      const followUp = await prisma.followUp.create({
-        data: {
+      const followUp = await prisma.followUp.upsert({
+        where: {
+          traineeId_stage: {
+            traineeId,
+            stage: s.stage as any,
+          }
+        },
+        update: {
+          scheduledDate,
+          status: "PENDING",
+        },
+        create: {
           traineeId,
           stage: s.stage as any,
           scheduledDate,

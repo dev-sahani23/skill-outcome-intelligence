@@ -7,7 +7,9 @@
     "start": "node dist/server.js",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "test:otp": "tsx testOtpFlow.ts"
+    "test:otp": "tsx testOtpFlow.ts",
+    "seed:demo": "tsx prisma/seed-demo.ts",
+    "seed:reset": "tsx prisma/seed-demo.ts --reset"
   },
   "keywords": [],
   "author": "",

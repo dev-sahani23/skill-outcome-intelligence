@@ -161,6 +161,39 @@ app.post('/api/test/trigger-followup', async (req: any, res: any) => {
   }
 });
 
+// Public Verification API for QR Code
+app.get("/api/public/verify/:hash", async (req, res) => {
+  try {
+    const { hash } = req.params;
+    
+    // Find enrollment by certificateId
+    const enrollment = await prisma.enrollment.findFirst({
+      where: { certificateId: hash, isCertified: true },
+      include: {
+        trainee: true,
+        program: {
+          include: { provider: true }
+        }
+      }
+    });
+
+    if (!enrollment) {
+      return res.status(404).json({ error: "Invalid or unfound certificate hash" });
+    }
+
+    return res.status(200).json({
+      traineeName: enrollment.trainee.fullName,
+      courseName: enrollment.program.name,
+      issuer: enrollment.program.provider.instituteName,
+      issuedDate: enrollment.completedAt || enrollment.enrolledAt,
+      status: "valid"
+    });
+  } catch (error) {
+    console.error("Verification error:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+});
+
 // Health check
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "ok" });
