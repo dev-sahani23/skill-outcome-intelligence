@@ -40,6 +40,21 @@ export default function OrgDashboard() {
         </div>
       </div>
 
+      <div className="flex gap-4">
+        <button
+          onClick={() => window.location.href = '/dashboard/admin/trainees'}
+          className="bg-[#7048e8] hover:bg-[#5f3dc4] text-white px-4 py-2 rounded shadow transition-colors"
+        >
+          View All Trainees
+        </button>
+        <button
+          onClick={() => window.location.href = '/dashboard/admin/skill-gaps'}
+          className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded shadow border border-slate-700 transition-colors"
+        >
+          View Skill Gaps & Anomalies
+        </button>
+      </div>
+
       <div className="grid gap-6 md:grid-cols-2">
         {/* Analytics Chart */}
         <Card className="bg-slate-900 border-slate-800 shadow-lg">
@@ -55,7 +70,7 @@ export default function OrgDashboard() {
                   <XAxis dataKey="name" stroke="#94a3b8" />
                   <YAxis stroke="#94a3b8" />
                   <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", color: "#f1f5f9" }} />
-                  <Bar dataKey="Placed" fill="#818cf8" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="Placed" fill="#7048e8" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
