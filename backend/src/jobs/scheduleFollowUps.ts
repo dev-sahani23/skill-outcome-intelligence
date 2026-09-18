@@ -31,41 +31,55 @@ export async function scheduleFollowUpsForTrainee(traineeId: string, certificati
       const scheduledDate = new Date(certificationDate);
       scheduledDate.setDate(scheduledDate.getDate() + s.delayDays);
 
-      const followUp = await prisma.followUp.upsert({
-        where: {
-          traineeId_stage: {
-            traineeId,
-            stage: s.stage as any,
-          }
-        },
-        update: {
-          scheduledDate,
-          status: "PENDING",
-        },
-        create: {
-          traineeId,
-          stage: s.stage as any,
-          scheduledDate,
-          status: "PENDING",
-        }
+      // We only create if it doesn't exist. We DO NOT overwrite status to PENDING on existing jobs!
+      let followUp = await prisma.followUp.findUnique({
+        where: { traineeId_stage: { traineeId, stage: s.stage as any } }
       });
 
-      const delayMs = s.delayDays * 24 * 60 * 60 * 1000;
-      const jobId = `followup-${traineeId}-${s.stage}`;
+      if (!followUp) {
+        followUp = await prisma.followUp.create({
+          data: { traineeId, stage: s.stage as any, scheduledDate, status: "PENDING" }
+        });
+      }
 
-      await followUpQueue.add(
-        "send-follow-up",
-        {
-          followUpId: followUp.id,
-          traineeId,
-          stage: s.stage as any,
-          primaryPhone: primaryContact.phone,
-          traineeFirstName: trainee.fullName.split(' ')[0] || trainee.fullName,
-          attemptNumber: 1,
-          contactId: primaryContact.id,
-        },
-        { delay: delayMs, jobId }
-      );
+      // If it's already sent, responded, unreachable, or escalated, don't enqueue.
+      if (['SENT', 'RESPONDED', 'UNREACHABLE', 'ESCALATED'].includes(followUp.status)) {
+        continue;
+      }
+
+      // Lock row to PROCESSING
+      const lockResult = await prisma.followUp.updateMany({
+        where: { id: followUp.id, status: 'PENDING' },
+        data: { status: 'PROCESSING' }
+      });
+
+      // If lock failed, it might already be PROCESSING from a concurrent run
+      if (lockResult.count === 0 && followUp.status === 'PENDING') {
+        continue; 
+      }
+
+      const delayMs = s.delayDays * 24 * 60 * 60 * 1000;
+      const jobId = `followup-${followUp.id}`;
+
+      try {
+        await followUpQueue.add(
+          "send-follow-up",
+          {
+            followUpId: followUp.id,
+            traineeId,
+            stage: s.stage as any,
+            primaryPhone: primaryContact.phone,
+            traineeFirstName: trainee.fullName.split(' ')[0] || trainee.fullName,
+            attemptNumber: 1,
+            contactId: primaryContact.id,
+          },
+          { delay: delayMs, jobId } // deterministic jobId is natively deduped by BullMQ!
+        );
+      } catch (err) {
+        console.error(`Failed to enqueue follow-up ${followUp.id}:`, err);
+        // DO NOT revert to PENDING. If Redis got it and response timed out, it's safe as PROCESSING.
+        // If Redis dropped it completely, /send-now reconciliation will heal it.
+      }
     }
   } catch (error) {
     console.error(`Failed to schedule follow-ups for trainee ${traineeId}:`, error);

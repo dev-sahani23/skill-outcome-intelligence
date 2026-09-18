@@ -20,4 +20,9 @@ router.get("/anomaly-flags", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), get
 // Update Anomaly Flag
 router.patch("/anomaly-flags/:id", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), updateAnomalyFlag);
 
+// Send Follow Up immediately
+router.post("/follow-ups/:id/send-now", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), (req, res) => {
+  import("./admin.controller").then(c => c.sendFollowUpNow(req, res));
+});
+
 export default router;

@@ -29,6 +29,21 @@ export const followUpWorker = new Worker<FollowUpJobData>(
     const currentContact = await prisma.contact.findUnique({ where: { id: contactId }});
     if (!currentContact) return;
 
+    // Consent Check (Final Guard)
+    const consent = await prisma.consentRecord.findFirst({
+      where: { traineeId, consentType: "data_sharing" },
+      orderBy: { grantedAt: "desc" }
+    });
+
+    if (consent?.revokedAt) {
+      await prisma.followUp.update({
+        where: { id: followUpId },
+        data: { status: "UNREACHABLE", notes: "System: data_sharing consent revoked." }
+      });
+      console.warn(`FollowUp ${followUpId} aborted due to revoked consent.`);
+      return;
+    }
+
     const response = await sendFollowUpWhatsApp(primaryPhone, stage, traineeFirstName);
 
     if (response.success) {

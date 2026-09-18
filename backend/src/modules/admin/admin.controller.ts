@@ -166,3 +166,100 @@ export const getTrainees = async (req: Request, res: Response) => {
   }
 };
 
+
+import { followUpQueue } from "../../queues/followUpQueue";
+
+export const sendFollowUpNow = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id as string;
+
+    const followUp = await prisma.followUp.findUnique({
+      where: { id },
+      include: { trainee: true }
+    });
+
+    if (!followUp) {
+      return res.status(404).json({ error: "Follow up not found" });
+    }
+
+    // Check consent before even trying
+    const consent = await prisma.consentRecord.findFirst({
+      where: { traineeId: followUp.traineeId, consentType: "data_sharing" },
+      orderBy: { grantedAt: "desc" }
+    });
+
+    if (consent?.revokedAt) {
+      return res.status(403).json({ error: "Consent is revoked for this trainee. Cannot send follow-ups." });
+    }
+
+    if (['SENT', 'RESPONDED', 'ESCALATED', 'UNREACHABLE'].includes(followUp.status)) {
+      return res.status(400).json({ error: `Follow up is already ${followUp.status}` });
+    }
+
+    const jobId = `followup-${followUp.id}`;
+
+    if (followUp.status === 'PROCESSING') {
+      // Reconciliation flow
+      const job = await followUpQueue.getJob(jobId);
+      if (job) {
+        const state = await job.getState();
+        if (['waiting', 'active', 'delayed'].includes(state)) {
+          return res.status(200).json({ message: "Job is already queued/running" });
+        }
+        if (state === 'completed') {
+          await prisma.followUp.update({ where: { id }, data: { status: 'SENT' } });
+          return res.status(200).json({ message: "Job was already completed. Database state reconciled." });
+        }
+        if (state === 'failed') {
+          if (job.attemptsMade < (job.opts.attempts || 1)) {
+            return res.status(200).json({ message: "Job is retrying in background." });
+          } else {
+            await prisma.followUp.update({ where: { id }, data: { status: 'UNREACHABLE', notes: 'Job failed completely' } });
+            return res.status(200).json({ message: "Job failed completely. Database state reconciled." });
+          }
+        }
+      }
+      // If job is missing, it's safe to fall through and retry.
+    }
+
+    const locked = await prisma.followUp.updateMany({
+      where: { id, status: { in: ['PENDING', 'PROCESSING'] } },
+      data: { status: 'PROCESSING' }
+    });
+
+    if (locked.count === 0) {
+      return res.status(409).json({ error: "Could not acquire lock or already processed" });
+    }
+
+    const contacts = await prisma.contact.findMany({
+      where: { traineeId: followUp.traineeId, isActive: true },
+      orderBy: { priorityOrder: "asc" }
+    });
+
+    const primaryContact = contacts[0];
+
+    try {
+      await followUpQueue.add(
+        "send-follow-up",
+        {
+          followUpId: followUp.id,
+          traineeId: followUp.traineeId,
+          stage: followUp.stage,
+          primaryPhone: primaryContact?.phone || followUp.trainee.phone || "",
+          traineeFirstName: followUp.trainee.fullName.split(' ')[0] || followUp.trainee.fullName,
+          attemptNumber: 1,
+          contactId: primaryContact?.id,
+        },
+        { jobId }
+      );
+      return res.status(200).json({ message: "Follow up queued successfully" });
+    } catch (err) {
+      console.error("Enqueue error:", err);
+      return res.status(500).json({ error: "Failed to enqueue follow up. Database is kept in PROCESSING state for reconciliation." });
+    }
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};

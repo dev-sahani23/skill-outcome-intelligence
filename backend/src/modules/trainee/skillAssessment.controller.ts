@@ -85,7 +85,7 @@ export const submitAssessment = async (req: Request, res: Response) => {
 
     const assessment = await prisma.skillAssessment.findUnique({
       where: { id: assessmentId },
-      include: { trainee: true },
+      include: { trainee: { select: { id: true, userId: true, fullName: true, phone: true } } },
     });
 
     if (!assessment) {
@@ -164,7 +164,7 @@ export const getAssessment = async (req: Request, res: Response) => {
 
     const assessment = await prisma.skillAssessment.findUnique({
       where: { id: assessmentId },
-      include: { trainee: true },
+      include: { trainee: { select: { id: true, userId: true, fullName: true, phone: true } } },
     });
 
     if (!assessment) {

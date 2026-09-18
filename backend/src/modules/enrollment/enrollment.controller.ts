@@ -13,7 +13,7 @@ export const recordTrainingDetails = async (req: Request, res: Response, next: N
 
         const user = await prisma.user.findUnique({
             where: { id: userId },
-            include: { traineeProfile: true }
+            include: { traineeProfile: { select: { id: true, userId: true, fullName: true, phone: true, qualification: true, districtId: true } } }
         });
 
         if (!user?.traineeProfile) {
@@ -114,7 +114,15 @@ export const getProviderEnrollments = async (req: Request, res: Response, next: 
             },
             include: {
                 trainee: {
-                    include: { user: { select: { email: true } } }
+                    select: { 
+                        id: true, 
+                        userId: true, 
+                        fullName: true, 
+                        phone: true, 
+                        qualification: true, 
+                        districtId: true,
+                        user: { select: { email: true } } 
+                    }
                 },
                 program: true
             },

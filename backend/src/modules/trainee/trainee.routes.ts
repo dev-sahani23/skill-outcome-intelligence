@@ -25,12 +25,14 @@ const assessmentRateLimiter = rateLimit({
 });
 const router = Router();
 
+import { createContactSchema, updateContactSchema } from "./trainee.schema";
+
 // Only TRAINEE role should be able to perform their own KYC and manage contacts
 router.post("/kyc", requireAuth, requireRole(["TRAINEE"]), verifyKyc);
 
-router.post("/contacts", requireAuth, requireRole(["TRAINEE"]), createContact);
+router.post("/contacts", requireAuth, requireRole(["TRAINEE"]), validateRequest(createContactSchema), createContact);
 router.get("/contacts", requireAuth, requireRole(["TRAINEE"]), getContacts);
-router.patch("/contacts/:id", requireAuth, requireRole(["TRAINEE"]), updateContact);
+router.patch("/contacts/:id", requireAuth, requireRole(["TRAINEE"]), validateRequest(updateContactSchema), updateContact);
 
 router.post("/location", requireAuth, requireRole(["TRAINEE"]), updateLocation);
 
