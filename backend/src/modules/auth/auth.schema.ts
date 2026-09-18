@@ -13,7 +13,7 @@ export const registerSchema = z.object({
   
   // Trainee specific
   fullName: z.string().optional(),
-  phone: z.string().optional(),
+  phone: z.string().regex(/^[6-9]\d{9}$/, "Invalid Indian mobile number").optional(),
   qualification: z.string().optional(),
   
   // Provider specific
