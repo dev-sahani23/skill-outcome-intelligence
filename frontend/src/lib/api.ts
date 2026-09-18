@@ -10,9 +10,9 @@ interface RequestOptions extends RequestInit {
 
 const request = async (endpoint: string, options: RequestOptions = {}) => {
   const url = `${API_BASE_URL}${endpoint}`;
-  
+
   const headers = new Headers(options.headers || {});
-  
+
   if (options.data && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
@@ -30,11 +30,11 @@ const request = async (endpoint: string, options: RequestOptions = {}) => {
   if (options.data) {
     config.body = JSON.stringify(options.data);
   }
-  
+
   config.credentials = "include";
 
   const response = await fetch(url, config);
-  
+
   if (response.status === 204) {
     return null;
   }
@@ -46,7 +46,7 @@ const request = async (endpoint: string, options: RequestOptions = {}) => {
     error.status = response.status;
     error.data = data;
     error.code = data.code;
-    
+
     // Global interceptor for mandatory password change
     if (error.code === "PASSWORD_CHANGE_REQUIRED") {
       // Don't redirect if we're already on the change-password page
@@ -54,7 +54,7 @@ const request = async (endpoint: string, options: RequestOptions = {}) => {
         window.location.href = "/change-password";
       }
     }
-    
+
     throw error;
   }
 
@@ -62,18 +62,18 @@ const request = async (endpoint: string, options: RequestOptions = {}) => {
 };
 
 export const api = {
-  get: (endpoint: string, options?: Omit<RequestOptions, "method" | "data">) => 
+  get: (endpoint: string, options?: Omit<RequestOptions, "method" | "data">) =>
     request(endpoint, { ...options, method: "GET" }),
-    
-  post: (endpoint: string, data?: any, options?: Omit<RequestOptions, "method" | "data">) => 
+
+  post: (endpoint: string, data?: any, options?: Omit<RequestOptions, "method" | "data">) =>
     request(endpoint, { ...options, method: "POST", data }),
-    
-  put: (endpoint: string, data?: any, options?: Omit<RequestOptions, "method" | "data">) => 
+
+  put: (endpoint: string, data?: any, options?: Omit<RequestOptions, "method" | "data">) =>
     request(endpoint, { ...options, method: "PUT", data }),
 
-  patch: (endpoint: string, data?: any, options?: Omit<RequestOptions, "method" | "data">) => 
+  patch: (endpoint: string, data?: any, options?: Omit<RequestOptions, "method" | "data">) =>
     request(endpoint, { ...options, method: "PATCH", data }),
-    
-  delete: (endpoint: string, options?: Omit<RequestOptions, "method" | "data">) => 
+
+  delete: (endpoint: string, options?: Omit<RequestOptions, "method" | "data">) =>
     request(endpoint, { ...options, method: "DELETE" }),
 };

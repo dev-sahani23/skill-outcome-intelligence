@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth, requireRole } from "../../middleware/auth";
-import { verifyKyc, createContact, getContacts, updateContact } from "./trainee.controller";
+import { verifyKyc, createContact, getContacts, updateContact, selfAttestContact } from "./trainee.controller";
 import { updateLocation } from "./trainee.location";
 import { startAssessment, submitAssessment, getAssessment } from "./skillAssessment.controller";
 import { createTrainingRecord, getTrainingRecords } from "./trainingRecord.controller";
@@ -33,6 +33,7 @@ router.post("/kyc", requireAuth, requireRole(["TRAINEE"]), verifyKyc);
 router.post("/contacts", requireAuth, requireRole(["TRAINEE"]), validateRequest(createContactSchema), createContact);
 router.get("/contacts", requireAuth, requireRole(["TRAINEE"]), getContacts);
 router.patch("/contacts/:id", requireAuth, requireRole(["TRAINEE"]), validateRequest(updateContactSchema), updateContact);
+router.post("/contacts/:id/self-attest", requireAuth, requireRole(["TRAINEE"]), selfAttestContact);
 
 router.post("/location", requireAuth, requireRole(["TRAINEE"]), updateLocation);
 

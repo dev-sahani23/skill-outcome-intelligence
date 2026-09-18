@@ -15,7 +15,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: any = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
 };

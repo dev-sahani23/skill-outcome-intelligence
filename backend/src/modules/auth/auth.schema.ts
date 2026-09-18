@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Role } from "@prisma/client";
+import { Role, Gender } from "@prisma/client";
 
 export const loginSchema = z.object({
   email: z.string().email(),
@@ -15,10 +15,13 @@ export const registerSchema = z.object({
   fullName: z.string().optional(),
   phone: z.string().regex(/^[6-9]\d{9}$/, "Invalid Indian mobile number").optional(),
   qualification: z.string().optional(),
+  gender: z.nativeEnum(Gender).optional(),
+  districtId: z.string().optional(),
   
   // Provider specific
   instituteName: z.string().optional(),
   programs: z.string().optional(),
+  registrationNo: z.string().optional(),
   
   // Organization specific (Wait, admins shouldn't register here, but leaving it for completeness if an internal tool uses it)
   department: z.string().optional(),

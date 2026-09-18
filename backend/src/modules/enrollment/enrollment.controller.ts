@@ -40,7 +40,13 @@ export const recordTrainingDetails = async (req: Request, res: Response, next: N
             },
             include: {
                 program: {
-                    include: { provider: true }
+                    select: {
+                        id: true,
+                        name: true,
+                        sector: true,
+                        skills: true,
+                        provider: { select: { id: true, instituteName: true, isVerified: true } }
+                    }
                 }
             }
         });
@@ -74,7 +80,13 @@ export const getMyEnrollments = async (req: Request, res: Response, next: NextFu
             where: { traineeId: trainee.id },
             include: {
                 program: {
-                    include: { provider: true }
+                    select: {
+                        id: true,
+                        name: true,
+                        sector: true,
+                        skills: true,
+                        provider: { select: { id: true, instituteName: true, isVerified: true } }
+                    }
                 }
             },
             orderBy: { enrolledAt: "desc" }

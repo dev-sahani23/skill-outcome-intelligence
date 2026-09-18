@@ -10,6 +10,7 @@ import { auth } from "../../lib/auth";
 const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
   const [instituteName, setInstituteName] = useState("");
   const [contactPerson, setContactPerson] = useState("");
+  const [registrationNo, setRegistrationNo] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [programs, setPrograms] = useState("");
@@ -36,6 +37,7 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
         fullName: contactPerson, // maps to fullName in schema
         phone,
         email,
+        registrationNo,
         programs,
         password,
       });
@@ -134,6 +136,17 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
               placeholder="Name of contact person"
               value={contactPerson}
               onChange={(e: any) => setContactPerson(e.target.value)}
+              required
+            />
+          </FormField>
+
+          <FormField label="Registration Number" htmlFor="provider-registration">
+            <Input
+              id="provider-registration"
+              type="text"
+              placeholder="e.g. PRV-2023-XYZ"
+              value={registrationNo}
+              onChange={(e: any) => setRegistrationNo(e.target.value)}
               required
             />
           </FormField>

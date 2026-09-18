@@ -5,6 +5,7 @@ export const createOutcomeSchema = z.object({
   type: z.nativeEnum(OutcomeType),
 
   // Common
+  employerId: z.string().optional(),
   employerName: z.string().optional(),
   designation: z.string().optional(),
   monthlyWage: z.number().nonnegative().optional(),

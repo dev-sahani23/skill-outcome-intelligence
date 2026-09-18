@@ -185,8 +185,12 @@ export const getTrainingRecords = async (req: Request, res: Response) => {
       where: { traineeId: traineeProfile.id },
       include: {
         program: {
-          include: {
-            provider: { select: { instituteName: true, isVerified: true } },
+          select: {
+            id: true,
+            name: true,
+            sector: true,
+            skills: true,
+            provider: { select: { id: true, instituteName: true, isVerified: true } },
           },
         },
         certification: {

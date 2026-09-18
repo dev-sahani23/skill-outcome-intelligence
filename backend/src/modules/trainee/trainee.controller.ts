@@ -134,3 +134,29 @@ export const updateContact = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const selfAttestContact = async (req: Request, res: Response) => {
+  try {
+    const traineeProfile = await prisma.traineeProfile.findUnique({ where: { userId: req.user?.id } });
+    if (!traineeProfile) return res.status(404).json({ error: "Profile not found" });
+    const id = req.params.id as string;
+
+    // Verify contact belongs to this trainee
+    const existing = await prisma.contact.findFirst({
+      where: { id, traineeId: traineeProfile.id }
+    });
+    if (!existing) return res.status(404).json({ error: "Contact not found" });
+
+    const contact = await prisma.contact.update({
+      where: { id },
+      data: {
+        lastVerifiedAt: new Date(),
+        isActive: true
+      }
+    });
+    return res.status(200).json({ contact });
+  } catch (error: any) {
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
