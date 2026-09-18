@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from "recharts";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useEffect, useState } from "react";
@@ -19,6 +20,21 @@ const SKILL_GAP_DATA = [
   { subject: 'Data Science', A: 80, B: 30, fullMark: 100 },
   { subject: 'AI/ML', A: 95, B: 15, fullMark: 100 },
 ];
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+};
 
 export default function OrgDashboard() {
   const [stats, setStats] = useState<{
@@ -41,22 +57,22 @@ export default function OrgDashboard() {
     : FALLBACK_PLACEMENT_DATA;
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 md:p-8 space-y-8 text-slate-100 relative">
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
+    <div className="min-h-screen bg-muted p-6 md:p-8 space-y-8 text-foreground relative">
+      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 bg-white p-6 border-4 border-border">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">Government Admin Dashboard</h1>
-          <p className="text-slate-400 mt-2">Overview of SIH Skilling Outcomes across Maharashtra.</p>
+          <h1 className="text-3xl font-black uppercase text-foreground">Government Admin Dashboard</h1>
+          <p className="text-muted-foreground font-bold mt-2">Overview of SIH Skilling Outcomes across Maharashtra.</p>
         </div>
         <div className="flex gap-4">
         <button
           onClick={() => window.location.href = '/dashboard/admin/trainees'}
-          className="bg-[#7048e8] hover:bg-[#5f3dc4] text-white px-4 py-2 rounded shadow transition-colors"
+          className="bg-primary hover:bg-secondary hover:border-secondary text-white px-4 py-2 font-bold uppercase tracking-wider border-2 border-primary transition-colors"
         >
           View All Trainees
         </button>
         <button
           onClick={() => window.location.href = '/dashboard/admin/skill-gaps'}
-          className="bg-slate-800 hover:bg-slate-700 text-white px-4 py-2 rounded shadow border border-slate-700 transition-colors"
+          className="bg-secondary hover:bg-primary hover:border-primary text-white px-4 py-2 font-bold uppercase tracking-wider border-2 border-secondary transition-colors"
         >
           View Skill Gaps & Anomalies
         </button>
@@ -64,65 +80,65 @@ export default function OrgDashboard() {
       </div>
 
       {/* Key Metrics */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="bg-slate-900 border-slate-800 shadow-lg border-l-4 border-l-indigo-500">
+      <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid gap-4 md:grid-cols-4">
+        <Card variants={itemVariants} className="bg-white border-4 border-border border-l-8 border-l-primary">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400">Total Enrolled</CardTitle>
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Total Enrolled</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white">
+            <div className="text-3xl font-black text-foreground">
               {isLoading ? "—" : stats?.totalEnrolled?.toLocaleString() ?? "0"}
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-900 border-slate-800 shadow-lg border-l-4 border-l-purple-500">
+        <Card variants={itemVariants} className="bg-white border-4 border-border border-l-8 border-l-secondary">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400">Placement Rate</CardTitle>
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Placement Rate</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white">
+            <div className="text-3xl font-black text-foreground">
               {isLoading ? "—" : `${stats?.placementRate ?? 0}%`}
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-900 border-slate-800 shadow-lg border-l-4 border-l-emerald-500">
+        <Card variants={itemVariants} className="bg-white border-4 border-border border-l-8 border-l-accent">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400">Avg Monthly Wage</CardTitle>
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Avg Monthly Wage</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-emerald-400">
+            <div className="text-3xl font-black text-secondary">
               {isLoading ? "—" : stats?.avgWage ? formatINR(stats.avgWage) : "N/A"}
             </div>
           </CardContent>
         </Card>
-        <Card className="bg-slate-900 border-slate-800 shadow-lg border-l-4 border-l-rose-500">
+        <Card variants={itemVariants} className="bg-white border-4 border-border border-l-8 border-l-destructive">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-medium text-slate-400">Skill Gap Index</CardTitle>
+            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Skill Gap Index</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-white">
+            <div className="text-3xl font-black text-foreground">
               42.5
             </div>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
         {/* Analytics Chart */}
-        <Card className="bg-slate-900 border-slate-800 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-slate-200">District-wise Placements</CardTitle>
+        <Card variants={itemVariants} className="bg-white border-4 border-border">
+          <CardHeader className="border-b-4 border-border pb-4">
+            <CardTitle className="text-lg font-black uppercase text-foreground">District-wise Placements</CardTitle>
           </CardHeader>
-          <CardContent className="h-80">
+          <CardContent className="h-80 pt-6">
             {isLoading ? (
-              <div className="flex items-center justify-center h-full text-slate-500">Loading chart...</div>
+              <div className="flex items-center justify-center h-full text-muted-foreground font-bold">Loading chart...</div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={placementData}>
-                  <XAxis dataKey="name" stroke="#94a3b8" />
-                  <YAxis stroke="#94a3b8" label={{ value: 'Trainees Placed', angle: -90, position: 'insideLeft', fill: '#94a3b8' }} />
-                  <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", color: "#f1f5f9" }} />
-                  <Bar dataKey="Placed" fill="#7048e8" radius={[4, 4, 0, 0]} />
+                  <XAxis dataKey="name" stroke="currentColor" className="text-muted-foreground font-bold text-xs" />
+                  <YAxis stroke="currentColor" className="text-muted-foreground font-bold text-xs" label={{ value: 'Trainees Placed', angle: -90, position: 'insideLeft', fill: 'currentColor' }} />
+                  <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: "#ffffff", borderColor: "#111827", borderWidth: 4, borderRadius: 0, color: "#111827", fontWeight: 'bold' }} />
+                  <Bar dataKey="Placed" fill="#3B82F6" radius={[0, 0, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
@@ -130,12 +146,12 @@ export default function OrgDashboard() {
         </Card>
 
         {/* Leaflet Map */}
-        <Card className="bg-slate-900 border-slate-800 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-slate-200">Geospatial Tracking</CardTitle>
+        <Card variants={itemVariants} className="bg-white border-4 border-border">
+          <CardHeader className="border-b-4 border-border pb-4">
+            <CardTitle className="text-lg font-black uppercase text-foreground">Geospatial Tracking</CardTitle>
           </CardHeader>
-          <CardContent className="h-80 relative rounded-md overflow-hidden">
-            <MapContainer center={[19.7515, 75.7139]} zoom={6} scrollWheelZoom={false} className="h-full w-full rounded-md z-0">
+          <CardContent className="h-80 relative overflow-hidden pt-6">
+            <MapContainer center={[19.7515, 75.7139]} zoom={6} scrollWheelZoom={false} className="h-full w-full z-0 border-2 border-border">
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; OpenStreetMap contributors'
@@ -149,29 +165,29 @@ export default function OrgDashboard() {
             </MapContainer>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
         {/* Radar Chart */}
-        <Card className="bg-slate-900 border-slate-800 shadow-lg">
-          <CardHeader>
-            <CardTitle className="text-slate-200">Skill Demand vs Supply Gap</CardTitle>
+        <Card variants={itemVariants} className="bg-white border-4 border-border">
+          <CardHeader className="border-b-4 border-border pb-4">
+            <CardTitle className="text-lg font-black uppercase text-foreground">Skill Demand vs Supply Gap</CardTitle>
           </CardHeader>
-          <CardContent className="h-80">
+          <CardContent className="h-80 pt-6">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={SKILL_GAP_DATA}>
-                <PolarGrid stroke="#334155" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#334155" />
-                <Radar name="Demand" dataKey="A" stroke="#7048e8" fill="#7048e8" fillOpacity={0.6} />
-                <Radar name="Supply" dataKey="B" stroke="#0ea5e9" fill="#0ea5e9" fillOpacity={0.6} />
-                <Legend wrapperStyle={{ paddingTop: "20px" }} />
-                <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", color: "#f1f5f9" }} />
+                <PolarGrid stroke="#e5e7eb" />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: '#111827', fontSize: 12, fontWeight: 'bold' }} />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#e5e7eb" />
+                <Radar name="Demand" dataKey="A" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.6} />
+                <Radar name="Supply" dataKey="B" stroke="#10B981" fill="#10B981" fillOpacity={0.6} />
+                <Legend wrapperStyle={{ paddingTop: "20px", fontWeight: 'bold' }} />
+                <Tooltip contentStyle={{ backgroundColor: "#ffffff", borderColor: "#111827", borderWidth: 4, borderRadius: 0, color: "#111827", fontWeight: 'bold' }} />
               </RadarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
-      </div>
+      </motion.div>
     </div>
   );
 }

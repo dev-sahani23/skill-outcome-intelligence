@@ -1,4 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { useEffect, useState } from "react";
 import { auth } from "../../lib/auth";
@@ -6,6 +7,21 @@ import { Briefcase, TrendingUp, User, Award, MapPin, X, CheckCircle, Calendar, F
 import { useNavigate } from "react-router-dom";
 import AddTrainingRecordModal from "../../components/trainee/AddTrainingRecordModal";
 import { formatINR, formatDate, formatFollowUpStage } from "../../utils/formatters";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08
+    }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+};
 
 export default function TraineeDashboard() {
   const navigate = useNavigate();
@@ -143,19 +159,19 @@ export default function TraineeDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 p-6 flex flex-col items-center justify-center text-slate-400 space-y-4">
-        <Loader2 className="w-12 h-12 animate-spin text-indigo-500" />
-        <p className="text-lg">Loading your dashboard...</p>
+      <div className="min-h-screen bg-muted p-6 flex flex-col items-center justify-center text-muted-foreground space-y-4">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+        <p className="text-lg font-bold">Loading your dashboard...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-950 p-6 flex flex-col items-center justify-center text-slate-400 space-y-4">
-        <AlertCircle className="w-12 h-12 text-rose-500" />
-        <p className="text-lg text-rose-400">{error}</p>
-        <Button onClick={fetchData} variant="outline" className="border-slate-700 text-slate-300">
+      <div className="min-h-screen bg-muted p-6 flex flex-col items-center justify-center text-muted-foreground space-y-4">
+        <AlertCircle className="w-12 h-12 text-destructive" />
+        <p className="text-lg text-destructive font-bold">{error}</p>
+        <Button onClick={fetchData} variant="outline" className="border-4 border-border text-foreground">
           Retry
         </Button>
       </div>
@@ -164,7 +180,7 @@ export default function TraineeDashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-slate-950 p-6 flex items-center justify-center text-slate-400">
+      <div className="min-h-screen bg-muted p-6 flex items-center justify-center text-muted-foreground font-bold">
         <p>No user data found. Please log in again.</p>
       </div>
     );
@@ -187,20 +203,20 @@ export default function TraineeDashboard() {
 
   return (
     <>
-      <div className="min-h-screen bg-slate-950 p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 text-slate-100 relative">
+      <div className="min-h-screen bg-muted p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 text-foreground relative">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between md:items-center bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl gap-4">
+        <div className="flex flex-col md:flex-row justify-between md:items-center bg-white p-6 border-4 border-border gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl font-black uppercase text-foreground">
               Trainee Dashboard
             </h1>
-            <p className="text-slate-400 mt-2 flex items-center gap-2 text-sm sm:text-base">
+            <p className="text-muted-foreground font-bold mt-2 flex items-center gap-2 text-sm sm:text-base">
               <User className="w-4 h-4" /> Track your skills, enrollments, and professional growth.
             </p>
           </div>
-          <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 flex flex-col justify-center items-start w-full md:w-auto">
-            <p className="text-xs sm:text-sm font-medium text-slate-500 uppercase tracking-wider mb-1">Logged In As</p>
-            <p className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+          <div className="bg-muted p-4 border-4 border-border flex flex-col justify-center items-start w-full md:w-auto">
+            <p className="text-xs sm:text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Logged In As</p>
+            <p className="text-lg sm:text-xl font-black text-foreground flex items-center gap-2">
               Welcome, {fullName}! 👋
             </p>
           </div>
@@ -209,13 +225,13 @@ export default function TraineeDashboard() {
         {/* Quick Actions Bar */}
         <div className="flex flex-col sm:flex-row gap-4">
           <Button 
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white h-12"
+            className="flex-1 bg-primary hover:bg-secondary text-white h-12 font-bold uppercase tracking-wider border-2 border-primary hover:border-secondary transition-colors"
             onClick={() => navigate('/trainee/outcome-passport')}
           >
             <FileText className="w-4 h-4 mr-2" /> View Outcome Passport
           </Button>
           <Button 
-            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white h-12"
+            className="flex-1 bg-secondary hover:bg-primary hover:border-primary text-white h-12 font-bold uppercase tracking-wider border-2 border-secondary transition-colors"
             onClick={() => navigate('/trainee/skill-verification')}
           >
             <Award className="w-4 h-4 mr-2" /> Start Skill Verification
@@ -223,156 +239,159 @@ export default function TraineeDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <Card className="bg-slate-900 border-slate-800">
+        <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <Card variants={itemVariants} className="bg-white border-4 border-border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-slate-400 text-xs sm:text-sm font-medium flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-rose-400" /> Location
+              <CardTitle className="text-muted-foreground text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-destructive" /> Location
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg sm:text-xl font-bold text-slate-200">{traineeProfile?.district || "Not Set"}</div>
-              <p className="text-xs text-slate-500 mt-1">Registered District</p>
+              <div className="text-lg sm:text-xl font-black text-foreground">{traineeProfile?.district || "Not Set"}</div>
+              <p className="text-xs font-bold text-muted-foreground mt-1 uppercase">Registered District</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900 border-slate-800">
+          <Card variants={itemVariants} className="bg-white border-4 border-border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-slate-400 text-xs sm:text-sm font-medium flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-amber-400" /> Next Follow-up
+              <CardTitle className="text-muted-foreground text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-accent" /> Next Follow-up
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg sm:text-xl font-bold text-slate-200">{nextFollowUpDate}</div>
-              <p className="text-xs text-slate-500 mt-1">{latestFollowUp?.stage ? formatFollowUpStage(latestFollowUp.stage) : "Pending creation"}</p>
+              <div className="text-lg sm:text-xl font-black text-foreground">{nextFollowUpDate}</div>
+              <p className="text-xs font-bold text-muted-foreground mt-1 uppercase">{latestFollowUp?.stage ? formatFollowUpStage(latestFollowUp.stage) : "Pending creation"}</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900 border-slate-800">
+          <Card variants={itemVariants} className="bg-white border-4 border-border">
             <CardHeader className="pb-2">
-              <CardTitle className="text-slate-400 text-xs sm:text-sm font-medium flex items-center gap-2">
-                <Award className="w-4 h-4 text-purple-400" /> Skill Score
+              <CardTitle className="text-muted-foreground text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+                <Award className="w-4 h-4 text-secondary" /> Skill Score
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg sm:text-xl font-bold text-slate-200">{skillScore}</div>
-              <p className="text-xs text-slate-500 mt-1">Latest AI Assessment</p>
+              <div className="text-lg sm:text-xl font-black text-foreground">{skillScore}</div>
+              <p className="text-xs font-bold text-muted-foreground mt-1 uppercase">Latest AI Assessment</p>
             </CardContent>
           </Card>
 
           <Card
-            className="bg-slate-900 border-slate-800 cursor-pointer hover:bg-slate-800 transition-colors shadow-lg shadow-indigo-900/10 group"
+            variants={itemVariants}
+            className="bg-white border-4 border-border cursor-pointer hover:bg-primary/5 hover:border-primary transition-colors group"
             onClick={() => setShowEmploymentModal(true)}
           >
             <CardHeader className="pb-2">
-              <CardTitle className="text-slate-400 text-xs sm:text-sm font-medium flex items-center gap-2 group-hover:text-blue-300 transition-colors">
-                <Briefcase className="w-4 h-4 text-blue-400" /> Employment Status
+              <CardTitle className="text-muted-foreground text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2 group-hover:text-primary transition-colors">
+                <Briefcase className="w-4 h-4 text-primary" /> Employment Status
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-lg sm:text-xl font-bold text-slate-200">{employmentStatus}</div>
-              <p className={`text-xs mt-1 ${employmentStatus === "Pending" ? "text-amber-400" : "text-emerald-400"}`}>
+              <div className="text-lg sm:text-xl font-black text-foreground">{employmentStatus}</div>
+              <p className={`text-xs font-bold uppercase mt-1 ${employmentStatus === "Pending" ? "text-accent" : "text-secondary"}`}>
                 {statusUpdatedText}
               </p>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
 
         {/* Detail Sections */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <Card className="bg-slate-900 border-slate-800 shadow-lg">
-            <CardHeader className="border-b border-slate-800 pb-4 flex flex-row items-center justify-between">
-              <CardTitle className="text-lg text-slate-200">Current Enrollments</CardTitle>
+        <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
+          <Card variants={itemVariants} className="bg-white border-4 border-border">
+            <CardHeader className="border-b-4 border-border pb-4 flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-black uppercase text-foreground">Current Enrollments</CardTitle>
               <button onClick={() => setShowModal(true)}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-3 py-1.5 rounded-lg flex items-center gap-1">
+                className="bg-primary hover:bg-secondary hover:border-secondary text-white text-sm font-bold uppercase tracking-wider px-3 py-1.5 flex items-center gap-1 border-2 border-primary transition-colors">
                 <span>+</span> Add Record
               </button>
             </CardHeader>
             <CardContent className="pt-6">
               {enrolledCourses.length > 0 ? (
-                enrolledCourses.map((course: any, idx: number) => (
-                  <div key={idx} className="p-4 border border-slate-800 rounded-lg mb-4 bg-slate-950/50 hover:bg-slate-800/80 transition-colors">
+                <motion.div variants={containerVariants} initial="hidden" animate="show">
+                {enrolledCourses.map((course: any, idx: number) => (
+                  <motion.div variants={itemVariants} key={idx} className="p-4 border-4 border-border bg-muted mb-4 hover:bg-accent hover:border-accent hover:text-black transition-colors group">
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-semibold text-slate-200 text-sm sm:text-base">
+                        <h3 className="font-black text-foreground text-sm sm:text-base">
                           {course.program?.name || course.trainingNumber || "Training"}
                         </h3>
-                        <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                        <p className="text-xs sm:text-sm font-bold text-muted-foreground mt-1 uppercase">
                           Provider: {course.program?.provider?.instituteName || "—"}
                         </p>
                         {course.certificateId && (
-                          <p className="text-xs text-emerald-500 mt-1 flex items-center gap-1">
+                          <p className="text-xs font-bold text-secondary mt-1 flex items-center gap-1 uppercase">
                             <CheckCircle className="w-3 h-3" /> Certified
                           </p>
                         )}
                       </div>
-                      <span className="px-2 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                      <span className="px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-white text-primary border-2 border-border">
                         {course.status || "Enrolled"}
                       </span>
                     </div>
-                  </div>
-                ))
+                  </motion.div>
+                ))}
+                </motion.div>
               ) : (
-                <div className="text-center py-6 text-slate-400 mb-4 border border-dashed border-slate-700 rounded-lg bg-slate-900/50">
-                  <p>No active enrollments</p>
-                  <p className="text-xs mt-1">Complete Training Record Validation to see courses here.</p>
+                <div className="text-center py-6 text-muted-foreground mb-4 border-4 border-dashed border-border bg-muted">
+                  <p className="font-bold">No active enrollments</p>
+                  <p className="text-xs font-bold uppercase mt-1">Complete Training Record Validation to see courses here.</p>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          <Card className="bg-slate-900 border-slate-800 shadow-lg flex flex-col justify-between">
-            <CardHeader className="border-b border-slate-800 pb-4">
-              <CardTitle className="text-lg text-slate-200">Employment Record Details</CardTitle>
+          <Card variants={itemVariants} className="bg-white border-4 border-border flex flex-col justify-between">
+            <CardHeader className="border-b-4 border-border pb-4">
+              <CardTitle className="text-lg font-black uppercase text-foreground">Employment Record Details</CardTitle>
             </CardHeader>
             <CardContent className="pt-6 h-full flex flex-col justify-start text-left">
               {latestOutcome ? (
                 <div className="space-y-4">
                   <div>
-                    <p className="text-xs text-slate-500 uppercase tracking-wider">Company / Business</p>
-                    <p className="text-xl font-bold text-white mt-1">{latestOutcome.employerName || latestOutcome.businessActivity || "Unknown"}</p>
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Company / Business</p>
+                    <p className="text-xl font-black text-foreground mt-1">{latestOutcome.employerName || latestOutcome.businessActivity || "Unknown"}</p>
                   </div>
                   
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-slate-500">Designation</p>
-                      <p className="font-medium text-slate-300 text-sm">{latestOutcome.designation || "—"}</p>
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Designation</p>
+                      <p className="font-bold text-foreground text-sm">{latestOutcome.designation || "—"}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">Monthly Wage</p>
-                      <p className="text-emerald-400 font-bold text-lg">{latestOutcome.monthlyWage ? formatINR(latestOutcome.monthlyWage) : "—"}</p>
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Monthly Wage</p>
+                      <p className="text-secondary font-black text-lg">{latestOutcome.monthlyWage ? formatINR(latestOutcome.monthlyWage) : "—"}</p>
                     </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="text-xs text-slate-500">Employment Type</p>
-                      <p className="text-white font-medium text-sm">{employmentStatus}</p>
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Employment Type</p>
+                      <p className="text-foreground font-bold text-sm">{employmentStatus}</p>
                     </div>
                     <div>
-                      <p className="text-xs text-slate-500">Joining Date</p>
-                      <p className="text-white font-medium text-sm">{latestOutcome.createdAt ? formatDate(latestOutcome.createdAt) : "—"}</p>
+                      <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Joining Date</p>
+                      <p className="text-foreground font-bold text-sm">{latestOutcome.createdAt ? formatDate(latestOutcome.createdAt) : "—"}</p>
                     </div>
                   </div>
                   
                   <div>
-                    <p className="text-xs text-slate-500 mb-1">Training Relevance</p>
-                    <span className="bg-emerald-900/30 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded-full text-xs">
+                    <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Training Relevance</p>
+                    <span className="bg-white text-secondary border-2 border-secondary px-2 py-1 text-xs font-bold uppercase tracking-wider">
                       High Relevance
                     </span>
                   </div>
                 </div>
               ) : (
                 <div className="flex flex-col items-center justify-center text-center space-y-4 flex-1">
-                  <TrendingUp className="w-12 h-12 text-slate-600 mb-2" />
-                  <p className="text-sm text-slate-400 max-w-[280px]">
+                  <TrendingUp className="w-12 h-12 text-muted-foreground mb-2" />
+                  <p className="text-sm font-bold text-muted-foreground max-w-[280px]">
                     Help the government track skill impact by updating your latest employment outcome.
                   </p>
                 </div>
               )}
               <div className="mt-auto pt-6">
                 <Button
-                className="w-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md shadow-indigo-900/20 transition-all border-none"
+                className="w-full bg-primary hover:bg-secondary hover:border-secondary text-white font-bold uppercase tracking-wider border-2 border-primary transition-colors"
                 onClick={() => {
                   if (employmentStatus !== "Pending" && employmentStatus !== "Unemployed") {
                     setShowEmploymentDetailsModal(true);
@@ -386,44 +405,62 @@ export default function TraineeDashboard() {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </motion.div>
       </div>
 
       {/* Add Training Record — 3-step modal with Cloudinary upload */}
-      <AddTrainingRecordModal
-        isOpen={showModal}
-        onClose={() => setShowModal(false)}
-        onSuccess={() => { setShowModal(false); fetchData(); }}
-      />
+      <AnimatePresence>
+        {showModal && (
+          <AddTrainingRecordModal
+            isOpen={showModal}
+            onClose={() => setShowModal(false)}
+            onSuccess={() => { setShowModal(false); fetchData(); }}
+          />
+        )}
+      </AnimatePresence>
       
-      {showEmploymentModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm px-4">
-          <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 relative">
-             <button onClick={() => setShowEmploymentModal(false)} className="absolute top-4 right-4 text-slate-400"><X className="w-5 h-5" /></button>
-             <h2 className="text-xl font-bold text-white mb-4">Update Status</h2>
-             <div className="space-y-3">
-               {['Employed', 'Self-Employed', 'Apprenticeship', 'Unemployed'].map((status) => (
-                 <button
-                   key={status}
-                   onClick={() => {
-                     setEmploymentStatus(status);
-                     setShowEmploymentModal(false);
-                     setStatusUpdatedText("Status updated");
-                     if (status === 'Unemployed') {
-                       auth.reportOutcome({ type: "UNEMPLOYED" }).then(outcome => setLatestOutcome(outcome)).catch(console.error);
-                     } else {
-                       setShowEmploymentDetailsModal(true);
-                     }
-                   }}
-                   className="w-full text-left px-4 py-3 bg-slate-950 border border-slate-800 hover:border-indigo-500 rounded-xl text-slate-200"
-                 >
-                   {status}
-                 </button>
-               ))}
-             </div>
-          </div>
-        </div>
-      )}
+      <AnimatePresence>
+        {showEmploymentModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 px-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="bg-white border-4 border-border w-full max-w-md p-6 relative"
+            >
+               <button onClick={() => setShowEmploymentModal(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X className="w-6 h-6" /></button>
+               <h2 className="text-xl font-black uppercase text-foreground mb-4">Update Status</h2>
+               <div className="space-y-3">
+                 {['Employed', 'Self-Employed', 'Apprenticeship', 'Unemployed'].map((status) => (
+                   <button
+                     key={status}
+                     onClick={() => {
+                       setEmploymentStatus(status);
+                       setShowEmploymentModal(false);
+                       setStatusUpdatedText("Status updated");
+                       if (status === 'Unemployed') {
+                         auth.reportOutcome({ type: "UNEMPLOYED" }).then(outcome => setLatestOutcome(outcome)).catch(console.error);
+                       } else {
+                         setShowEmploymentDetailsModal(true);
+                       }
+                     }}
+                     className="w-full text-left px-4 py-3 bg-muted border-4 border-border hover:border-primary font-bold text-foreground"
+                   >
+                     {status}
+                   </button>
+                 ))}
+               </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

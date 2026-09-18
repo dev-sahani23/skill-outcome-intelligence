@@ -2,9 +2,23 @@ import React, { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader2, AlertCircle, Users, Search, ArrowLeft } from "lucide-react";
+import { motion } from "framer-motion";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { useNavigate } from "react-router-dom";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.08 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 24 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+};
 
 export default function TraineesList() {
   const navigate = useNavigate();
@@ -38,19 +52,19 @@ export default function TraineesList() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-950 p-6 flex flex-col items-center justify-center text-slate-400 space-y-4">
-        <Loader2 className="w-12 h-12 animate-spin text-[#7048e8]" />
-        <p className="text-lg">Loading trainees...</p>
+      <div className="min-h-screen bg-muted p-6 flex flex-col items-center justify-center text-muted-foreground space-y-4">
+        <Loader2 className="w-12 h-12 animate-spin text-primary" />
+        <p className="text-lg font-bold">Loading trainees...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-slate-950 p-6 flex flex-col items-center justify-center text-slate-400 space-y-4">
-        <AlertCircle className="w-12 h-12 text-rose-500" />
-        <p className="text-lg text-rose-400">{error}</p>
-        <Button onClick={fetchTrainees} variant="outline" className="border-slate-700 text-slate-300">
+      <div className="min-h-screen bg-muted p-6 flex flex-col items-center justify-center text-muted-foreground space-y-4">
+        <AlertCircle className="w-12 h-12 text-destructive" />
+        <p className="text-lg text-destructive font-bold">{error}</p>
+        <Button onClick={fetchTrainees} variant="outline" className="border-4 border-border text-foreground">
           Retry
         </Button>
       </div>
@@ -58,67 +72,67 @@ export default function TraineesList() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 p-6 md:p-8 space-y-6 text-slate-100">
+    <div className="min-h-screen bg-muted p-6 md:p-8 space-y-6 text-foreground">
       <div className="max-w-6xl mx-auto space-y-6">
         <button
           onClick={() => navigate('/dashboard/admin')}
-          className="flex items-center text-slate-400 hover:text-slate-200 transition-colors text-sm"
+          className="flex items-center text-muted-foreground hover:text-foreground transition-colors text-sm font-bold uppercase tracking-wider"
         >
           <ArrowLeft className="w-4 h-4 mr-1" /> Back to Dashboard
         </button>
 
-        <div className="flex flex-col md:flex-row justify-between md:items-center bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow-xl gap-4">
+        <div className="flex flex-col md:flex-row justify-between md:items-center bg-white p-6 border-4 border-border gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#7048e8]">
+            <h1 className="text-2xl sm:text-3xl font-black uppercase text-foreground">
               All Trainees
             </h1>
-            <p className="text-slate-400 mt-2 flex items-center gap-2 text-sm sm:text-base">
+            <p className="text-muted-foreground font-bold mt-2 flex items-center gap-2 text-sm sm:text-base">
               <Users className="w-4 h-4" /> View and monitor trainee progress across all providers.
             </p>
           </div>
           <div className="relative w-full md:w-64">
-            <Search className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
+            <Search className="w-4 h-4 absolute left-3 top-3.5 text-muted-foreground" />
             <Input 
               placeholder="Search trainees..." 
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="pl-9 bg-slate-950 border-slate-700 text-white"
+              className="pl-9"
             />
           </div>
         </div>
 
         {filteredTrainees.length === 0 ? (
-          <div className="text-center py-12 bg-slate-900 border border-slate-800 rounded-2xl">
-            <Users className="w-12 h-12 mx-auto text-slate-600 mb-4" />
-            <p className="text-slate-400">No trainees found.</p>
+          <div className="text-center py-12 bg-white border-4 border-border">
+            <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+            <p className="text-muted-foreground font-bold">No trainees found.</p>
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {filteredTrainees.map((trainee) => (
-              <Card key={trainee.id} className="bg-slate-900 border-slate-800 flex flex-col justify-between">
-                <CardHeader className="pb-2 border-b border-slate-800">
-                  <CardTitle className="text-lg text-slate-200">{trainee.fullName || "Unnamed Trainee"}</CardTitle>
-                  <p className="text-xs text-slate-500">{trainee.user?.email}</p>
+              <Card variants={itemVariants} key={trainee.id} className="bg-white border-4 border-border flex flex-col justify-between hover:bg-primary/5 hover:border-primary transition-colors">
+                <CardHeader className="pb-2 border-b-4 border-border">
+                  <CardTitle className="text-lg font-black uppercase text-foreground">{trainee.fullName || "Unnamed Trainee"}</CardTitle>
+                  <p className="text-xs font-bold text-muted-foreground uppercase">{trainee.user?.email}</p>
                 </CardHeader>
                 <CardContent className="pt-4 space-y-3">
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-400">District:</span>
-                    <span className="text-slate-200 font-medium">{trainee.district || "N/A"}</span>
+                    <span className="text-muted-foreground font-bold uppercase tracking-wider">District:</span>
+                    <span className="text-foreground font-black">{trainee.district || "N/A"}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-400">Enrollments:</span>
-                    <span className="text-slate-200 font-medium">{trainee.enrollments?.length || 0}</span>
+                    <span className="text-muted-foreground font-bold uppercase tracking-wider">Enrollments:</span>
+                    <span className="text-foreground font-black">{trainee.enrollments?.length || 0}</span>
                   </div>
                   <div className="flex justify-between items-center text-sm">
-                    <span className="text-slate-400">Skill Score:</span>
-                    <span className="text-slate-200 font-bold">
+                    <span className="text-muted-foreground font-bold uppercase tracking-wider">Skill Score:</span>
+                    <span className="text-secondary font-black">
                       {trainee.skillAssessments?.[0] ? 100 - trainee.skillAssessments[0].skillGapScore : "N/A"}
                     </span>
                   </div>
                 </CardContent>
               </Card>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </div>
