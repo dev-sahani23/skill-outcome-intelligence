@@ -23,7 +23,7 @@ export default function PublicVerify() {
     // Call the public verification API endpoint without auth headers
     // Using fetch directly because our api wrapper might inject auth headers and fail if logged out,
     // though the public endpoint should ignore it. Let's use standard fetch to be safe.
-    fetch(`http://localhost:5000/api/public/verify/${hash}`)
+    fetch(`/api/public/verify/${hash}`)
       .then(async (res) => {
         if (!res.ok) {
           const errData = await res.json().catch(() => ({}));

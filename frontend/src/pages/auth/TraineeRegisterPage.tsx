@@ -24,7 +24,7 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/public/districts")
+    fetch("/api/public/districts")
       .then(res => res.json())
       .then(data => setDistricts(data.districts || []))
       .catch(console.error);
@@ -213,10 +213,11 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
               {districtId && (
                 <span className="absolute right-3 top-3 text-green-600 text-xs font-bold">✓ Selected</span>
               )}
-              {showDistrictDropdown && districtSearch.length > 0 && (
+              {showDistrictDropdown && (
                 <div className="absolute z-20 w-full bg-white border border-input rounded-md mt-1 shadow-lg max-h-56 overflow-y-auto">
                   {districts
                     .filter((d: any) =>
+                      districtSearch.length === 0 ||
                       d.name.toLowerCase().includes(districtSearch.toLowerCase()) ||
                       d.state.toLowerCase().includes(districtSearch.toLowerCase())
                     )
@@ -235,7 +236,7 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
                         <span className="text-xs text-muted-foreground ml-2">{d.state}</span>
                       </div>
                     ))}
-                  {districts.filter((d: any) =>
+                  {districtSearch.length > 0 && districts.filter((d: any) =>
                     d.name.toLowerCase().includes(districtSearch.toLowerCase()) ||
                     d.state.toLowerCase().includes(districtSearch.toLowerCase())
                   ).length === 0 && (

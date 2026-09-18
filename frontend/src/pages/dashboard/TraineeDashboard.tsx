@@ -38,6 +38,8 @@ export default function TraineeDashboard() {
   const [statusUpdatedText, setStatusUpdatedText] = useState("Please update status");
   const [isSubmittingOutcome, setIsSubmittingOutcome] = useState(false);
   const [outcomeError, setOutcomeError] = useState("");
+  const [employerResults, setEmployerResults] = useState<any[]>([]);
+  const [showEmployerDropdown, setShowEmployerDropdown] = useState(false);
 
   const [empFormData, setEmpFormData] = useState({
     consent: false,
@@ -46,9 +48,27 @@ export default function TraineeDashboard() {
     aadhaarNo: "",
     UANNo: "",
     companyName: "",
+    employerId: "",
     udhyamNo: "",
     napsNo: "",
   });
+
+  useEffect(() => {
+    if (empFormData.companyName && empFormData.companyName.length > 2 && !empFormData.employerId) {
+      const timer = setTimeout(() => {
+        fetch(`/api/public/employers/search?q=${empFormData.companyName}`)
+          .then(res => res.json())
+          .then(data => {
+            setEmployerResults(data.employers || []);
+            setShowEmployerDropdown(true);
+          })
+          .catch(console.error);
+      }, 300);
+      return () => clearTimeout(timer);
+    } else {
+      setShowEmployerDropdown(false);
+    }
+  }, [empFormData.companyName]);
 
   const [formData, setFormData] = useState({
     trainingNumber: "",
@@ -134,6 +154,8 @@ export default function TraineeDashboard() {
     try {
       const payload: any = { type };
       if (employmentStatus === "Employed") {
+        if (empFormData.companyName) payload.employerName = empFormData.companyName;
+        if (empFormData.employerId) payload.employerId = empFormData.employerId;
         if (empFormData.designation) payload.designation = empFormData.designation;
         if (empFormData.monthlyWage) payload.monthlyWage = parseFloat(empFormData.monthlyWage);
         if (empFormData.aadhaarNo) payload.aadhaarNo = empFormData.aadhaarNo.replace(/\s/g, "");
@@ -456,6 +478,131 @@ export default function TraineeDashboard() {
                    </button>
                  ))}
                </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showEmploymentDetailsModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-foreground/60 px-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="bg-white border-4 border-border w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto"
+            >
+               <button onClick={() => setShowEmploymentDetailsModal(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X className="w-6 h-6" /></button>
+               <h2 className="text-xl font-black uppercase text-foreground mb-4">Provide Details</h2>
+               
+               <form onSubmit={handleEmpFormSubmit} className="space-y-4">
+                 {outcomeError && (
+                   <div className="p-3 bg-red-100 text-red-600 font-bold text-sm">
+                     {outcomeError}
+                   </div>
+                 )}
+
+                 {employmentStatus === "Employed" && (
+                   <>
+                     <div className="relative">
+                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Search Employer</label>
+                       <input 
+                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
+                         placeholder="e.g. Tata Motors" 
+                         value={empFormData.companyName}
+                         onChange={(e) => {
+                           setEmpFormData({...empFormData, companyName: e.target.value, employerId: ""})
+                         }}
+                         required
+                       />
+                       {showEmployerDropdown && employerResults.length > 0 && (
+                         <div className="absolute z-10 w-full bg-white border-2 border-border mt-1 shadow-lg max-h-48 overflow-y-auto">
+                           {employerResults.map((emp) => (
+                             <div 
+                               key={emp.id} 
+                               className="p-2 hover:bg-muted cursor-pointer"
+                               onClick={() => {
+                                 setEmpFormData({...empFormData, companyName: emp.name, employerId: emp.id});
+                                 setShowEmployerDropdown(false);
+                               }}
+                             >
+                               <p className="font-bold">{emp.name}</p>
+                               <p className="text-xs text-muted-foreground">{emp.sector} {emp.isVerified && "✓"}</p>
+                             </div>
+                           ))}
+                         </div>
+                       )}
+                     </div>
+                     <div>
+                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Designation</label>
+                       <input 
+                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
+                         value={empFormData.designation}
+                         onChange={(e) => setEmpFormData({...empFormData, designation: e.target.value})}
+                         required
+                       />
+                     </div>
+                     <div>
+                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Monthly Wage (INR)</label>
+                       <input 
+                         type="number"
+                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
+                         value={empFormData.monthlyWage}
+                         onChange={(e) => setEmpFormData({...empFormData, monthlyWage: e.target.value})}
+                         required
+                       />
+                     </div>
+                     <div>
+                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Aadhaar Number (Optional, 12 digits)</label>
+                       <input 
+                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
+                         placeholder="e.g. 1234 5678 9012" 
+                         value={empFormData.aadhaarNo}
+                         onChange={(e) => setEmpFormData({...empFormData, aadhaarNo: e.target.value})}
+                         pattern="[0-9\s]{12,14}"
+                       />
+                     </div>
+                     <div>
+                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">UAN Number (Optional, 12 digits)</label>
+                       <input 
+                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
+                         placeholder="e.g. 100000000000" 
+                         value={empFormData.UANNo}
+                         onChange={(e) => setEmpFormData({...empFormData, UANNo: e.target.value})}
+                         pattern="[0-9]{12}"
+                       />
+                     </div>
+                   </>
+                 )}
+
+                 {employmentStatus === "Self-Employed" && (
+                   <>
+                     <div>
+                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Business Name</label>
+                       <input 
+                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
+                         value={empFormData.companyName}
+                         onChange={(e) => setEmpFormData({...empFormData, companyName: e.target.value})}
+                         required
+                       />
+                     </div>
+                   </>
+                 )}
+
+                 <Button 
+                   type="submit" 
+                   disabled={isSubmittingOutcome}
+                   className="w-full bg-primary hover:bg-secondary text-white font-bold uppercase tracking-wider border-2 border-primary"
+                 >
+                   {isSubmittingOutcome ? "Saving..." : "Save Details"}
+                 </Button>
+               </form>
             </motion.div>
           </motion.div>
         )}
