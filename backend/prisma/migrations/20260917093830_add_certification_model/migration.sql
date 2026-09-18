@@ -25,3 +25,4 @@ CREATE UNIQUE INDEX "certifications_verificationHash_key" ON "certifications"("v
 
 -- AddForeignKey
 ALTER TABLE "certifications" ADD CONSTRAINT "certifications_enrollmentId_fkey" FOREIGN KEY ("enrollmentId") REFERENCES "enrollments"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+

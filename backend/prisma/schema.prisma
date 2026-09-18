@@ -86,6 +86,7 @@ enum FollowUpChannel {
 // NEW
 enum FollowUpStatus {
   PENDING
+  PROCESSING
   SENT
   RESPONDED
   ESCALATED
@@ -353,6 +354,7 @@ model Certification {
 model Employer {
   id             String   @id @default(uuid())
   name           String
+  normalizedName String   @unique
   sector         String?
   registrationNo String?  @unique
   isVerified     Boolean  @default(false)

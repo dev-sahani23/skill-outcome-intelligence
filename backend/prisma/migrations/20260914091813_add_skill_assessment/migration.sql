@@ -31,3 +31,4 @@ ALTER TABLE "skill_assessments" ADD CONSTRAINT "skill_assessments_traineeId_fkey
 
 -- AddForeignKey
 ALTER TABLE "skill_assessments" ADD CONSTRAINT "skill_assessments_enrollmentId_fkey" FOREIGN KEY ("enrollmentId") REFERENCES "enrollments"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+

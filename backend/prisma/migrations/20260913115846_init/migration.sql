@@ -483,3 +483,4 @@ ALTER TABLE "skill_gap_reports" ADD CONSTRAINT "skill_gap_reports_districtId_fke
 
 -- AddForeignKey
 ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_actorUserId_fkey" FOREIGN KEY ("actorUserId") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+
