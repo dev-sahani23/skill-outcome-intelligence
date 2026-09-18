@@ -3,7 +3,7 @@ import AuthLayout from "./components/AuthLayout";
 import { Input } from "../../components/ui/Input";
 import FormField from "../../components/ui/FormField";
 import { Button } from "../../components/ui/Button";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../lib/auth";
 
@@ -12,11 +12,23 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [qualification, setQualification] = useState("");
+  const [gender, setGender] = useState("");
+  const [districtId, setDistrictId] = useState("");
+  const [districtSearch, setDistrictSearch] = useState("");
+  const [showDistrictDropdown, setShowDistrictDropdown] = useState(false);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [districts, setDistricts] = useState([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch("http://localhost:3000/api/public/districts")
+      .then(res => res.json())
+      .then(data => setDistricts(data.districts || []))
+      .catch(console.error);
+  }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -35,6 +47,8 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
         phone,
         email,
         qualification,
+        gender: gender || undefined,
+        districtId: districtId || undefined,
         password,
       });
       navigate("/dashboard/trainee");
@@ -160,6 +174,78 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
               onChange={(e: any) => setQualification(e.target.value)}
               required
             />
+          </FormField>
+          
+          <FormField label="Gender" htmlFor="trainee-gender">
+            <select
+              id="trainee-gender"
+              className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              value={gender}
+              onChange={(e: any) => setGender(e.target.value)}
+              required
+            >
+              <option value="">Select Gender</option>
+              <option value="MALE">Male</option>
+              <option value="FEMALE">Female</option>
+              <option value="OTHER">Other</option>
+              <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+            </select>
+          </FormField>
+
+          <FormField label="District" htmlFor="trainee-district" fullWidth>
+            <div className="relative">
+              <input
+                type="text"
+                id="trainee-district-search"
+                className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                placeholder="Search district (e.g. Mumbai, Pune)..."
+                value={districtSearch}
+                onChange={(e: any) => {
+                  setDistrictSearch(e.target.value);
+                  setDistrictId("");
+                  setShowDistrictDropdown(true);
+                }}
+                onFocus={() => setShowDistrictDropdown(true)}
+                onBlur={() => setTimeout(() => setShowDistrictDropdown(false), 200)}
+                autoComplete="off"
+                required={!districtId}
+              />
+              {districtId && (
+                <span className="absolute right-3 top-3 text-green-600 text-xs font-bold">✓ Selected</span>
+              )}
+              {showDistrictDropdown && districtSearch.length > 0 && (
+                <div className="absolute z-20 w-full bg-white border border-input rounded-md mt-1 shadow-lg max-h-56 overflow-y-auto">
+                  {districts
+                    .filter((d: any) =>
+                      d.name.toLowerCase().includes(districtSearch.toLowerCase()) ||
+                      d.state.toLowerCase().includes(districtSearch.toLowerCase())
+                    )
+                    .slice(0, 30)
+                    .map((d: any) => (
+                      <div
+                        key={d.id}
+                        className="px-3 py-2 hover:bg-muted cursor-pointer"
+                        onMouseDown={() => {
+                          setDistrictId(d.id);
+                          setDistrictSearch(`${d.name}, ${d.state}`);
+                          setShowDistrictDropdown(false);
+                        }}
+                      >
+                        <span className="font-medium text-sm">{d.name}</span>
+                        <span className="text-xs text-muted-foreground ml-2">{d.state}</span>
+                      </div>
+                    ))}
+                  {districts.filter((d: any) =>
+                    d.name.toLowerCase().includes(districtSearch.toLowerCase()) ||
+                    d.state.toLowerCase().includes(districtSearch.toLowerCase())
+                  ).length === 0 && (
+                    <div className="px-3 py-2 text-sm text-muted-foreground">No districts found</div>
+                  )}
+                </div>
+              )}
+              {/* Hidden required input to enforce selection */}
+              <input type="hidden" value={districtId} required />
+            </div>
           </FormField>
 
           <FormField label="Password" htmlFor="trainee-password">
