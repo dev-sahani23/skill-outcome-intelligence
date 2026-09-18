@@ -21,7 +21,7 @@ const FormField = ({
     <div className={fullWidth ? "sm:col-span-2" : ""}>
       <label
         htmlFor={htmlFor}
-        className="block text-sm font-medium text-slate-300 mb-2"
+        className="block text-sm font-semibold uppercase tracking-wider text-foreground mb-2"
       >
         {label}
       </label>
@@ -30,7 +30,7 @@ const FormField = ({
         <p className="mt-1.5 text-xs text-error">{error}</p>
       )}
       {!error && helperText && (
-        <p className="mt-1.5 text-xs text-slate-500">{helperText}</p>
+        <p className="mt-1.5 text-sm font-medium text-muted-foreground">{helperText}</p>
       )}
     </div>
   );
