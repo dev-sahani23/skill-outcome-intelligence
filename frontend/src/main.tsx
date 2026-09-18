@@ -1,4 +1,5 @@
 import "./styles/index.css";
+import "./lib/i18n";
 import { createElement } from "react";
 import ReactDOM from "react-dom/client";
 import AppRouter from "./app/Router";

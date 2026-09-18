@@ -134,8 +134,8 @@ export const createTrainingRecord = async (req: Request, res: Response) => {
       const issuedDate = data.certificationIssuedDate
         ? new Date(data.certificationIssuedDate)
         : data.endDate
-        ? new Date(data.endDate)
-        : new Date();
+          ? new Date(data.endDate)
+          : new Date();
 
       // SHA-256(traineeId + programName + issuedDate) — deterministic verification hash
       const hashInput = `${traineeProfile.id}${data.programName}${issuedDate.toISOString()}`;

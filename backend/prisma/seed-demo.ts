@@ -56,12 +56,12 @@ async function main() {
   });
 
   // --- 2. DISTRICTS ---
-  const pune = await prisma.district.create({ data: { name: "Pune Demo", state: "Maharashtra", latitude: 18.5204, longitude: 73.8567 } });
-  const nagpur = await prisma.district.create({ data: { name: "Nagpur Demo", state: "Maharashtra", latitude: 21.1458, longitude: 79.0882 } });
-  const aurangabad = await prisma.district.create({ data: { name: "Aurangabad Demo", state: "Maharashtra", latitude: 19.8762, longitude: 75.3433 } });
-  const mumbai = await prisma.district.create({ data: { name: "Mumbai Demo", state: "Maharashtra", latitude: 19.0760, longitude: 72.8777 } });
-  const nashik = await prisma.district.create({ data: { name: "Nashik Demo", state: "Maharashtra", latitude: 19.9975, longitude: 73.7898 } });
-  const thane = await prisma.district.create({ data: { name: "Thane Demo", state: "Maharashtra", latitude: 19.2183, longitude: 72.9781 } });
+  const pune = await prisma.district.create({ data: { name: "Pune Demo", state: "Maharashtra" } });
+  const nagpur = await prisma.district.create({ data: { name: "Nagpur Demo", state: "Maharashtra" } });
+  const aurangabad = await prisma.district.create({ data: { name: "Aurangabad Demo", state: "Maharashtra" } });
+  const mumbai = await prisma.district.create({ data: { name: "Mumbai Demo", state: "Maharashtra" } });
+  const nashik = await prisma.district.create({ data: { name: "Nashik Demo", state: "Maharashtra" } });
+  const thane = await prisma.district.create({ data: { name: "Thane Demo", state: "Maharashtra" } });
   const demoDistricts = [pune, nagpur, aurangabad, mumbai, nashik, thane];
 
   // --- 3. PROVIDERS & COURSES ---
@@ -232,7 +232,7 @@ async function main() {
     const completedDate = new Date();
     completedDate.setMonth(completedDate.getMonth() - 2);
 
-    let status = EnrollmentStatus.COMPLETED;
+    let status: EnrollmentStatus = EnrollmentStatus.COMPLETED;
     if (i % 4 === 0) status = EnrollmentStatus.IN_PROGRESS; // 25%
     else if (i % 6 === 0) status = EnrollmentStatus.DROPPED; // ~16%
 
