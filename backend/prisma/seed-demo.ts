@@ -12,37 +12,45 @@ async function cleanDemoData() {
   for (const domain of demoDomains) {
     const users = await prisma.user.findMany({ where: { email: { endsWith: domain } } });
     for (const user of users) {
-      // Due to cascade deletes, this will delete trainee profiles, provider profiles, etc.
       await prisma.user.delete({ where: { id: user.id } });
     }
   }
 
-  // Also clean up any districts created by demo to avoid duplicates
   await prisma.district.deleteMany({
     where: { name: { in: ["Pune Demo", "Nagpur Demo", "Aurangabad Demo", "Mumbai Demo", "Nashik Demo", "Thane Demo"] } }
   });
 
-  // Clean skill gaps that might not be attached to users
   await prisma.skillGapReport.deleteMany({
     where: { sector: "IT (Demo)" }
   });
 }
 
 async function main() {
-  await cleanDemoData();
+  if (process.env.SEED_DEMO_DATA !== "true") {
+    console.log("Skipping demo seed. Set SEED_DEMO_DATA=true to enable.");
+    return;
+  }
+  
+  if (process.env.DATABASE_URL?.includes("prod") || !process.env.DATABASE_URL?.includes("localhost")) {
+    console.warn("Safety check failed. Refusing to run demo seed against a non-local or production database.");
+    return;
+  }
 
   if (isResetOnly) {
+    await cleanDemoData();
     console.log("Reset complete. Exiting.");
     return;
   }
 
-  console.log("Seeding realistic demo data...");
+  console.log("Seeding realistic demo data deterministically...");
 
   const defaultPassword = await hashPassword("Demo@1234");
 
   // --- 1. ADMIN ---
-  const admin = await prisma.user.create({
-    data: {
+  const admin = await prisma.user.upsert({
+    where: { email: "admin@skillportal.gov.in" },
+    update: {},
+    create: {
       email: "admin@skillportal.gov.in",
       passwordHash: defaultPassword,
       role: Role.GOVERNMENT_ADMIN,
@@ -56,19 +64,26 @@ async function main() {
   });
 
   // --- 2. DISTRICTS ---
-  const pune = await prisma.district.create({ data: { name: "Pune Demo", state: "Maharashtra" } });
-  const nagpur = await prisma.district.create({ data: { name: "Nagpur Demo", state: "Maharashtra" } });
-  const aurangabad = await prisma.district.create({ data: { name: "Aurangabad Demo", state: "Maharashtra" } });
-  const mumbai = await prisma.district.create({ data: { name: "Mumbai Demo", state: "Maharashtra" } });
-  const nashik = await prisma.district.create({ data: { name: "Nashik Demo", state: "Maharashtra" } });
-  const thane = await prisma.district.create({ data: { name: "Thane Demo", state: "Maharashtra" } });
+  const upsertDistrict = async (name: string) => 
+    prisma.district.upsert({ 
+      where: { name_state: { name, state: "Maharashtra" } }, 
+      update: {}, 
+      create: { name, state: "Maharashtra" } 
+    });
+
+  const pune = await upsertDistrict("Pune Demo");
+  const nagpur = await upsertDistrict("Nagpur Demo");
+  const aurangabad = await upsertDistrict("Aurangabad Demo");
+  const mumbai = await upsertDistrict("Mumbai Demo");
+  const nashik = await upsertDistrict("Nashik Demo");
+  const thane = await upsertDistrict("Thane Demo");
   const demoDistricts = [pune, nagpur, aurangabad, mumbai, nashik, thane];
 
   // --- 3. PROVIDERS & COURSES ---
-  
-  // Provider A (Good Rating)
-  const providerA = await prisma.user.create({
-    data: {
+  const providerA = await prisma.user.upsert({
+    where: { email: "providerA@skillcorp.in" },
+    update: {},
+    create: {
       email: "providerA@skillcorp.in",
       passwordHash: defaultPassword,
       role: Role.PROVIDER,
@@ -76,7 +91,7 @@ async function main() {
         create: {
           instituteName: "Excel Skills Academy",
           contactPerson: "Aditi Sharma",
-          phone: "9876543210",
+          phone: "9876543212",
           districtId: pune.id,
           isVerified: true
         }
@@ -85,43 +100,40 @@ async function main() {
     include: { providerProfile: true }
   });
 
-  const progA1 = await prisma.trainingProgram.create({
-    data: {
-      providerId: providerA.providerProfile!.id,
-      name: "Full Stack Web Development",
-      durationMonths: 6,
-      sector: "IT (Demo)",
-      certificationName: "FSWD Level 1"
-    }
+  let progA1 = await prisma.trainingProgram.findFirst({
+    where: { providerId: providerA.providerProfile!.id, name: "Full Stack Web Development", certificationName: "FSWD Level 1" }
   });
+  if (!progA1) {
+    progA1 = await prisma.trainingProgram.create({
+      data: {
+        providerId: providerA.providerProfile!.id,
+        name: "Full Stack Web Development",
+        durationMonths: 6,
+        sector: "IT (Demo)",
+        certificationName: "FSWD Level 1"
+      }
+    });
+  }
 
-  const progA2 = await prisma.trainingProgram.create({
-    data: {
-      providerId: providerA.providerProfile!.id,
-      name: "Cloud Solutions Architect",
-      durationMonths: 4,
-      sector: "IT (Demo)",
-      certificationName: "CSA Basics"
-    }
+  let progA2 = await prisma.trainingProgram.findFirst({
+    where: { providerId: providerA.providerProfile!.id, name: "Cloud Solutions Architect", certificationName: "CSA Basics" }
   });
+  if (!progA2) {
+    progA2 = await prisma.trainingProgram.create({
+      data: {
+        providerId: providerA.providerProfile!.id,
+        name: "Cloud Solutions Architect",
+        durationMonths: 4,
+        sector: "IT (Demo)",
+        certificationName: "CSA Basics"
+      }
+    });
+  }
 
-  await prisma.courseRating.create({
-    data: {
-      programId: progA1.id,
-      ratingPeriodStart: new Date("2025-01-01"),
-      ratingPeriodEnd: new Date("2026-01-01"),
-      weightedPlacementScore: 88,
-      relativeLayoffScore: 92,
-      relevanceScore: 85,
-      wageProgressionScore: 80,
-      sampleSize: 120,
-      finalScore: 82.5 // Good Score
-    }
-  });
-
-  // Provider B (Bad Rating + Anomaly)
-  const providerB = await prisma.user.create({
-    data: {
+  const providerB = await prisma.user.upsert({
+    where: { email: "providerB@badprovider.in" },
+    update: {},
+    create: {
       email: "providerB@badprovider.in",
       passwordHash: defaultPassword,
       role: Role.PROVIDER,
@@ -138,23 +150,50 @@ async function main() {
     include: { providerProfile: true }
   });
 
-  const progB1 = await prisma.trainingProgram.create({
-    data: {
-      providerId: providerB.providerProfile!.id,
-      name: "Basic Data Entry",
-      durationMonths: 2,
-      sector: "IT (Demo)",
-      certificationName: "Data Entry Operator"
-    }
+  let progB1 = await prisma.trainingProgram.findFirst({
+    where: { providerId: providerB.providerProfile!.id, name: "Basic Data Entry", certificationName: "Data Entry Operator" }
   });
+  if (!progB1) {
+    progB1 = await prisma.trainingProgram.create({
+      data: {
+        providerId: providerB.providerProfile!.id,
+        name: "Basic Data Entry",
+        durationMonths: 2,
+        sector: "IT (Demo)",
+        certificationName: "Data Entry Operator"
+      }
+    });
+  }
 
-  const progB2 = await prisma.trainingProgram.create({
+  let progB2 = await prisma.trainingProgram.findFirst({
+    where: { providerId: providerB.providerProfile!.id, name: "Digital Marketing FastTrack", certificationName: "DM Level 1" }
+  });
+  if (!progB2) {
+    progB2 = await prisma.trainingProgram.create({
+      data: {
+        providerId: providerB.providerProfile!.id,
+        name: "Digital Marketing FastTrack",
+        durationMonths: 1,
+        sector: "IT (Demo)",
+        certificationName: "DM Level 1"
+      }
+    });
+  }
+
+  // Since courseRating has no natural unique constraint in schema currently other than id, we will just delete existing and recreate for idempotency
+  await prisma.courseRating.deleteMany({ where: { programId: { in: [progA1.id, progB1.id] } } });
+  
+  await prisma.courseRating.create({
     data: {
-      providerId: providerB.providerProfile!.id,
-      name: "Digital Marketing FastTrack",
-      durationMonths: 1,
-      sector: "IT (Demo)",
-      certificationName: "DM Level 1"
+      programId: progA1.id,
+      ratingPeriodStart: new Date("2025-01-01"),
+      ratingPeriodEnd: new Date("2026-01-01"),
+      weightedPlacementScore: 88,
+      relativeLayoffScore: 92,
+      relevanceScore: 85,
+      wageProgressionScore: 80,
+      sampleSize: 120,
+      finalScore: 82.5
     }
   });
 
@@ -168,11 +207,12 @@ async function main() {
       relevanceScore: 50,
       wageProgressionScore: 48,
       sampleSize: 80,
-      finalScore: 51.2 // Bad Score
+      finalScore: 51.2
     }
   });
 
-  // Anomaly Flags
+  await prisma.providerAnomalyFlag.deleteMany({ where: { providerId: providerB.providerProfile!.id } });
+  
   await prisma.providerAnomalyFlag.create({
     data: {
       providerId: providerB.providerProfile!.id,
@@ -205,20 +245,22 @@ async function main() {
     const program = programs[i % programs.length];
     const hash = uuidv4();
 
-    const trainee = await prisma.user.create({
-      data: {
+    const trainee = await prisma.user.upsert({
+      where: { email },
+      update: {},
+      create: {
         email,
         passwordHash: defaultPassword,
         role: Role.TRAINEE,
         traineeProfile: {
           create: {
             fullName: isMainTrainee ? "Ramesh Demo" : `Trainee Demo ${i}`,
-            phone: `999000${i.toString().padStart(4, '0')}`,
+            phone: `999111${i.toString().padStart(4, '0')}`,
             districtId: district.id,
             district: district.name,
             contacts: {
               create: [
-                { contactType: "SELF", name: isMainTrainee ? "Ramesh Demo" : `Trainee Demo ${i}`, phone: `999000${i.toString().padStart(4, '0')}`, priorityOrder: 1 }
+                { contactType: "SELF", name: isMainTrainee ? "Ramesh Demo" : `Trainee Demo ${i}`, phone: `999111${i.toString().padStart(4, '0')}`, priorityOrder: 1 }
               ]
             }
           }
@@ -254,90 +296,98 @@ async function main() {
       });
     }
 
-    if (i % 3 !== 0) { // Placed
-      const outcome = await prisma.employmentOutcome.create({
-        data: {
-          traineeId: trainee.traineeProfile!.id,
-          type: OutcomeType.FORMAL_EMPLOYMENT,
-          employerName: `Tech Corp ${district.name}`,
-          designation: "Developer",
-          monthlyWage: 20000 + (i * 1000),
-          districtId: district.id,
-          isVerified: true
-        }
-      });
-
-      // Wage Records
-      await prisma.wageRecord.createMany({
-        data: [
-          { outcomeId: outcome.id, recordedDate: completedDate, salaryAmount: 20000 + (i * 1000) },
-          { outcomeId: outcome.id, recordedDate: new Date(), salaryAmount: 22000 + (i * 1000) }
-        ]
-      });
-
-      // Follow Up RESPONDED
-      if (i % 2 === 0 || isMainTrainee) {
-        await prisma.followUp.create({
+    // Outcome
+    const existingOutcome = await prisma.employmentOutcome.findFirst({
+      where: { traineeId: trainee.traineeProfile!.id }
+    });
+    
+    if (!existingOutcome) {
+      if (i % 3 !== 0) { // Placed
+        const outcome = await prisma.employmentOutcome.create({
           data: {
             traineeId: trainee.traineeProfile!.id,
-            stage: "DAY_30",
-            scheduledDate: completedDate,
-            status: "RESPONDED",
-            channelUsed: "WHATSAPP",
-            responseData: {
-              employmentStatus: "employed",
-              salary: 22000 + (i * 1000),
-              sentimentSignal: "positive",
-              jobRole: "Developer"
+            type: OutcomeType.FORMAL_EMPLOYMENT,
+            employerName: `Tech Corp ${district.name}`,
+            designation: "Developer",
+            monthlyWage: 20000 + (i * 1000),
+            districtId: district.id,
+            isVerified: true
+          }
+        });
+
+        await prisma.wageRecord.createMany({
+          data: [
+            { outcomeId: outcome.id, recordedDate: completedDate, salaryAmount: 20000 + (i * 1000) },
+            { outcomeId: outcome.id, recordedDate: new Date(), salaryAmount: 22000 + (i * 1000) }
+          ]
+        });
+
+        if (i % 2 === 0 || isMainTrainee) {
+          await prisma.followUp.upsert({
+            where: { traineeId_stage: { traineeId: trainee.traineeProfile!.id, stage: "DAY_30" } },
+            update: {},
+            create: {
+              traineeId: trainee.traineeProfile!.id,
+              stage: "DAY_30",
+              scheduledDate: completedDate,
+              status: "RESPONDED",
+              channelUsed: "WHATSAPP",
+              responseData: {
+                employmentStatus: "employed",
+                salary: 22000 + (i * 1000),
+                sentimentSignal: "positive",
+                jobRole: "Developer"
+              },
+              completedAt: new Date()
+            }
+          });
+        }
+      } else { // Unemployed
+        await prisma.employmentOutcome.create({
+          data: {
+            traineeId: trainee.traineeProfile!.id,
+            type: OutcomeType.UNEMPLOYED,
+            nonPlacementReason: "Preparing for govt exams",
+            skillGapIdentified: "Communication"
+          }
+        });
+      }
+    }
+
+    if (i <= 3 && status === EnrollmentStatus.COMPLETED) {
+      const existingAssessment = await prisma.skillAssessment.findFirst({ where: { enrollmentId: enrollment.id } });
+      if (!existingAssessment) {
+        await prisma.skillAssessment.create({
+          data: {
+            traineeId: trainee.traineeProfile!.id,
+            enrollmentId: enrollment.id,
+            status: "COMPLETED",
+            claimedSkills: ["React", "Node.js"],
+            claimedCertifications: [],
+            claimedProjects: [],
+            claimedCourses: [],
+            skillGapScore: 25 + i * 10,
+            verificationConfidence: 0.9,
+            analysisResult: {
+              verifiedSkills: ["React"],
+              skillGaps: [{ skill: "Node.js", reason: "Could not answer basic backend architecture questions" }],
+              overallAssessment: "Strong frontend, needs backend work"
             },
             completedAt: new Date()
           }
         });
       }
-    } else { // Unemployed
-      await prisma.employmentOutcome.create({
-        data: {
-          traineeId: trainee.traineeProfile!.id,
-          type: OutcomeType.UNEMPLOYED,
-          nonPlacementReason: "Preparing for govt exams",
-          skillGapIdentified: "Communication"
-        }
-      });
-    }
-
-    // Skill Assessments for a few completed
-    if (i <= 3 && status === EnrollmentStatus.COMPLETED) {
-      await prisma.skillAssessment.create({
-        data: {
-          traineeId: trainee.traineeProfile!.id,
-          enrollmentId: enrollment.id,
-          status: "COMPLETED",
-          claimedSkills: ["React", "Node.js"],
-          claimedCertifications: [],
-          claimedProjects: [],
-          claimedCourses: [],
-          skillGapScore: 25 + i * 10,
-          verificationConfidence: 0.9,
-          analysisResult: {
-            verifiedSkills: ["React"],
-            skillGaps: [{ skill: "Node.js", reason: "Could not answer basic backend architecture questions" }],
-            overallAssessment: "Strong frontend, needs backend work"
-          },
-          completedAt: new Date()
-        }
-      });
     }
   }
 
   // --- 5. SKILL GAPS ---
-  await prisma.skillGapReport.create({
-    data: { sector: "IT (Demo)", skillName: "Cloud Computing", districtId: pune.id, demandScore: 90, supplyScore: 40, gapScore: 50 }
-  });
-  await prisma.skillGapReport.create({
-    data: { sector: "IT (Demo)", skillName: "Cybersecurity", districtId: nagpur.id, demandScore: 85, supplyScore: 20, gapScore: 65 }
-  });
-  await prisma.skillGapReport.create({
-    data: { sector: "IT (Demo)", skillName: "React Development", districtId: aurangabad.id, demandScore: 70, supplyScore: 60, gapScore: 10 }
+  await prisma.skillGapReport.deleteMany({ where: { sector: "IT (Demo)" } });
+  await prisma.skillGapReport.createMany({
+    data: [
+      { sector: "IT (Demo)", skillName: "Cloud Computing", districtId: pune.id, demandScore: 90, supplyScore: 40, gapScore: 50 },
+      { sector: "IT (Demo)", skillName: "Cybersecurity", districtId: nagpur.id, demandScore: 85, supplyScore: 20, gapScore: 65 },
+      { sector: "IT (Demo)", skillName: "React Development", districtId: aurangabad.id, demandScore: 70, supplyScore: 60, gapScore: 10 }
+    ]
   });
 
   console.log("Demo seed complete!");
