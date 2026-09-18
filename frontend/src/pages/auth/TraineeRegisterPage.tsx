@@ -47,22 +47,22 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
 
   const heroContent = (
     <div className="mb-8 lg:mb-12">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-sm font-medium mb-6 sm:mb-8">
-        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-[pulse_2s_ease-in-out_infinite]"></span>
+      <div className="inline-flex items-center gap-2 px-4 py-2 bg-white text-primary text-sm font-bold uppercase tracking-wider mb-6 sm:mb-8">
+        <span className="w-2 h-2 rounded-full bg-primary animate-[pulse_2s_ease-in-out_infinite]"></span>
         Personalized onboarding
       </div>
 
       <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4 sm:mb-6">
         Set up your
         <br />
-        <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-blue-400">
+        <span className="text-white underline decoration-4 decoration-accent underline-offset-8">
           Trainee
         </span>
         <br />
         profile.
       </h1>
 
-      <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl">
+      <p className="text-base sm:text-lg text-white font-medium leading-relaxed max-w-xl">
         Fill in your details to create the right account and start using the
         platform for tracking outcomes and impact.
       </p>
@@ -91,14 +91,14 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
       </div>
 
       <div className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-        <span className="inline-flex items-center px-3 py-1 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-medium mb-4">
+        <span className="inline-flex items-center px-3 py-1 rounded-sm bg-blue-100 text-primary text-xs font-bold uppercase tracking-wider mb-4">
           Trainee
         </span>
 
-        <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">
+        <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
           Create trainee account
         </h2>
-        <p className="text-slate-400 text-sm mb-6 sm:mb-8">
+        <p className="text-muted-foreground text-base mb-6 sm:mb-8 font-medium">
           Build your learning profile and track your outcomes.
         </p>
       </div>

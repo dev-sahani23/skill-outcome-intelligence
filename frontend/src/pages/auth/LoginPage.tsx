@@ -283,7 +283,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
       <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4 sm:mb-6">
         Measure skills.
         <br />
-        <span className="text-transparent bg-clip-text bg-linear-to-r from-indigo-400 to-blue-400">
+        <span className="text-accent">
           Track outcomes.
         </span>
         <br />
@@ -296,10 +296,10 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         outcomes.
       </p>
 
-      <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-4 sm:gap-6 p-4 sm:p-6 rounded-2xl bg-slate-900/50 border border-white/5 backdrop-blur-sm w-full sm:w-max sm:max-w-full">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-4 sm:gap-6 p-6 sm:p-8 rounded-lg bg-white text-foreground w-full sm:w-max sm:max-w-full border-4 border-foreground">
         <div className="flex flex-col gap-1">
-          <strong className="text-xl sm:text-2xl font-bold text-white">360°</strong>
-          <span className="text-xs sm:text-sm text-slate-400 font-medium">
+          <strong className="text-xl sm:text-2xl font-bold text-primary">360°</strong>
+          <span className="text-xs sm:text-sm text-foreground font-semibold uppercase tracking-wider">
             Outcome Tracking
           </span>
         </div>
@@ -308,8 +308,8 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         <div className="sm:hidden w-full h-px bg-white/10"></div>
 
         <div className="flex flex-col gap-1">
-          <strong className="text-xl sm:text-2xl font-bold text-white">AI</strong>
-          <span className="text-xs sm:text-sm text-slate-400 font-medium">
+          <strong className="text-xl sm:text-2xl font-bold text-secondary">AI</strong>
+          <span className="text-xs sm:text-sm text-foreground font-semibold uppercase tracking-wider">
             Powered Insights
           </span>
         </div>
@@ -318,8 +318,8 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         <div className="sm:hidden w-full h-px bg-white/10"></div>
 
         <div className="flex flex-col gap-1">
-          <strong className="text-xl sm:text-2xl font-bold text-white">100%</strong>
-          <span className="text-xs sm:text-sm text-slate-400 font-medium">
+          <strong className="text-xl sm:text-2xl font-bold text-accent">100%</strong>
+          <span className="text-xs sm:text-sm text-foreground font-semibold uppercase tracking-wider">
             Data Driven
           </span>
         </div>
@@ -354,34 +354,34 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
   const forgotPasswordModal = forgotPasswordOpen ? (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="bg-slate-900 border border-slate-700 p-6 sm:p-8 rounded-2xl shadow-xl w-full max-w-md relative animate-fade-in-up">
+      <div className="bg-white border-4 border-border p-6 sm:p-8 w-full max-w-md relative animate-fade-in-up">
         <button
           type="button"
           onClick={handleCloseForgotPassword}
-          className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+          className="absolute top-4 right-4 text-muted-foreground hover:text-destructive hover:bg-red-50 p-1 transition-colors"
           aria-label="Close"
         >
           {XIcon}
         </button>
-        <h3 className="text-xl font-semibold text-white mb-2">
+        <h3 className="text-xl font-black uppercase text-foreground mb-2">
           {forgotPasswordStep === "email" && "Forgot Password"}
           {forgotPasswordStep === "otp" && "Verify OTP"}
           {forgotPasswordStep === "reset" && "Set New Password"}
           {forgotPasswordStep === "success" && "Password Reset!"}
         </h3>
         {forgotPasswordError && (
-          <div className="mb-4 text-sm text-red-400 p-3 bg-red-500/10 rounded border border-red-500/20">
+          <div className="mb-4 text-sm font-bold text-destructive p-3 bg-red-50 border-4 border-destructive">
             {forgotPasswordError}
           </div>
         )}
 
         {forgotPasswordStep === "email" && (
           <form onSubmit={handleSendOtp}>
-            <p className="text-slate-400 text-sm mb-5">
+            <p className="text-muted-foreground font-bold text-sm mb-5">
               Enter your email address to receive a temporary OTP to reset your password.
             </p>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-300 mb-2">Email Address</label>
+              <label className="block text-sm font-bold uppercase tracking-wider text-foreground mb-2">Email Address</label>
               <Input
                 type="email"
                 placeholder="e.g. name@example.com"
@@ -397,11 +397,11 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
         {forgotPasswordStep === "otp" && (
           <form onSubmit={handleVerifyOtp}>
-            <p className="text-slate-400 text-sm mb-5">
-              We have sent an OTP to <strong className="text-white">{otpTargetEmail}</strong>. Enter it below.
+            <p className="text-muted-foreground font-bold text-sm mb-5">
+              We have sent an OTP to <strong className="text-foreground">{otpTargetEmail}</strong>. Enter it below.
             </p>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-300 mb-2">OTP Code</label>
+              <label className="block text-sm font-bold uppercase tracking-wider text-foreground mb-2">OTP Code</label>
               <Input
                 type="text"
                 maxLength={6}
@@ -418,7 +418,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                 type="button" 
                 disabled={resendCooldown > 0 || forgotPasswordLoading}
                 onClick={() => handleSendOtp()}
-                className={`text-sm font-medium transition-colors ${resendCooldown > 0 ? "text-slate-500 cursor-not-allowed" : "text-indigo-400 hover:text-indigo-300"}`}
+                className={`text-sm font-bold uppercase tracking-wider transition-colors ${resendCooldown > 0 ? "text-muted-foreground cursor-not-allowed" : "text-primary hover:text-accent"}`}
               >
                 {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : "Resend OTP"}
               </button>
@@ -428,11 +428,11 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
         {forgotPasswordStep === "reset" && (
           <form onSubmit={handleResetPassword} className="animate-fade-in">
-            <p className="text-slate-400 text-sm mb-5">
-              OTP verified! Choose a strong new password for <strong className="text-white">{otpTargetEmail}</strong>.
+            <p className="text-muted-foreground font-bold text-sm mb-5">
+              OTP verified! Choose a strong new password for <strong className="text-foreground">{otpTargetEmail}</strong>.
             </p>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-slate-300 mb-2">New Password</label>
+              <label className="block text-sm font-bold uppercase tracking-wider text-foreground mb-2">New Password</label>
               <Input
                 type="password"
                 placeholder="Min. 6 characters"
@@ -441,7 +441,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
               />
             </div>
             <div className="mb-6">
-              <label className="block text-sm font-medium text-slate-300 mb-2">Confirm New Password</label>
+              <label className="block text-sm font-bold uppercase tracking-wider text-foreground mb-2">Confirm New Password</label>
               <Input
                 type="password"
                 placeholder="Re-enter your new password"
@@ -458,13 +458,13 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         {forgotPasswordStep === "success" && (
           <div className="animate-fade-in">
             <div className="flex justify-center mb-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-500/20 flex items-center justify-center">
-                <svg className="w-8 h-8 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <div className="w-16 h-16 border-4 border-secondary flex items-center justify-center bg-white">
+                <svg className="w-8 h-8 text-secondary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
             </div>
-            <p className="text-emerald-400 text-sm mb-6 bg-emerald-500/10 p-4 rounded-lg border border-emerald-500/20 text-center">
+            <p className="text-secondary font-bold text-sm mb-6 bg-white p-4 border-4 border-secondary text-center uppercase">
               Your password has been reset successfully! You can now log in with your new password.
             </p>
             <Button type="button" fullWidth onClick={handleCloseForgotPassword}>
@@ -485,37 +485,37 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         </div>
 
         <div className="mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-          <h2 className="text-xl sm:text-2xl font-semibold text-white mb-2">
+          <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
             Welcome back
           </h2>
-          <p className="text-slate-400 text-sm">
+          <p className="text-muted-foreground text-base">
             Sign in to continue to your
-            <span className="text-indigo-400 font-medium"> SkillTrack </span>
+            <span className="text-primary font-bold"> SkillTrack </span>
             dashboard.
           </p>
         </div>
 
         {/* Quick Test / Demo Accounts */}
         <div
-          className="mb-6 p-4 rounded-xl bg-slate-900/90 border border-slate-700/70 shadow-lg backdrop-blur-md animate-fade-in-up"
+          className="mb-6 p-6 rounded-lg bg-muted border-4 border-border shadow-none animate-fade-in-up"
           style={{ animationDelay: "0.12s" }}
         >
-          <div className="flex items-center justify-between mb-2.5">
+          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <span className="flex h-2 w-2 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-indigo-500"></span>
+              <span className="flex h-3 w-3 relative">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
               </span>
-              <span className="text-xs font-semibold uppercase tracking-wider text-slate-200">
-                Demo Test Accounts
+              <span className="text-sm font-bold uppercase tracking-wider text-foreground">
+                Demo Accounts
               </span>
             </div>
-            <span className="text-[11px] text-slate-400 bg-slate-800/80 px-2 py-0.5 rounded font-mono border border-slate-700/50">
+            <span className="text-sm text-foreground bg-white px-2 py-1 rounded-sm font-bold border-2 border-border">
               pwd: password123
             </span>
           </div>
 
-          <p className="text-xs text-slate-400 mb-3">
+          <p className="text-sm font-medium text-muted-foreground mb-4">
             Click any role below to autofill and test its role-specific dashboard:
           </p>
 
@@ -531,28 +531,28 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                     setPassword(acc.password);
                     setError("");
                   }}
-                  className={`relative flex flex-col items-start p-2.5 rounded-lg border transition-all duration-200 text-left bg-gradient-to-b ${acc.bgColor} ${acc.borderColor} ${isSelected
-                      ? "ring-2 ring-indigo-400/80 shadow-md shadow-indigo-500/10 border-indigo-400"
-                      : "opacity-85 hover:opacity-100 hover:scale-[1.02]"
+                  className={`relative flex flex-col items-start p-3 rounded-md border-4 transition-all duration-200 text-left bg-white ${isSelected
+                      ? "border-primary bg-blue-50"
+                      : "border-border hover:border-gray-300 hover:scale-[1.02]"
                     }`}
                 >
                   <div className="flex items-center justify-between w-full mb-1.5">
                     <div className="flex items-center gap-1.5">
                       {acc.icon}
-                      <span className="text-xs font-semibold text-white">
+                      <span className="text-sm font-bold text-foreground">
                         {acc.shortRole}
                       </span>
                     </div>
                     {isSelected && (
-                      <span className="text-[10px] text-indigo-400 font-bold">
+                      <span className="text-xs text-primary font-bold">
                         ✓ Active
                       </span>
                     )}
                   </div>
-                  <span className="text-[10px] text-slate-300 font-mono truncate w-full mb-1">
+                  <span className="text-xs text-muted-foreground font-bold truncate w-full mb-1">
                     {acc.email}
                   </span>
-                  <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${acc.badgeColor}`}>
+                  <span className={`text-xs px-2 py-1 rounded-sm font-bold text-white ${acc.shortRole === 'Admin' ? 'bg-accent' : acc.shortRole === 'Provider' ? 'bg-primary' : 'bg-secondary'}`}>
                     {acc.badge}
                   </span>
                 </button>
@@ -570,12 +570,12 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           <div className="mb-5 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-slate-300 mb-2"
+              className="block text-sm font-bold uppercase tracking-wider text-foreground mb-2"
             >
               Email address
             </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 [&>svg]:w-5 [&>svg]:h-5">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground [&>svg]:w-5 [&>svg]:h-5">
                 {MailIcon}
               </div>
               <Input
@@ -594,14 +594,14 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
             <div className="flex items-center justify-between mb-2">
               <label
                 htmlFor="password"
-                className="block text-sm font-medium text-slate-300"
+                className="block text-sm font-bold uppercase tracking-wider text-foreground"
               >
                 Password
               </label>
 
               <button
                 type="button"
-                className="text-sm text-indigo-400 hover:text-indigo-300 font-medium transition-colors duration-200"
+                className="text-sm text-primary hover:text-blue-600 font-bold transition-colors duration-200"
                 onClick={() => setForgotPasswordOpen(true)}
               >
                 Forgot password?
@@ -609,7 +609,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
             </div>
 
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400 [&>svg]:w-5 [&>svg]:h-5">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground [&>svg]:w-5 [&>svg]:h-5">
                 {LockIcon}
               </div>
               <Input
@@ -661,11 +661,11 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         </form>
 
         <div className="relative flex items-center justify-center my-6 sm:my-8 animate-fade-in" style={{ animationDelay: "0.35s" }}>
-          <div className="flex-1 h-px bg-white/10"></div>
-          <span className="px-4 text-sm text-slate-500 font-medium">
+          <div className="flex-1 h-1 bg-muted"></div>
+          <span className="px-4 text-sm text-muted-foreground font-bold uppercase tracking-wider">
             or continue with
           </span>
-          <div className="flex-1 h-px bg-white/10"></div>
+          <div className="flex-1 h-1 bg-muted"></div>
         </div>
 
         <div className="animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
@@ -702,11 +702,11 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           </Button>
         </div>
 
-        <div className="mt-6 sm:mt-8 text-center text-sm text-slate-400 animate-fade-in" style={{ animationDelay: "0.45s" }}>
+        <div className="mt-6 sm:mt-8 text-center text-sm font-bold text-muted-foreground animate-fade-in" style={{ animationDelay: "0.45s" }}>
           <span>Don't have an account?</span>
           <button
             type="button"
-            className="ml-2 text-indigo-400 font-medium hover:text-indigo-300 transition-colors duration-200"
+            className="ml-2 text-primary hover:text-blue-600 transition-colors duration-200"
             onClick={onNavigateToRegister}
           >
             Create account
