@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, type Variants } from "framer-motion";
 import { Button } from "@/components/ui/Button";
 import { useEffect, useState } from "react";
 import { auth } from "../../lib/auth";
@@ -7,8 +7,7 @@ import { Briefcase, TrendingUp, User, Award, MapPin, X, CheckCircle, Calendar, F
 import { useNavigate } from "react-router-dom";
 import AddTrainingRecordModal from "../../components/trainee/AddTrainingRecordModal";
 import { formatINR, formatDate, formatFollowUpStage } from "../../utils/formatters";
-
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
@@ -18,7 +17,7 @@ const containerVariants = {
   }
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { opacity: 0, y: 24 },
   show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
 };
