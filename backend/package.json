@@ -9,7 +9,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:otp": "tsx testOtpFlow.ts",
     "seed:demo": "tsx prisma/seed-demo.ts",
-    "seed:reset": "tsx prisma/seed-demo.ts --reset"
+    "seed:reset": "tsx prisma/seed-demo.ts --reset",
+    "seed:districts": "tsx prisma/seed-districts.ts"
   },
   "keywords": [],
   "author": "",

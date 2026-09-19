@@ -5,9 +5,13 @@ import { z } from "zod";
 // Retrieve the API key from environment, normally injected by dotenv/config
 export const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-// llama-3.3-70b-versatile: best quality available on Groq free tier
-// mixtral-8x7b-32768: high-context fallback
-const PRIMARY_MODEL = "openai/gpt-oss-120b";
+// Models confirmed live on this Groq account (from groq.models.list()):
+//   openai/gpt-oss-120b  — highest quality, use for analysis & question generation
+//   openai/gpt-oss-20b   — faster/cheaper, use for classification & extraction
+//   qwen/qwen3.8-27b     — multilingual strength (Hindi/Marathi), use for follow-up parsing
+const PRIMARY_MODEL   = "openai/gpt-oss-120b";   // complex reasoning tasks
+const FAST_MODEL      = "openai/gpt-oss-20b";    // simple classification/extraction
+const MULTILANG_MODEL = "qwen/qwen3.8-27b";      // Hindi/Marathi follow-up parsing
 
 const MAX_RETRIES = 3;
 const FALLBACK_BACKOFF_MS = 2000;
@@ -437,7 +441,7 @@ OUTPUT
 Return ONLY a valid JSON object. No markdown, no explanation.`;
 
   const payload = {
-    model: PRIMARY_MODEL,
+    model: MULTILANG_MODEL,  // qwen3.8-27b: best multilingual (Hindi/Marathi) extraction
     temperature: 0.1,
     messages: [
       { role: "system", content: systemPrompt },
@@ -537,7 +541,7 @@ OUTPUT
 Return ONLY a valid JSON object. No markdown, no explanation.`;
 
   const payload = {
-    model: PRIMARY_MODEL,
+    model: FAST_MODEL,  // gpt-oss-20b: simple enum classification, no need for 120b
     temperature: 0.0,
     messages: [
       { role: "system", content: systemPrompt },
