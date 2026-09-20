@@ -19,7 +19,7 @@ const containerVariants: Variants = {
 
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } }
 };
 
 export default function TraineeDashboard() {
@@ -252,7 +252,7 @@ export default function TraineeDashboard() {
             <FileText className="w-4 h-4 mr-2" /> View Outcome Passport
           </Button>
           <Button
-            className="flex-1 bg-secondary hover:bg-primary hover:border-primary text-white h-12 font-bold uppercase tracking-wider border-2 border-secondary transition-colors"
+            className="flex-1 bg-primary hover:bg-secondary text-white h-12 font-bold uppercase tracking-wider border-2 border-primary hover:border-secondary transition-colors"
             onClick={() => navigate('/trainee/skill-verification')}
           >
             <Award className="w-4 h-4 mr-2" /> Start Skill Verification
@@ -260,8 +260,8 @@ export default function TraineeDashboard() {
         </div>
 
         {/* Stats Cards */}
-        <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-          <Card variants={itemVariants} className="bg-white border-4 border-border">
+        <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+          <Card variants={itemVariants} className="bg-white border-4 border-border hover:border-primary hover:-translate-y-1 hover:shadow-lg transition-all duration-500 ease-out">
             <CardHeader className="pb-2">
               <CardTitle className="text-muted-foreground text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
                 <MapPin className="w-4 h-4 text-destructive" /> Location
@@ -273,7 +273,7 @@ export default function TraineeDashboard() {
             </CardContent>
           </Card>
 
-          <Card variants={itemVariants} className="bg-white border-4 border-border">
+          <Card variants={itemVariants} className="bg-white border-4 border-border hover:border-primary hover:-translate-y-1 hover:shadow-lg transition-all duration-500 ease-out">
             <CardHeader className="pb-2">
               <CardTitle className="text-muted-foreground text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-accent" /> Next Follow-up
@@ -285,7 +285,7 @@ export default function TraineeDashboard() {
             </CardContent>
           </Card>
 
-          <Card variants={itemVariants} className="bg-white border-4 border-border">
+          <Card variants={itemVariants} className="bg-white border-4 border-border hover:border-primary hover:-translate-y-1 hover:shadow-lg transition-all duration-500 ease-out">
             <CardHeader className="pb-2">
               <CardTitle className="text-muted-foreground text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
                 <Award className="w-4 h-4 text-secondary" /> Skill Score
@@ -299,7 +299,7 @@ export default function TraineeDashboard() {
 
           <Card
             variants={itemVariants}
-            className="bg-white border-4 border-border cursor-pointer hover:bg-primary/5 hover:border-primary transition-colors group"
+            className="bg-white border-4 border-border cursor-pointer hover:border-primary hover:-translate-y-1 hover:shadow-lg transition-all duration-500 ease-out group"
             onClick={() => setShowEmploymentModal(true)}
           >
             <CardHeader className="pb-2">
@@ -318,7 +318,7 @@ export default function TraineeDashboard() {
 
         {/* Detail Sections */}
         <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
-          <Card variants={itemVariants} className="bg-white border-4 border-border">
+          <Card variants={itemVariants} className="bg-white border-4 border-border hover:border-primary hover:-translate-y-1 hover:shadow-lg transition-all duration-500 ease-out">
             <CardHeader className="border-b border-black/5 pb-4 flex flex-row items-center justify-between">
               <CardTitle className="text-lg font-black uppercase text-slate-900">Current Enrollments</CardTitle>
               <button onClick={() => setShowModal(true)}
@@ -361,7 +361,7 @@ export default function TraineeDashboard() {
             </CardContent>
           </Card>
 
-          <Card variants={itemVariants} className="bg-white border-4 border-border flex flex-col justify-between">
+          <Card variants={itemVariants} className="bg-white border-4 border-border flex flex-col justify-between hover:border-primary hover:-translate-y-1 hover:shadow-lg transition-all duration-500 ease-out">
             <CardHeader className="border-b-4 border-border pb-4">
               <CardTitle className="text-lg font-black uppercase text-foreground">Employment Record Details</CardTitle>
             </CardHeader>

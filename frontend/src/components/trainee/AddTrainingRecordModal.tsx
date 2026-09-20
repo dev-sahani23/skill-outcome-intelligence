@@ -47,10 +47,10 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
             <div className="flex flex-col items-center gap-1">
               <div
                 className={`w-8 h-8 flex items-center justify-center text-sm font-black transition-all ${isDone
-                    ? "bg-secondary text-white border-4 border-secondary"
-                    : isActive
-                      ? "bg-primary text-white border-4 border-primary"
-                      : "bg-white text-muted-foreground border-4 border-border"
+                  ? "bg-secondary text-white border-4 border-secondary"
+                  : isActive
+                    ? "bg-primary text-white border-4 border-primary"
+                    : "bg-white text-muted-foreground border-4 border-border"
                   }`}
               >
                 {isDone ? <CheckCircle2 className="w-4 h-4" /> : stepNum}
@@ -266,13 +266,13 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
   const totalSteps = form.status === "completed" ? 3 : 2;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm px-4">
-      <div className="bg-white border-4 border-border w-full max-w-xl relative overflow-hidden max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 backdrop-blur-md px-4">
+      <div className="bg-white/80 backdrop-blur-xl border border-white/50 shadow-2xl rounded-[2rem] w-full max-w-xl relative overflow-hidden max-h-[90vh] flex flex-col">
         {/* Header */}
-        <div className="p-6 pb-0 flex-shrink-0">
+        <div className="p-6 pb-0 flex-shrink-0 relative">
           <button
             onClick={handleClose}
-            className="absolute top-4 right-4 text-muted-foreground hover:text-destructive hover:bg-red-50 p-1 transition-colors"
+            className="absolute top-6 right-6 text-slate-400 hover:text-slate-800 bg-white/50 hover:bg-white rounded-full p-2 transition-all hover:scale-105"
           >
             <X className="w-5 h-5" />
           </button>
@@ -310,7 +310,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                   <select
                     value={form.providerType}
                     onChange={(e) => patch({ providerType: e.target.value as any })}
-                    className="w-full h-12 border-4 border-border bg-white px-3 text-sm font-bold text-foreground focus-visible:ring-2 focus-visible:ring-accent/50 outline-none transition-all"
+                    className="w-full h-12 rounded-xl border border-black/10 bg-white/70 px-4 text-sm font-bold text-slate-800 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-inner"
                   >
                     <option value="">Select type</option>
                     <option value="government">Government</option>
@@ -325,7 +325,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                 <select
                   value={form.sector}
                   onChange={(e) => patch({ sector: e.target.value })}
-                  className="w-full h-12 border-4 border-border bg-white px-3 text-sm font-bold text-foreground focus-visible:ring-2 focus-visible:ring-accent/50 outline-none transition-all"
+                  className="w-full h-12 rounded-xl border border-black/10 bg-white/70 px-4 text-sm font-bold text-slate-800 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-inner"
                 >
                   <option value="">Select sector</option>
                   {["Manufacturing", "IT", "Construction", "Healthcare", "Retail", "Agriculture", "Other"].map((s) => (
@@ -363,13 +363,13 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                       key={s}
                       type="button"
                       onClick={() => patch({ status: s })}
-                      className={`flex-1 py-2.5 border-4 text-sm font-bold uppercase tracking-wider transition-all ${form.status === s
-                          ? s === "completed"
-                            ? "bg-secondary border-secondary text-white"
-                            : s === "in_progress"
-                              ? "bg-primary border-primary text-white"
-                              : "bg-destructive border-destructive text-white"
-                          : "bg-white border-border text-muted-foreground hover:bg-secondary/10 hover:text-secondary hover:border-secondary"
+                      className={`flex-1 py-3 rounded-xl border text-sm font-bold uppercase tracking-wider transition-all hover:shadow-md ${form.status === s
+                        ? s === "completed"
+                          ? "bg-secondary/90 border-transparent text-white shadow-lg"
+                          : s === "in_progress"
+                            ? "bg-primary/90 border-transparent text-white shadow-lg"
+                            : "bg-destructive/90 border-transparent text-white shadow-lg"
+                        : "bg-white/60 border-black/10 text-slate-500 hover:bg-white hover:text-slate-800"
                         }`}
                     >
                       {s === "completed" ? "Completed" : s === "in_progress" ? "In Progress" : "Dropped Out"}
@@ -439,9 +439,9 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                     patch({ noCertificate: e.target.checked });
                     if (e.target.checked) setCertificate(null);
                   }}
-                  className="w-4 h-4 border-2 border-foreground accent-primary"
+                  className="w-5 h-5 rounded-md border-black/20 text-primary focus:ring-primary/20 transition-all"
                 />
-                <span className="text-sm font-bold text-muted-foreground group-hover:text-foreground transition-colors uppercase">
+                <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors uppercase pt-0.5">
                   I don't have a certificate (enrollment will still be recorded)
                 </span>
               </label>
@@ -522,7 +522,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
           )}
         </div>
 
-        <div className="p-6 pt-4 border-t-4 border-border flex-shrink-0 flex gap-3">
+        <div className="p-6 pt-4 border-t border-black/5 bg-white/40 flex-shrink-0 flex gap-3 backdrop-blur-sm">
           {step > 1 && (
             <Button
               type="button"
@@ -539,8 +539,8 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
               onClick={handleNext}
               disabled={step === 1 && !step1Valid}
               className={`flex-1 font-bold uppercase tracking-wider border-2 transition-colors ${step === 1 && !step1Valid
-                  ? "bg-muted text-muted-foreground cursor-not-allowed border-muted-foreground"
-                  : "bg-primary border-primary hover:bg-secondary hover:border-secondary text-white"
+                ? "bg-muted text-muted-foreground cursor-not-allowed border-muted-foreground"
+                : "bg-primary border-primary hover:bg-secondary hover:border-secondary text-white"
                 }`}
             >
               Next <ChevronRight className="w-4 h-4 ml-1" />

@@ -111,7 +111,7 @@ export default function SkillVerification() {
         <div>
           <div className="flex justify-between w-full md:w-auto items-center mb-2">
             <button
-              onClick={() => navigate('/dashboard')}
+              onClick={() => navigate('/dashboard/trainee')}
               className="flex items-center text-muted-foreground hover:text-foreground transition-colors text-sm font-bold uppercase tracking-wider"
             >
               <ArrowLeft className="w-4 h-4 mr-1" /> {t('outcomePassport.backToDashboard')}
@@ -192,13 +192,15 @@ export default function SkillVerification() {
 
                 <div className="space-y-6 mb-6">
                   {questions.map((q, idx) => (
-                    <div key={q.id} className="p-5 bg-muted border-4 border-border">
-                      <label className="block text-md font-black uppercase text-foreground mb-3 flex items-start gap-2">
-                        <span className="mt-1"><HelpCircle className="w-4 h-4 text-primary" /></span>
-                        <span>{idx + 1}. {q.question}</span>
+                    <div key={q.id} className="p-6 bg-white/40 backdrop-blur-md border border-black/10 rounded-2xl shadow-sm hover:shadow-md hover:bg-white/60 transition-all duration-300 group">
+                      <label className="block text-md font-black uppercase text-slate-900 mb-4 flex items-start gap-3">
+                        <span className="mt-0.5 flex-shrink-0 bg-primary/10 p-1.5 rounded-lg group-hover:bg-primary/20 transition-colors">
+                          <HelpCircle className="w-5 h-5 text-primary" />
+                        </span>
+                        <span className="leading-snug pt-1">{idx + 1}. {q.question}</span>
                       </label>
                       <textarea
-                        className="w-full h-auto min-h-[100px] border-4 border-border bg-white px-3.5 py-3 text-sm font-bold text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none"
+                        className="w-full h-auto min-h-[120px] rounded-xl border border-black/10 bg-white/70 px-4 py-4 text-sm font-bold text-slate-800 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all resize-none shadow-inner"
                         rows={4}
                         placeholder="Type your answer here..."
                         value={answers[q.id] || ""}
@@ -284,7 +286,7 @@ export default function SkillVerification() {
               {analysis.recommendedPathways && analysis.recommendedPathways.length > 0 && (
                 <div className="mt-8">
                   <h3 className="text-lg font-black uppercase mb-4 text-foreground flex items-center gap-2">
-                    <Target className="w-5 h-5 text-primary" /> 
+                    <Target className="w-5 h-5 text-primary" />
                     {analysis.overallSkillGaps.length === 0 ? t('skillVerification.step3.advanceSkillsTitle') : t('skillVerification.step3.careerPathwayTitle')}
                   </h3>
                   <div className="space-y-4">
@@ -311,14 +313,14 @@ export default function SkillVerification() {
                               {pathway.estimatedDuration}
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-xs text-muted-foreground font-bold uppercase mr-1">{t('skillVerification.step3.addresses')}</span>
                             {pathway.skillsAddressed.map((skill, sIdx) => {
                               // Find original skill result to match color
                               const matchedResult = analysis.perSkillResults.find(r => r.skill.toLowerCase() === skill.toLowerCase() || skill.toLowerCase().includes(r.skill.toLowerCase()));
                               const isGap = !matchedResult || matchedResult.status === "gap";
-                              
+
                               return (
                                 <span key={sIdx} className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border-2 ${isGap ? 'bg-white text-destructive border-destructive' : 'bg-white text-secondary border-secondary'}`}>
                                   {skill}
@@ -330,7 +332,7 @@ export default function SkillVerification() {
                       </div>
                     ))}
                   </div>
-                  
+
                   <div className="mt-4 p-3 bg-white border-4 border-border flex items-start gap-2">
                     <Info className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                     <p className="text-xs font-bold text-muted-foreground">
