@@ -49,47 +49,70 @@ export default function OutcomePassport() {
     fetchData();
   }, []);
 
+  const PageWrapper = ({ children }: { children: React.ReactNode }) => (
+    <div className="min-h-screen bg-[#e0e5ec] p-6 sm:p-8 md:p-12 flex flex-col items-center relative overflow-hidden font-sans">
+      <div className="absolute inset-0 pointer-events-none indus-schematic-bg opacity-60" aria-hidden />
+      <div
+        className="absolute -top-32 -left-32 w-96 h-96 rounded-full pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)",
+        }}
+        aria-hidden
+      />
+      <div className="relative z-10 w-full flex flex-col items-center">
+        {children}
+      </div>
+    </div>
+  );
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-muted p-6 flex flex-col items-center justify-center text-muted-foreground space-y-4">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
-        <p className="text-lg font-bold">{t('outcomePassport.loading')}</p>
-      </div>
+      <PageWrapper>
+        <div className="flex flex-col items-center justify-center space-y-4 text-[#4a5568] min-h-[60vh]">
+          <Loader2 className="w-12 h-12 animate-spin text-[#ff4757]" />
+          <p className="indus-label">{t('outcomePassport.loading')}</p>
+        </div>
+      </PageWrapper>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-muted p-6 flex flex-col items-center justify-center text-muted-foreground space-y-4">
-        <AlertCircle className="w-12 h-12 text-destructive" />
-        <p className="text-lg text-destructive font-bold">{t('outcomePassport.error')}</p>
-        <Button onClick={fetchData} variant="outline" className="border-4 border-border text-foreground">
-          {t('outcomePassport.retry')}
-        </Button>
-      </div>
+      <PageWrapper>
+        <Card elevated className="max-w-md w-full p-8 flex flex-col items-center justify-center text-center">
+          <AlertCircle className="w-12 h-12 text-[#ff4757] mb-4" />
+          <p className="text-lg text-[#2d3436] font-bold mb-6">{t('outcomePassport.error')}</p>
+          <Button onClick={fetchData} variant="secondary">
+            {t('outcomePassport.retry')}
+          </Button>
+        </Card>
+      </PageWrapper>
     );
   }
 
   if (!enrollment) {
     return (
-      <div className="min-h-screen bg-muted p-6 md:p-8 flex flex-col items-center">
-        <div className="w-full max-w-lg mb-8 flex justify-between items-center">
-          <button onClick={() => navigate('/dashboard/trainee')} className="flex items-center text-muted-foreground hover:text-foreground transition-colors text-sm font-bold uppercase tracking-wider">
+      <PageWrapper>
+        <div className="w-full max-w-xl mb-8 flex justify-between items-center">
+          <button onClick={() => navigate('/dashboard/trainee')} className="flex items-center text-[#4a5568] hover:text-[#ff4757] transition-colors text-sm font-bold uppercase tracking-wider">
             <ArrowLeft className="w-4 h-4 mr-1" /> {t('outcomePassport.backToDashboard')}
           </button>
           <LanguageSelector />
         </div>
-        <div className="text-center p-8 bg-white border-4 border-border max-w-lg w-full">
-          <ShieldCheck className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-          <h2 className="text-2xl font-black uppercase text-foreground mb-2">{t('outcomePassport.noVerifiedCert')}</h2>
-          <p className="text-muted-foreground font-bold mb-6">
+        
+        <Card elevated className="w-full max-w-xl p-10 flex flex-col items-center text-center">
+          <div className="w-20 h-20 rounded-full mb-6 flex items-center justify-center" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+            <ShieldCheck className="w-10 h-10 text-[#a0aec0]" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#2d3436] mb-3">{t('outcomePassport.noVerifiedCert')}</h2>
+          <p className="text-[#4a5568] font-medium mb-8 max-w-md leading-relaxed">
             {t('outcomePassport.noVerifiedCertDesc')}
           </p>
-          <Button onClick={() => navigate('/dashboard/trainee')} className="bg-primary hover:bg-secondary w-full text-white font-bold uppercase tracking-wider border-2 border-primary hover:border-secondary transition-colors">
+          <Button onClick={() => navigate('/dashboard/trainee')} variant="default" fullWidth>
             {t('outcomePassport.returnToDashboard')}
           </Button>
-        </div>
-      </div>
+        </Card>
+      </PageWrapper>
     );
   }
 
@@ -115,93 +138,117 @@ export default function OutcomePassport() {
   };
 
   return (
-    <div className="min-h-screen bg-muted p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 text-foreground flex flex-col items-center">
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }} className="w-full max-w-md md:max-w-xl flex justify-between items-start">
+    <PageWrapper>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }} className="w-full max-w-3xl flex justify-between items-start mb-8">
         <div>
           <button
             onClick={() => navigate('/dashboard/trainee')}
-            className="flex items-center text-muted-foreground hover:text-foreground transition-colors mb-4 text-sm font-bold uppercase tracking-wider"
+            className="flex items-center text-[#4a5568] hover:text-[#ff4757] transition-colors mb-6 text-sm font-bold uppercase tracking-wider"
           >
             <ArrowLeft className="w-4 h-4 mr-1" /> {t('outcomePassport.backToDashboard')}
           </button>
-          <h1 className="text-2xl sm:text-3xl font-black uppercase text-foreground mb-2">
+          
+          <div className="flex items-center gap-3 mb-2">
+            <span className="indus-led-green"></span>
+            <span className="indus-label text-[#22c55e]">Verified Identity</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#2d3436] tracking-tight mb-2">
             {t('outcomePassport.title')}
           </h1>
-          <p className="text-muted-foreground font-bold text-sm sm:text-base">
+          <p className="text-[#4a5568] font-medium text-sm sm:text-base">
             Your universally verifiable proof of skill and employment.
           </p>
         </div>
         <LanguageSelector />
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }} className="w-full max-w-md md:max-w-xl">
-      <Card className="w-full bg-white border-4 border-border overflow-hidden relative">
-        <div className="absolute top-0 left-0 w-full h-2 bg-primary" />
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }} className="w-full max-w-3xl mb-8">
+        <Card elevated className="w-full overflow-hidden p-0">
+          <CardContent className="p-0 flex flex-col md:flex-row">
+            
+            {/* Left Column: Details */}
+            <div className="flex-1 p-8 sm:p-10 space-y-8">
+              <div>
+                <p className="indus-label text-[#4a5568] mb-1">Passport Holder</p>
+                <h2 className="text-3xl font-bold text-[#2d3436] mb-1">{fullName}</h2>
+                <p className="text-sm font-medium text-[#4a5568] flex items-center gap-1">
+                  <MapPin className="w-4 h-4" /> {district}, MH
+                </p>
+              </div>
 
-        <CardContent className="p-6 sm:p-8 pt-10 flex flex-col md:flex-row gap-8 items-center md:items-start">
-          <div className="flex-1 space-y-6 w-full">
-            <div>
-              <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1">Passport Holder</p>
-              <h2 className="text-2xl font-black text-foreground uppercase">{fullName}</h2>
-              <p className="text-sm font-bold text-muted-foreground flex items-center gap-1 mt-1 uppercase">
-                <MapPin className="w-3.5 h-3.5" /> {district}, MH
+              <div className="space-y-4">
+                {/* Recessed Info Blocks */}
+                <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+                  <p className="indus-label text-[#4a5568] mb-1">{t('outcomePassport.certifiedCourse')}</p>
+                  <p className="font-bold text-[#2d3436] text-base mb-1">{courseName}</p>
+                  <p className="text-sm font-mono text-[#4a5568]">{t('outcomePassport.completionDate')}: {certDate}</p>
+                </div>
+
+                <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+                  <p className="indus-label text-[#4a5568] mb-1 flex items-center gap-1">
+                    <Briefcase className="w-4 h-4" /> Employment Status
+                  </p>
+                  <p className="font-bold text-[#3b82f6] text-base mb-1">{getOutcomeText()}</p>
+                  {outcome?.monthlyWage && (
+                    <p className="text-sm font-mono text-[#2d3436]">
+                      {t('outcomePassport.salary')}: {formatINR(outcome.monthlyWage)}
+                    </p>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+                    <p className="indus-label text-[#4a5568] mb-1">{t('outcomePassport.skillVerificationScore')}</p>
+                    <p className="font-bold text-[#22c55e] text-2xl font-mono">{skillScore}</p>
+                  </div>
+                  <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+                    <p className="indus-label text-[#4a5568] mb-1">Issuer</p>
+                    <p className="font-bold text-[#2d3436] text-sm truncate" title={enrollment.program?.provider?.instituteName || "Govt of MH"}>
+                      {enrollment.program?.provider?.instituteName || "Govt of MH"}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right Column: QR Code */}
+            <div className="flex flex-col items-center justify-center p-8 sm:p-10 shrink-0 md:w-[320px] bg-[#d8dde8] relative overflow-hidden">
+               {/* Vertical divider line for desktop */}
+              <div className="hidden md:block absolute left-0 top-12 bottom-12 w-px bg-gradient-to-b from-transparent via-[#babecc] to-transparent" />
+              
+              <div 
+                className="p-6 rounded-2xl bg-[#f0f2f5] mb-6"
+                style={{ boxShadow: "var(--shadow-floating)" }}
+              >
+                <div className="p-4 bg-white rounded-lg shadow-inner">
+                  <QRCodeSVG
+                    value={verifyUrl}
+                    size={180}
+                    level="H"
+                    includeMargin={false}
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 mb-2">
+                <ShieldCheck className="w-5 h-5 text-[#22c55e]" />
+                <span className="font-bold text-[#2d3436]">Cryptographically Secure</span>
+              </div>
+              <p className="indus-label text-[#4a5568] text-center max-w-[200px]">
+                {t('outcomePassport.scanToVerify')}
               </p>
             </div>
-
-            <div className="space-y-4">
-              <div className="bg-muted p-3 border-4 border-border">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">{t('outcomePassport.certifiedCourse')}</p>
-                <p className="font-black text-foreground text-sm sm:text-base uppercase">{courseName}</p>
-                <p className="text-xs font-bold text-muted-foreground mt-1 uppercase">{t('outcomePassport.completionDate')}: {certDate}</p>
-              </div>
-
-              <div className="bg-muted p-3 border-4 border-border">
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1 flex items-center gap-1">
-                  <Briefcase className="w-3.5 h-3.5" /> Employment Status
-                </p>
-                <p className="font-black text-secondary text-sm sm:text-base uppercase">{getOutcomeText()}</p>
-                {outcome?.monthlyWage && (
-                  <p className="text-foreground font-bold text-xs mt-1 uppercase">{t('outcomePassport.salary')}: {formatINR(outcome.monthlyWage)}</p>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="bg-muted p-3 border-4 border-border">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">{t('outcomePassport.skillVerificationScore')}</p>
-                  <p className="font-black text-foreground text-lg">{skillScore}</p>
-                </div>
-                <div className="bg-muted p-3 border-4 border-border">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Issuer</p>
-                  <p className="font-black text-foreground text-sm truncate uppercase" title={enrollment.program?.provider?.instituteName || "Govt of MH"}>
-                    {enrollment.program?.provider?.instituteName || "Govt of MH"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col items-center justify-center space-y-4 w-full md:w-auto shrink-0 border-t-4 md:border-t-0 md:border-l-4 border-border pt-6 md:pt-0 md:pl-8">
-            <div className="bg-white p-3 border-4 border-border">
-              <QRCodeSVG
-                value={verifyUrl}
-                size={160}
-                level="H"
-                includeMargin={false}
-              />
-            </div>
-            <p className="text-[10px] text-muted-foreground font-bold text-center uppercase tracking-widest max-w-[160px]">
-              {t('outcomePassport.scanToVerify')}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }} className="w-full max-w-md md:max-w-xl flex gap-4">
-        <Button className="flex-1 bg-white hover:bg-accent text-foreground hover:text-black border-4 border-border hover:border-accent font-bold uppercase tracking-wider transition-colors">
-          <Download className="w-4 h-4 mr-2" /> {t('outcomePassport.downloadPdf')}
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }} className="w-full max-w-3xl flex justify-end">
+        <Button variant="secondary" className="group">
+          <Download className="w-5 h-5 mr-2 text-[#4a5568] group-hover:text-[#ff4757] transition-colors" /> 
+          {t('outcomePassport.downloadPdf')}
         </Button>
       </motion.div>
-    </div>
+    </PageWrapper>
   );
 }

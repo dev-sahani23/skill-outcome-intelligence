@@ -37,30 +37,40 @@ interface CloudinaryFile {
 function StepIndicator({ current, total }: { current: number; total: number }) {
   const steps = ["Training Details", "Certificate", "Review & Submit"];
   return (
-    <div className="flex items-center justify-center gap-2 mb-6">
+    <div className="flex items-center justify-center gap-2 mb-8 mt-2">
       {steps.map((label, i) => {
         const stepNum = i + 1;
         const isActive = stepNum === current;
         const isDone = stepNum < current;
         return (
           <div key={i} className="flex items-center">
-            <div className="flex flex-col items-center gap-1">
+            <div className="flex flex-col items-center gap-2">
               <div
-                className={`w-8 h-8 flex items-center justify-center text-sm font-black transition-all ${isDone
-                  ? "bg-secondary text-white border-4 border-secondary"
-                  : isActive
-                    ? "bg-primary text-white border-4 border-primary"
-                    : "bg-white text-muted-foreground border-4 border-border"
-                  }`}
+                className={`w-10 h-10 flex items-center justify-center text-sm font-bold rounded-full transition-all ${
+                  isDone
+                    ? "bg-[#22c55e] text-white shadow-[var(--shadow-btn-accent)]"
+                    : isActive
+                    ? "bg-[#ff4757] text-white shadow-[var(--shadow-btn-accent)]"
+                    : "bg-[#e0e5ec] text-[#4a5568] shadow-[var(--shadow-recessed)]"
+                }`}
               >
-                {isDone ? <CheckCircle2 className="w-4 h-4" /> : stepNum}
+                {isDone ? <CheckCircle2 className="w-5 h-5" /> : stepNum}
               </div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider whitespace-nowrap mt-1 ${isActive ? "text-primary" : "text-muted-foreground"}`}>
+              <span
+                className={`text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${
+                  isActive ? "text-[#ff4757]" : isDone ? "text-[#22c55e]" : "text-[#4a5568]"
+                }`}
+              >
                 {label}
               </span>
             </div>
             {i < total - 1 && (
-              <div className={`w-12 h-1 mx-1 mb-4 ${isDone ? "bg-secondary" : "bg-border"}`} />
+              <div
+                className={`w-12 h-1 mx-2 mb-5 rounded-full ${
+                  isDone ? "bg-[#22c55e]" : "bg-[#e2e8f0]"
+                }`}
+                style={{ boxShadow: isDone ? "0 0 8px rgba(34, 197, 94, 0.4)" : "inset 0 1px 2px rgba(0,0,0,0.1)" }}
+              />
             )}
           </div>
         );
@@ -85,7 +95,7 @@ function SkillInput({ skills, onChange }: { skills: string[]; onChange: (s: stri
   const removeSkill = (skill: string) => onChange(skills.filter((s) => s !== skill));
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       <div className="flex gap-2">
         <Input
           placeholder='Type a skill and press Enter (e.g. "React")'
@@ -97,26 +107,27 @@ function SkillInput({ skills, onChange }: { skills: string[]; onChange: (s: stri
               addSkill();
             }
           }}
-          className="flex-1 focus-visible:ring-secondary focus-visible:border-secondary"
+          className="flex-1 indus-input"
         />
-        <Button type="button" onClick={addSkill} className="bg-foreground hover:bg-accent hover:text-black text-white border-2 border-foreground hover:border-accent transition-colors px-3 font-bold uppercase tracking-wider">
-          Add
+        <Button type="button" variant="secondary" onClick={addSkill} className="px-6">
+          ADD
         </Button>
       </div>
       {skills.length > 0 && (
-        <div className="flex flex-wrap gap-2 pt-1">
+        <div className="flex flex-wrap gap-2 pt-2">
           {skills.map((skill) => (
             <span
               key={skill}
-              className="inline-flex items-center gap-1 bg-white text-primary font-bold uppercase tracking-wider border-4 border-primary text-xs px-2.5 py-1"
+              className="inline-flex items-center gap-1.5 bg-[#f0f2f5] text-[#2d3436] font-bold uppercase tracking-wider text-xs px-3 py-1.5 rounded-md shadow-sm border border-[#e2e8f0]"
             >
+              <span className="indus-led-green w-1.5 h-1.5"></span>
               {skill}
               <button
                 type="button"
                 onClick={() => removeSkill(skill)}
-                className="hover:text-blue-700 transition-colors ml-0.5"
+                className="hover:text-[#ff4757] transition-colors ml-1"
               >
-                <X className="w-3 h-3" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </span>
           ))}
@@ -153,7 +164,6 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
 
   const patch = (updates: Partial<FormData>) => setForm((f) => ({ ...f, ...updates }));
 
-  // Reset everything when closing
   const handleClose = () => {
     setStep(1);
     setSubmitError("");
@@ -167,7 +177,6 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
     onClose();
   };
 
-  // Step 1 validation gate
   const step1Valid =
     form.programName.trim().length >= 2 &&
     form.providerName.trim().length >= 2 &&
@@ -179,7 +188,6 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
 
   const handleNext = () => {
     if (step === 1) {
-      // Skip step 2 if not completed
       setStep(form.status === "completed" ? 2 : 3);
     } else {
       setStep(3);
@@ -194,7 +202,6 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
     }
   };
 
-  // Cloudinary unsigned upload widget
   const openUploadWidget = useCallback(() => {
     if (!window.cloudinary) {
       alert("Cloudinary widget is not loaded. Please refresh and try again.");
@@ -263,54 +270,65 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
 
   if (!isOpen) return null;
 
-  const totalSteps = form.status === "completed" ? 3 : 2;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/30 backdrop-blur-md px-4">
-      <div className="bg-white/80 backdrop-blur-xl border border-white/50 shadow-2xl rounded-[2rem] w-full max-w-xl relative overflow-hidden max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2d3436]/40 backdrop-blur-md px-4 font-sans">
+      <div className="bg-[#f0f2f5] shadow-[var(--shadow-floating)] rounded-2xl w-full max-w-xl relative overflow-hidden max-h-[90vh] flex flex-col border border-white/40">
+        
         {/* Header */}
-        <div className="p-6 pb-0 flex-shrink-0 relative">
+        <div className="p-8 pb-4 flex-shrink-0 relative border-b border-[#d1d9e6]">
           <button
             onClick={handleClose}
-            className="absolute top-6 right-6 text-slate-400 hover:text-slate-800 bg-white/50 hover:bg-white rounded-full p-2 transition-all hover:scale-105"
+            className="absolute top-6 right-6 text-[#4a5568] hover:text-[#ff4757] bg-[#e0e5ec] hover:bg-white rounded-lg p-2 shadow-sm transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
-          <h2 className="text-xl font-black uppercase tracking-wider text-foreground mb-1">Add Training Record</h2>
-          <p className="text-sm font-bold text-muted-foreground mb-4">Record your training history and upload certificates.</p>
+          
+          <div className="flex items-center gap-2 mb-2">
+            <span className="indus-led-green"></span>
+            <span className="indus-label text-[#22c55e]">Training Module</span>
+          </div>
+          
+          <h2 className="text-2xl font-bold text-[#2d3436] tracking-tight mb-2">Add Training Record</h2>
+          <p className="text-sm font-medium text-[#4a5568]">Record your training history and upload certificates.</p>
+        </div>
+
+        {/* Progress Indicator */}
+        <div className="px-8 pt-6">
           <StepIndicator current={step} total={3} />
         </div>
 
         {/* Scrollable body */}
-        <div className="overflow-y-auto flex-1 px-6 pb-2">
+        <div className="overflow-y-auto flex-1 px-8 pb-8 pt-2">
 
           {/* ─── STEP 1: Training Details ─── */}
           {step === 1 && (
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold uppercase tracking-wider text-foreground">Training / Course Name *</label>
+            <div className="space-y-6">
+              <div className="space-y-2">
+                <label className="indus-label text-[#2d3436]">Training / Course Name *</label>
                 <Input
+                  className="indus-input w-full"
                   placeholder="e.g. Full Stack Web Development"
                   value={form.programName}
                   onChange={(e) => patch({ programName: e.target.value })}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold uppercase tracking-wider text-foreground">Institution / Provider *</label>
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <label className="indus-label text-[#2d3436]">Institution / Provider *</label>
                   <Input
+                    className="indus-input w-full"
                     placeholder="e.g. Excel Skills Academy"
                     value={form.providerName}
                     onChange={(e) => patch({ providerName: e.target.value })}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold uppercase tracking-wider text-foreground">Provider Type *</label>
+                <div className="space-y-2">
+                  <label className="indus-label text-[#2d3436]">Provider Type *</label>
                   <select
                     value={form.providerType}
                     onChange={(e) => patch({ providerType: e.target.value as any })}
-                    className="w-full h-12 rounded-xl border border-black/10 bg-white/70 px-4 text-sm font-bold text-slate-800 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-inner"
+                    className="indus-input w-full h-[52px] px-4"
                   >
                     <option value="">Select type</option>
                     <option value="government">Government</option>
@@ -320,12 +338,12 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold uppercase tracking-wider text-foreground">Sector *</label>
+              <div className="space-y-2">
+                <label className="indus-label text-[#2d3436]">Sector *</label>
                 <select
                   value={form.sector}
                   onChange={(e) => patch({ sector: e.target.value })}
-                  className="w-full h-12 rounded-xl border border-black/10 bg-white/70 px-4 text-sm font-bold text-slate-800 focus-visible:ring-2 focus-visible:ring-primary/20 outline-none transition-all shadow-inner"
+                  className="indus-input w-full h-[52px] px-4"
                 >
                   <option value="">Select sector</option>
                   {["Manufacturing", "IT", "Construction", "Healthcare", "Retail", "Agriculture", "Other"].map((s) => (
@@ -334,20 +352,22 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold uppercase tracking-wider text-foreground">Start Date *</label>
+              <div className="grid grid-cols-2 gap-5">
+                <div className="space-y-2">
+                  <label className="indus-label text-[#2d3436]">Start Date *</label>
                   <Input
                     type="date"
+                    className="indus-input w-full"
                     value={form.startDate}
                     max={new Date().toISOString().split("T")[0]}
                     onChange={(e) => patch({ startDate: e.target.value })}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold uppercase tracking-wider text-foreground">End Date</label>
+                <div className="space-y-2">
+                  <label className="indus-label text-[#2d3436]">End Date</label>
                   <Input
                     type="date"
+                    className="indus-input w-full"
                     value={form.endDate}
                     min={form.startDate}
                     onChange={(e) => patch({ endDate: e.target.value })}
@@ -355,59 +375,59 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-bold uppercase tracking-wider text-foreground">Status *</label>
-                <div className="flex gap-3">
-                  {(["completed", "in_progress", "dropped"] as const).map((s) => (
-                    <button
-                      key={s}
-                      type="button"
-                      onClick={() => patch({ status: s })}
-                      className={`flex-1 py-3 rounded-xl border text-sm font-bold uppercase tracking-wider transition-all hover:shadow-md ${form.status === s
-                        ? s === "completed"
-                          ? "bg-secondary/90 border-transparent text-white shadow-lg"
-                          : s === "in_progress"
-                            ? "bg-primary/90 border-transparent text-white shadow-lg"
-                            : "bg-destructive/90 border-transparent text-white shadow-lg"
-                        : "bg-white/60 border-black/10 text-slate-500 hover:bg-white hover:text-slate-800"
+              <div className="space-y-3">
+                <label className="indus-label text-[#2d3436]">Status *</label>
+                <div className="flex gap-3 bg-[#e0e5ec] p-2 rounded-xl shadow-[var(--shadow-recessed)]">
+                  {(["completed", "in_progress", "dropped"] as const).map((s) => {
+                    const isSelected = form.status === s;
+                    return (
+                      <button
+                        key={s}
+                        type="button"
+                        onClick={() => patch({ status: s })}
+                        className={`flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                          isSelected
+                            ? "bg-white text-[#2d3436] shadow-sm border border-[#e2e8f0]"
+                            : "bg-transparent text-[#4a5568] hover:bg-[#d1d9e6]"
                         }`}
-                    >
-                      {s === "completed" ? "Completed" : s === "in_progress" ? "In Progress" : "Dropped Out"}
-                    </button>
-                  ))}
+                      >
+                        {s === "completed" ? "Completed" : s === "in_progress" ? "In Progress" : "Dropped"}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-sm font-bold uppercase tracking-wider text-foreground">
-                  Skills Learned *
-                  {form.status === "completed" && <span className="text-destructive ml-1">(min 1 required)</span>}
+              <div className="space-y-2">
+                <label className="indus-label text-[#2d3436] flex justify-between">
+                  <span>Skills Learned *</span>
+                  {form.status === "completed" && <span className="text-[#ff4757]">(min 1 required)</span>}
                 </label>
                 <SkillInput skills={form.skills} onChange={(s) => patch({ skills: s })} />
               </div>
             </div>
           )}
 
-          {/* ─── STEP 2: Certificate Upload (completed only) ─── */}
+          {/* ─── STEP 2: Certificate Upload ─── */}
           {step === 2 && (
-            <div className="space-y-5">
-              <p className="text-sm font-bold text-muted-foreground">
+            <div className="space-y-6">
+              <p className="text-sm font-medium text-[#4a5568] leading-relaxed">
                 Upload the certificate you received. The file goes directly from your browser to our secure storage — no data passes through our servers.
               </p>
 
               {certificate ? (
-                <div className="bg-white border-4 border-secondary p-4 flex items-center gap-3">
-                  <div className="bg-secondary p-2 text-white">
+                <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-4 flex items-center gap-4 shadow-sm">
+                  <div className="bg-[#e0e5ec] p-3 rounded-lg text-[#2d3436]">
                     <FileText className="w-6 h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-black uppercase text-foreground truncate">{certificate.fileName}</p>
-                    <p className="text-xs font-bold text-muted-foreground uppercase mt-0.5">Uploaded successfully</p>
+                    <p className="text-sm font-bold text-[#2d3436] truncate">{certificate.fileName}</p>
+                    <p className="indus-label text-[#22c55e] mt-1">Uploaded successfully</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setCertificate(null)}
-                    className="text-muted-foreground hover:text-destructive"
+                    className="text-[#4a5568] hover:text-[#ff4757] p-2 bg-white rounded-md shadow-sm transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -417,21 +437,21 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                   type="button"
                   onClick={openUploadWidget}
                   disabled={isUploading}
-                  className="w-full bg-muted border-4 border-dashed border-border hover:border-primary hover:bg-primary/5 hover:text-primary p-8 flex flex-col items-center gap-3 text-muted-foreground transition-colors focus-visible:ring-2 focus-visible:ring-primary outline-none group"
+                  className="w-full bg-[#f8fafc] border-2 border-dashed border-[#babecc] hover:border-[#3b82f6] hover:bg-[#ebf5ff] rounded-xl p-10 flex flex-col items-center gap-3 text-[#4a5568] hover:text-[#3b82f6] transition-colors focus-visible:ring-2 focus-visible:ring-[#3b82f6] outline-none group shadow-sm"
                 >
                   {isUploading ? (
                     <Loader2 className="w-8 h-8 animate-spin" />
                   ) : (
-                    <Upload className="w-8 h-8 group-hover:scale-110 transition-transform" />
+                    <Upload className="w-8 h-8 group-hover:-translate-y-1 transition-transform" />
                   )}
-                  <span className="text-sm font-black uppercase tracking-wider">
+                  <span className="text-sm font-bold uppercase tracking-wider">
                     {isUploading ? "Opening upload widget..." : "Upload Certificate (PDF or Image)"}
                   </span>
-                  <span className="text-xs font-bold uppercase tracking-wider opacity-70">PDF, JPG, PNG · Max 5MB</span>
+                  <span className="indus-label opacity-70">PDF, JPG, PNG · Max 5MB</span>
                 </button>
               ) : null}
 
-              <label className="flex items-center gap-2.5 cursor-pointer group">
+              <label className="flex items-center gap-3 cursor-pointer group bg-[#e0e5ec] p-4 rounded-xl shadow-[var(--shadow-recessed)]">
                 <input
                   type="checkbox"
                   checked={form.noCertificate}
@@ -439,26 +459,32 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                     patch({ noCertificate: e.target.checked });
                     if (e.target.checked) setCertificate(null);
                   }}
-                  className="w-5 h-5 rounded-md border-black/20 text-primary focus:ring-primary/20 transition-all"
+                  className="w-5 h-5 rounded border-[#babecc] text-[#ff4757] focus:ring-[#ff4757] transition-all bg-white"
                 />
-                <span className="text-sm font-bold text-slate-600 group-hover:text-slate-900 transition-colors uppercase pt-0.5">
-                  I don't have a certificate (enrollment will still be recorded)
+                <span className="text-sm font-bold text-[#2d3436] group-hover:text-[#ff4757] transition-colors uppercase tracking-wider">
+                  I don't have a certificate
                 </span>
               </label>
 
-              <div className="border-t-4 border-border pt-4 space-y-4">
-                <p className="text-xs text-muted-foreground uppercase tracking-wider font-bold">Optional Details</p>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold uppercase tracking-wider text-foreground">Certification Name</label>
+              <div className="border-t border-[#d1d9e6] pt-6 space-y-5">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="indus-led-green"></span>
+                  <p className="indus-label text-[#4a5568]">Optional Details</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="indus-label text-[#2d3436]">Certification Name</label>
                   <Input
+                    className="indus-input w-full"
                     placeholder="e.g. FSWD Level 1"
                     value={form.certificationName}
                     onChange={(e) => patch({ certificationName: e.target.value })}
                   />
                 </div>
-                <div className="space-y-1.5">
-                  <label className="text-sm font-bold uppercase tracking-wider text-foreground">Certification Issued Date</label>
+                <div className="space-y-2">
+                  <label className="indus-label text-[#2d3436]">Certification Issued Date</label>
                   <Input
+                    className="indus-input w-full"
                     type="date"
                     value={form.certificationIssuedDate}
                     onChange={(e) => patch({ certificationIssuedDate: e.target.value })}
@@ -470,27 +496,27 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
 
           {/* ─── STEP 3: Review & Submit ─── */}
           {step === 3 && (
-            <div className="space-y-4">
-              <div className="bg-muted border-4 border-border p-4 space-y-3">
+            <div className="space-y-6">
+              <div className="bg-[#e0e5ec] rounded-xl p-6 shadow-[var(--shadow-recessed)] space-y-4">
                 <Row label="Course" value={form.programName} />
                 <Row label="Provider" value={`${form.providerName} (${form.providerType})`} />
                 <Row label="Sector" value={form.sector} />
                 <Row label="Period" value={`${form.startDate}${form.endDate ? ` → ${form.endDate}` : ""}`} />
                 <Row
                   label="Status"
-                  value={form.status === "completed" ? "✅ Completed" : form.status === "in_progress" ? "🔄 In Progress" : "❌ Dropped Out"}
+                  value={form.status === "completed" ? "✅ Completed" : form.status === "in_progress" ? "🔄 In Progress" : "❌ Dropped"}
                 />
-                <div className="pt-2 border-t-4 border-border">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-2">Skills</p>
-                  <div className="flex flex-wrap gap-1.5">
+                <div className="pt-4 border-t border-[#babecc]">
+                  <p className="indus-label text-[#4a5568] mb-2">Skills Learned</p>
+                  <div className="flex flex-wrap gap-2">
                     {form.skills.map((s) => (
-                      <span key={s} className="bg-white text-primary font-bold uppercase tracking-wider border-4 border-primary text-xs px-2 py-0.5">
+                      <span key={s} className="bg-white text-[#2d3436] font-bold text-xs px-2.5 py-1 rounded shadow-sm border border-[#e2e8f0]">
                         {s}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="pt-2 border-t-4 border-border">
+                <div className="pt-4 border-t border-[#babecc]">
                   <Row
                     label="Certificate"
                     value={
@@ -501,33 +527,35 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                           : "Not uploaded"
                     }
                   />
-                  {form.certificationName && <Row label="Cert Name" value={form.certificationName} />}
+                  {form.certificationName && <div className="mt-2"><Row label="Cert Name" value={form.certificationName} /></div>}
                 </div>
               </div>
 
               {submitError && (
-                <div className="flex items-center gap-2 bg-red-50 border-4 border-destructive text-destructive font-bold text-sm p-3 uppercase tracking-wider">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                  {submitError}
+                <div className="flex items-center gap-3 bg-white border border-[#ff4757] rounded-lg p-4 shadow-sm">
+                  <AlertCircle className="w-5 h-5 text-[#ff4757] flex-shrink-0" />
+                  <p className="text-sm font-bold text-[#ff4757]">{submitError}</p>
                 </div>
               )}
 
               {toast && (
-                <div className="flex items-center gap-2 bg-emerald-50 border-4 border-secondary text-secondary font-bold text-sm p-3 uppercase tracking-wider">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                  {toast}
+                <div className="flex items-center gap-3 bg-white border border-[#22c55e] rounded-lg p-4 shadow-sm">
+                  <CheckCircle2 className="w-5 h-5 text-[#22c55e] flex-shrink-0" />
+                  <p className="text-sm font-bold text-[#22c55e]">{toast}</p>
                 </div>
               )}
             </div>
           )}
         </div>
 
-        <div className="p-6 pt-4 border-t border-black/5 bg-white/40 flex-shrink-0 flex gap-3 backdrop-blur-sm">
+        {/* Footer actions */}
+        <div className="p-6 border-t border-[#d1d9e6] bg-[#e0e5ec] flex-shrink-0 flex gap-4 rounded-b-2xl">
           {step > 1 && (
             <Button
               type="button"
+              variant="secondary"
               onClick={handleBack}
-              className="bg-white hover:bg-accent text-foreground hover:text-black border-4 border-border hover:border-accent flex-1 font-bold uppercase tracking-wider transition-colors"
+              className="flex-1"
             >
               <ChevronLeft className="w-4 h-4 mr-1" /> Back
             </Button>
@@ -536,37 +564,26 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
           {step < 3 ? (
             <Button
               type="button"
+              variant="default"
               onClick={handleNext}
               disabled={step === 1 && !step1Valid}
-              className={`flex-1 font-bold uppercase tracking-wider border-2 transition-colors ${step === 1 && !step1Valid
-                ? "bg-muted text-muted-foreground cursor-not-allowed border-muted-foreground"
-                : "bg-primary border-primary hover:bg-secondary hover:border-secondary text-white"
-                }`}
+              className="flex-1"
             >
               Next <ChevronRight className="w-4 h-4 ml-1" />
             </Button>
           ) : (
             <Button
               type="button"
+              variant="default"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="flex-1 bg-primary hover:bg-secondary hover:border-secondary text-white font-bold uppercase tracking-wider border-2 border-primary transition-colors"
+              className="flex-1"
             >
               {isSubmitting ? (
                 <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Saving...</>
               ) : (
                 "Submit Record"
               )}
-            </Button>
-          )}
-
-          {step === 3 && (
-            <Button
-              type="button"
-              onClick={() => setStep(1)}
-              className="bg-white hover:bg-accent text-foreground hover:text-black border-4 border-border hover:border-accent font-bold uppercase tracking-wider transition-colors"
-            >
-              Edit
             </Button>
           )}
         </div>
@@ -580,8 +597,8 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-start gap-4">
-      <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider flex-shrink-0">{label}</span>
-      <span className="text-sm font-black text-foreground uppercase text-right">{value}</span>
+      <span className="indus-label text-[#4a5568] flex-shrink-0">{label}</span>
+      <span className="text-sm font-bold text-[#2d3436] text-right">{value}</span>
     </div>
   );
 }

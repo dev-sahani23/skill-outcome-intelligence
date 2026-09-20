@@ -63,8 +63,6 @@ export default function SkillVerification() {
         throw new Error("Please enter at least one skill.");
       }
 
-      // We omit certificates, projects, and courses from this simple UI for brevity,
-      // but they can easily be added to the payload.
       const payload = {
         claimedSkills: skillsArray,
         claimedCertifications: [],
@@ -106,25 +104,33 @@ export default function SkillVerification() {
   };
 
   return (
-    <div className="min-h-screen bg-muted p-6 md:p-8 space-y-8 text-foreground relative">
-      <div className="flex flex-col md:flex-row justify-between md:items-center bg-white p-6 border-4 border-border gap-4">
+    <div className="min-h-screen bg-[#e0e5ec] indus-schematic-bg p-6 md:p-8 space-y-8 font-sans">
+      
+      {/* Header Panel */}
+      <div className="flex flex-col md:flex-row justify-between md:items-center bg-[#f0f2f5] p-6 rounded-2xl shadow-[var(--shadow-floating)] border border-white/40 gap-4">
         <div>
-          <div className="flex justify-between w-full md:w-auto items-center mb-2">
+          <div className="flex justify-between w-full md:w-auto items-center mb-3">
             <button
               onClick={() => navigate('/dashboard/trainee')}
-              className="flex items-center text-muted-foreground hover:text-foreground transition-colors text-sm font-bold uppercase tracking-wider"
+              className="flex items-center text-[#4a5568] hover:text-[#ff4757] transition-colors text-sm font-bold uppercase tracking-wider bg-[#e0e5ec] px-3 py-1.5 rounded-lg shadow-sm"
             >
-              <ArrowLeft className="w-4 h-4 mr-1" /> {t('outcomePassport.backToDashboard')}
+              <ArrowLeft className="w-4 h-4 mr-1.5" /> {t('outcomePassport.backToDashboard')}
             </button>
             <div className="md:hidden block">
               <LanguageSelector />
             </div>
           </div>
-          <h1 className="text-3xl font-black uppercase text-foreground flex items-center gap-2">
+          
+          <div className="flex items-center gap-2 mb-1">
+            <span className="indus-led-red"></span>
+            <span className="indus-label text-[#ff4757]">AI Diagnostic</span>
+          </div>
+
+          <h1 className="text-3xl font-bold text-[#2d3436] tracking-tight">
             {t('skillVerification.title')}
           </h1>
-          <p className="text-muted-foreground font-bold mt-2 flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-primary" /> {t('skillVerification.subtitle')}
+          <p className="text-[#4a5568] font-medium mt-1 flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#ff4757]" /> {t('skillVerification.subtitle')}
           </p>
         </div>
         <div className="hidden md:block">
@@ -133,28 +139,31 @@ export default function SkillVerification() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border-4 border-destructive text-destructive font-bold p-4 flex items-center gap-3">
+        <div className="bg-white border border-[#ff4757] text-[#ff4757] font-bold p-4 rounded-xl shadow-sm flex items-center gap-3">
           <AlertCircle className="w-5 h-5" />
           {error}
         </div>
       )}
 
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto space-y-6">
+        
+        {/* Step 1: Claim Skills */}
         {step === 1 && (
-          <Card className="bg-white border-4 border-border">
-            <CardHeader className="border-b-4 border-border pb-4">
-              <CardTitle className="text-xl font-black uppercase text-foreground flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 bg-primary text-white text-sm">1</span>
+          <Card className="relative overflow-hidden border border-white/40">
+            <CardHeader className="border-b border-[#d1d9e6] bg-white/40 pb-4">
+              <CardTitle className="text-xl font-bold text-[#2d3436] flex items-center gap-3">
+                <span className="flex items-center justify-center w-8 h-8 bg-[#ff4757] rounded-full text-white shadow-[var(--shadow-btn-accent)] text-sm">1</span>
                 {t('skillVerification.step1.title').replace('Step 1: ', '')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="pt-8">
               <form onSubmit={handleStart} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-sm font-bold uppercase tracking-wider text-foreground">
+                <div className="space-y-3">
+                  <label className="indus-label text-[#2d3436]">
                     {t('skillVerification.step1.title').replace('Step 1: ', '')} (Comma separated)
                   </label>
                   <Input
+                    className="indus-input w-full"
                     type="text"
                     placeholder={t('skillVerification.step1.inputPlaceholder')}
                     value={skillsStr}
@@ -162,12 +171,13 @@ export default function SkillVerification() {
                     disabled={loading}
                     required
                   />
-                  <p className="text-xs font-bold text-muted-foreground">{t('skillVerification.step1.description')}</p>
+                  <p className="text-sm font-medium text-[#4a5568] pl-1">{t('skillVerification.step1.description')}</p>
                 </div>
                 <Button
                   type="submit"
-                  className="w-full bg-primary hover:bg-secondary text-white font-bold uppercase tracking-wider border-2 border-primary hover:border-secondary transition-colors"
+                  variant="default"
                   disabled={loading}
+                  fullWidth
                 >
                   {loading ? t('skillVerification.step1.generatingBtn') : t('skillVerification.step1.generateBtn')}
                 </Button>
@@ -176,31 +186,32 @@ export default function SkillVerification() {
           </Card>
         )}
 
+        {/* Step 2: Answer Questions */}
         {step === 2 && (
-          <Card className="bg-white border-4 border-border">
-            <CardHeader className="border-b-4 border-border pb-4">
-              <CardTitle className="text-xl font-black uppercase text-foreground flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 bg-primary text-white text-sm">2</span>
+          <Card className="relative overflow-hidden border border-white/40">
+            <CardHeader className="border-b border-[#d1d9e6] bg-white/40 pb-4">
+              <CardTitle className="text-xl font-bold text-[#2d3436] flex items-center gap-3">
+                <span className="flex items-center justify-center w-8 h-8 bg-[#ff4757] rounded-full text-white shadow-[var(--shadow-btn-accent)] text-sm">2</span>
                 {t('skillVerification.step2.title').replace('Step 2: ', '')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
+            <CardContent className="pt-8">
               <form onSubmit={handleSubmitAnswers}>
-                <p className="mb-6 font-bold text-muted-foreground text-sm">
+                <p className="mb-6 font-medium text-[#4a5568] text-sm bg-white p-4 rounded-xl shadow-sm border border-[#e2e8f0]">
                   Please answer the following verification questions based on your knowledge and experience.
                 </p>
 
-                <div className="space-y-6 mb-6">
+                <div className="space-y-6 mb-8">
                   {questions.map((q, idx) => (
-                    <div key={q.id} className="p-6 bg-white/40 backdrop-blur-md border border-black/10 rounded-2xl shadow-sm hover:shadow-md hover:bg-white/60 transition-all duration-300 group">
-                      <label className="block text-md font-black uppercase text-slate-900 mb-4 flex items-start gap-3">
-                        <span className="mt-0.5 flex-shrink-0 bg-primary/10 p-1.5 rounded-lg group-hover:bg-primary/20 transition-colors">
-                          <HelpCircle className="w-5 h-5 text-primary" />
+                    <div key={q.id} className="p-6 bg-[#e0e5ec] rounded-2xl shadow-[var(--shadow-recessed)] space-y-4">
+                      <label className="block text-base font-bold text-[#2d3436] flex items-start gap-3">
+                        <span className="mt-0.5 flex-shrink-0 bg-white p-2 rounded-lg shadow-sm border border-[#e2e8f0]">
+                          <HelpCircle className="w-5 h-5 text-[#3b82f6]" />
                         </span>
                         <span className="leading-snug pt-1">{idx + 1}. {q.question}</span>
                       </label>
                       <textarea
-                        className="w-full h-auto min-h-[120px] rounded-xl border border-black/10 bg-white/70 px-4 py-4 text-sm font-bold text-slate-800 placeholder:text-slate-400 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all resize-none shadow-inner"
+                        className="indus-input w-full min-h-[120px] rounded-xl px-4 py-4 resize-y"
                         rows={4}
                         placeholder="Type your answer here..."
                         value={answers[q.id] || ""}
@@ -214,8 +225,9 @@ export default function SkillVerification() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-primary hover:bg-secondary text-white font-bold uppercase tracking-wider border-2 border-primary hover:border-secondary transition-colors"
+                  variant="default"
                   disabled={loading}
+                  fullWidth
                 >
                   {loading ? t('skillVerification.step2.analyzingBtn') : t('skillVerification.step2.submitBtn')}
                 </Button>
@@ -224,58 +236,65 @@ export default function SkillVerification() {
           </Card>
         )}
 
+        {/* Step 3: Analysis Results */}
         {step === 3 && analysis && (
-          <Card className="bg-white border-4 border-border">
-            <CardHeader className="border-b-4 border-border pb-4">
-              <CardTitle className="text-xl font-black uppercase text-foreground flex items-center gap-2">
-                <span className="flex items-center justify-center w-6 h-6 bg-primary text-white text-sm">3</span>
+          <Card className="relative overflow-hidden border border-white/40">
+            <CardHeader className="border-b border-[#d1d9e6] bg-white/40 pb-4">
+              <CardTitle className="text-xl font-bold text-[#2d3436] flex items-center gap-3">
+                <span className="flex items-center justify-center w-8 h-8 bg-[#22c55e] rounded-full text-white shadow-[var(--shadow-btn-accent)] text-sm">3</span>
                 {t('skillVerification.step3.title')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div className={`p-5 border-4 flex flex-col justify-center ${analysis.skillGapScore < 30 ? 'bg-green-50 border-secondary' : analysis.skillGapScore < 70 ? 'bg-yellow-50 border-accent' : 'bg-red-50 border-destructive'}`}>
-                  <h3 className={`text-sm font-bold uppercase tracking-wider mb-2 ${analysis.skillGapScore < 30 ? 'text-secondary' : analysis.skillGapScore < 70 ? 'text-accent' : 'text-destructive'}`}>
+            <CardContent className="pt-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-8">
+                <div className="p-6 rounded-2xl bg-white shadow-sm border border-[#e2e8f0] flex flex-col justify-center items-center text-center">
+                  <h3 className="indus-label text-[#4a5568] mb-3">
                     {t('skillVerification.step3.proficiencyScore')}
                   </h3>
                   <div className="flex items-baseline gap-2">
-                    <p className={`text-5xl font-black ${analysis.skillGapScore < 30 ? 'text-secondary' : analysis.skillGapScore < 70 ? 'text-accent' : 'text-destructive'}`}>
+                    <p className={`text-6xl font-black ${analysis.skillGapScore < 30 ? 'text-[#22c55e]' : analysis.skillGapScore < 70 ? 'text-[#f59e0b]' : 'text-[#ff4757]'}`}>
                       {100 - analysis.skillGapScore}
                     </p>
-                    <span className="text-muted-foreground font-black text-lg">/ 100</span>
+                    <span className="text-[#a0aec0] font-bold text-xl">/ 100</span>
                   </div>
                 </div>
               </div>
 
-              <div className="p-5 bg-muted border-4 border-border mb-6">
-                <p className="font-bold text-foreground leading-relaxed text-sm">{analysis.summary}</p>
+              <div className="p-6 bg-[#e0e5ec] rounded-2xl shadow-[var(--shadow-recessed)] mb-8">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="indus-led-green"></span>
+                  <p className="indus-label text-[#2d3436]">Diagnostic Summary</p>
+                </div>
+                <p className="font-medium text-[#4a5568] leading-relaxed text-sm">{analysis.summary}</p>
               </div>
 
-              <h3 className="text-lg font-black uppercase mb-4 text-foreground flex items-center gap-2">
-                <Award className="w-5 h-5 text-primary" /> {t('skillVerification.step3.skillBreakdown')}
-              </h3>
+              <div className="flex items-center gap-3 mb-5">
+                <Award className="w-6 h-6 text-[#ff4757]" /> 
+                <h3 className="text-xl font-bold text-[#2d3436]">
+                  {t('skillVerification.step3.skillBreakdown')}
+                </h3>
+              </div>
 
-              <div className="space-y-4">
+              <div className="space-y-4 mb-10">
                 {analysis.perSkillResults.map((result, idx) => {
                   const isVerified = result.status === "verified";
                   const isPartial = result.status === "partially_verified";
-                  const bgColor = isVerified ? "bg-white text-secondary" : isPartial ? "bg-white text-accent" : "bg-white text-destructive";
-                  const borderColor = isVerified ? "border-secondary" : isPartial ? "border-accent" : "border-destructive";
-                  const iconColor = isVerified ? "text-secondary" : isPartial ? "text-accent" : "text-destructive";
+                  const bgColor = isVerified ? "bg-[#22c55e]/10 text-[#22c55e]" : isPartial ? "bg-[#f59e0b]/10 text-[#f59e0b]" : "bg-[#ff4757]/10 text-[#ff4757]";
+                  const iconColor = isVerified ? "text-[#22c55e]" : isPartial ? "text-[#f59e0b]" : "text-[#ff4757]";
 
                   return (
-                    <div key={idx} className={`p-5 border-4 bg-muted ${borderColor}`}>
-                      <div className="flex justify-between items-center mb-2">
-                        <span className="text-lg font-black uppercase text-foreground">{result.skill}</span>
-                        <span className={`px-2.5 py-1 text-xs font-bold uppercase border-2 ${bgColor} ${borderColor}`}>
+                    <div key={idx} className="p-5 rounded-xl bg-white border border-[#e2e8f0] shadow-sm">
+                      <div className="flex justify-between items-center mb-3">
+                        <span className="text-lg font-bold text-[#2d3436]">{result.skill}</span>
+                        <span className={`px-3 py-1 text-xs font-bold uppercase tracking-wider rounded-md ${bgColor}`}>
                           {result.status.replace("_", " ")}
                         </span>
                       </div>
 
                       {result.status === "gap" && (
-                        <div className="mt-3 text-sm font-bold text-muted-foreground flex items-start gap-2">
-                          <AlertCircle className={`w-4 h-4 mt-0.5 shrink-0 ${iconColor}`} />
-                          <span><strong className="text-foreground uppercase">{t('skillVerification.step3.reasoning')}:</strong> {result.reasoning}</span>
+                        <div className="p-4 bg-[#f8fafc] rounded-lg mt-3 text-sm font-medium text-[#4a5568] flex items-start gap-3 border border-[#e2e8f0]">
+                          <AlertCircle className={`w-5 h-5 mt-0.5 shrink-0 ${iconColor}`} />
+                          <span><strong className="text-[#2d3436] font-bold">{t('skillVerification.step3.reasoning')}:</strong> {result.reasoning}</span>
                         </div>
                       )}
                     </div>
@@ -284,45 +303,47 @@ export default function SkillVerification() {
               </div>
 
               {analysis.recommendedPathways && analysis.recommendedPathways.length > 0 && (
-                <div className="mt-8">
-                  <h3 className="text-lg font-black uppercase mb-4 text-foreground flex items-center gap-2">
-                    <Target className="w-5 h-5 text-primary" />
-                    {analysis.overallSkillGaps.length === 0 ? t('skillVerification.step3.advanceSkillsTitle') : t('skillVerification.step3.careerPathwayTitle')}
-                  </h3>
-                  <div className="space-y-4">
+                <div className="mt-10 border-t border-[#d1d9e6] pt-8">
+                  <div className="flex items-center gap-3 mb-6">
+                    <Target className="w-6 h-6 text-[#ff4757]" />
+                    <h3 className="text-xl font-bold text-[#2d3436]">
+                      {analysis.overallSkillGaps.length === 0 ? t('skillVerification.step3.advanceSkillsTitle') : t('skillVerification.step3.careerPathwayTitle')}
+                    </h3>
+                  </div>
+                  
+                  <div className="space-y-5">
                     {analysis.recommendedPathways.map((pathway, idx) => (
-                      <div key={idx} className="p-5 border-4 bg-muted border-primary">
-                        <div className="flex justify-between items-start mb-2">
-                          <span className="text-lg font-black uppercase text-foreground">{pathway.courseName}</span>
+                      <div key={idx} className="p-6 rounded-2xl bg-[#e0e5ec] shadow-[var(--shadow-recessed)] relative overflow-hidden">
+                        <div className="absolute top-0 left-0 w-1 h-full bg-[#3b82f6]"></div>
+                        
+                        <div className="flex justify-between items-start mb-3">
+                          <span className="text-lg font-bold text-[#2d3436]">{pathway.courseName}</span>
                           <div className="flex gap-2">
-                            <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider border-2 ${pathway.difficulty === 'beginner' ? 'bg-white text-secondary border-secondary' : pathway.difficulty === 'intermediate' ? 'bg-white text-accent border-accent' : 'bg-white text-destructive border-destructive'}`}>
+                            <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-white shadow-sm border border-[#e2e8f0] ${pathway.difficulty === 'beginner' ? 'text-[#22c55e]' : pathway.difficulty === 'intermediate' ? 'text-[#f59e0b]' : 'text-[#ff4757]'}`}>
                               {pathway.difficulty}
                             </span>
-                            <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider border-2 ${pathway.isFree ? 'bg-white text-primary border-primary' : 'bg-white text-muted-foreground border-border'}`}>
+                            <span className={`px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-white shadow-sm border border-[#e2e8f0] ${pathway.isFree ? 'text-[#3b82f6]' : 'text-[#4a5568]'}`}>
                               {pathway.isFree ? t('skillVerification.step3.free') : t('skillVerification.step3.paid')}
                             </span>
                           </div>
                         </div>
 
-                        <p className="text-sm font-bold text-muted-foreground mb-4">{pathway.reasoning}</p>
+                        <p className="text-sm font-medium text-[#4a5568] mb-5">{pathway.reasoning}</p>
 
-                        <div className="flex flex-wrap items-center justify-between gap-4 border-t-4 border-border pt-3">
-                          <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-1.5 text-xs text-foreground font-black uppercase">
-                              <Clock className="w-4 h-4 text-foreground" />
-                              {pathway.estimatedDuration}
-                            </div>
+                        <div className="flex flex-wrap items-center justify-between gap-4 border-t border-[#babecc] pt-4">
+                          <div className="flex items-center gap-2 text-xs text-[#2d3436] font-bold uppercase">
+                            <Clock className="w-4 h-4 text-[#4a5568]" />
+                            {pathway.estimatedDuration}
                           </div>
 
                           <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-xs text-muted-foreground font-bold uppercase mr-1">{t('skillVerification.step3.addresses')}</span>
+                            <span className="indus-label text-[#a0aec0] mr-1">{t('skillVerification.step3.addresses')}</span>
                             {pathway.skillsAddressed.map((skill, sIdx) => {
-                              // Find original skill result to match color
                               const matchedResult = analysis.perSkillResults.find(r => r.skill.toLowerCase() === skill.toLowerCase() || skill.toLowerCase().includes(r.skill.toLowerCase()));
                               const isGap = !matchedResult || matchedResult.status === "gap";
 
                               return (
-                                <span key={sIdx} className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider border-2 ${isGap ? 'bg-white text-destructive border-destructive' : 'bg-white text-secondary border-secondary'}`}>
+                                <span key={sIdx} className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-md border ${isGap ? 'bg-white text-[#ff4757] border-[#ff4757]/30 shadow-sm' : 'bg-transparent text-[#4a5568] border-[#a0aec0]'}`}>
                                   {skill}
                                 </span>
                               );
@@ -333,16 +354,17 @@ export default function SkillVerification() {
                     ))}
                   </div>
 
-                  <div className="mt-4 p-3 bg-white border-4 border-border flex items-start gap-2">
-                    <Info className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                    <p className="text-xs font-bold text-muted-foreground">
-                      <strong className="text-foreground uppercase">{t('skillVerification.step3.aiDisclaimerPrefix')}:</strong> {t('skillVerification.step3.aiDisclaimerDesc')}
+                  <div className="mt-6 p-4 bg-white rounded-xl shadow-sm border border-[#e2e8f0] flex items-start gap-3">
+                    <Info className="w-5 h-5 text-[#3b82f6] mt-0.5 shrink-0" />
+                    <p className="text-xs font-medium text-[#4a5568] leading-relaxed">
+                      <strong className="text-[#2d3436] font-bold">{t('skillVerification.step3.aiDisclaimerPrefix')}:</strong> {t('skillVerification.step3.aiDisclaimerDesc')}
                     </p>
                   </div>
                 </div>
               )}
 
               <Button
+                variant="secondary"
                 onClick={() => {
                   setStep(1);
                   setSkillsStr("");
@@ -351,7 +373,7 @@ export default function SkillVerification() {
                   setAnswers({});
                   setAnalysis(null);
                 }}
-                className="w-full mt-8 bg-white hover:bg-accent text-foreground hover:text-black border-4 border-border hover:border-accent font-bold uppercase tracking-wider transition-colors"
+                className="w-full mt-8"
               >
                 {t('skillVerification.step3.startNew')}
               </Button>
