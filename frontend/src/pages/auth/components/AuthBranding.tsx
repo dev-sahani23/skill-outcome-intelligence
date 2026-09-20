@@ -1,39 +1,49 @@
 const AuthBranding = () => {
   return (
     <div className="flex items-center gap-4 group">
-      <div className="relative w-12 h-12 rounded-xl bg-linear-to-br from-indigo-600 to-indigo-700 text-white font-bold flex items-center justify-center shadow-lg shadow-indigo-600/30 overflow-hidden">
-        {/* Logo icon */}
+      {/* Logo housing — elevated neumorphic circle */}
+      <div
+        className="relative w-14 h-14 rounded-full flex items-center justify-center overflow-hidden"
+        style={{
+          background: "#ff4757",
+          boxShadow: "var(--shadow-floating), 0 0 0 3px rgba(255,71,87,0.15)",
+        }}
+      >
+        {/* Logo icon — layers SVG */}
         <svg
           viewBox="0 0 24 24"
           fill="none"
-          stroke="currentColor"
+          stroke="white"
           strokeWidth="1.8"
-          className="w-6 h-6 relative z-10"
+          className="w-7 h-7 relative z-10"
         >
           <path d="M12 2L2 7l10 5 10-5-10-5z" />
           <path d="M2 17l10 5 10-5" />
           <path d="M2 12l10 5 10-5" />
         </svg>
-
-        {/* Shimmer overlay */}
+        {/* Top-left highlight rim — reinforces 45° lighting */}
         <div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+          className="absolute inset-0 rounded-full pointer-events-none"
           style={{
-            background:
-              "linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent)",
-            backgroundSize: "200% 100%",
-            animation: "shimmer 2s linear infinite",
+            background: "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, transparent 60%)",
           }}
         />
       </div>
 
       <div>
-        <h2 className="text-xl font-semibold text-white tracking-tight">
+        <h2
+          className="text-xl font-bold text-[#2d3436] tracking-tight"
+          style={{ textShadow: "0 1px 0 rgba(255,255,255,0.8)" }}
+        >
           SkillTrack
         </h2>
-        <p className="text-sm text-slate-400">
-          Outcome &amp; Impact Measurement
-        </p>
+        {/* Monospace subtitle with LED status */}
+        <div className="flex items-center gap-2 mt-0.5">
+          <span className="indus-led-green" aria-label="System online" />
+          <p className="indus-label text-[#4a5568]">
+            Skill Track Intelligence Layer
+          </p>
+        </div>
       </div>
     </div>
   );

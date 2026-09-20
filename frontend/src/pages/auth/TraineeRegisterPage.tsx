@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/Button";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../lib/auth";
+import { ArrowLeft } from "lucide-react";
 
 const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
   const [fullName, setFullName] = useState("");
@@ -25,15 +26,15 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
 
   useEffect(() => {
     fetch("/api/public/districts")
-      .then(res => res.json())
-      .then(data => setDistricts(data.districts || []))
+      .then((res) => res.json())
+      .then((data) => setDistricts(data.districts || []))
       .catch(console.error);
   }, []);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
-    
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -61,22 +62,23 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
 
   const heroContent = (
     <div className="mb-8 lg:mb-12">
-      <div className="inline-flex items-center gap-2 px-4 py-2 bg-white text-primary text-sm font-bold uppercase tracking-wider mb-6 sm:mb-8">
-        <span className="w-2 h-2 rounded-full bg-primary animate-[pulse_2s_ease-in-out_infinite]"></span>
-        Personalized onboarding
+      <div className="inline-flex items-center gap-3 px-4 py-2 bg-white rounded-lg shadow-sm mb-6 sm:mb-8 border-2 border-border">
+        <span className="indus-led-blue"></span>
+        <span className="indus-label text-primary">Personalized Onboarding</span>
       </div>
 
-      <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4 sm:mb-6">
+      <h1
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2d3436] leading-tight tracking-tight mb-4 sm:mb-6"
+        style={{ textShadow: "0 1px 0 rgba(255,255,255,0.9)" }}
+      >
         Set up your
         <br />
-        <span className="text-white underline decoration-4 decoration-accent underline-offset-8">
-          Trainee
-        </span>
+        <span className="text-[#ff4757]">Trainee</span>
         <br />
         profile.
       </h1>
 
-      <p className="text-base sm:text-lg text-white font-medium leading-relaxed max-w-xl">
+      <p className="text-base sm:text-lg text-[#4a5568] font-medium leading-relaxed max-w-xl">
         Fill in your details to create the right account and start using the
         platform for tracking outcomes and impact.
       </p>
@@ -84,46 +86,37 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
   );
 
   return (
-    <AuthLayout
-      heroContent={heroContent}
-      hideHeroOnMobile
-      formMaxWidth="xl"
-    >
+    <AuthLayout heroContent={heroContent} hideHeroOnMobile formMaxWidth="xl">
       <div className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
-        <Button
+        <button
           type="button"
-          variant="secondary"
-          className="mb-6 text-sm"
+          className="flex items-center gap-1 text-[#4a5568] hover:text-[#ff4757] transition-colors indus-label mb-6"
           onClick={onBack}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-            <path d="M19 12H5" />
-            <path d="M11 18l-6-6 6-6" />
-          </svg>
-          Back
-        </Button>
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
       </div>
 
       <div className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-        <span className="inline-flex items-center px-3 py-1 rounded-sm bg-blue-100 text-primary text-xs font-bold uppercase tracking-wider mb-4">
-          Trainee
-        </span>
-
-        <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
+        <h2 className="text-3xl sm:text-4xl font-bold text-[#2d3436] tracking-tight mb-2">
           Create trainee account
         </h2>
-        <p className="text-muted-foreground text-base mb-6 sm:mb-8 font-medium">
+        <p className="text-[#4a5568] indus-label mb-6 sm:mb-8">
           Build your learning profile and track your outcomes.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+      <form
+        onSubmit={handleSubmit}
+        className="animate-fade-in-up"
+        style={{ animationDelay: "0.2s" }}
+      >
         {error && (
-          <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="mb-4 p-3 rounded-lg bg-[#ff4757]/10 border border-[#ff4757]/20 text-[#ff4757] text-sm font-bold">
             {error}
           </div>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <FormField label="Full name" htmlFor="trainee-name">
             <Input
               id="trainee-name"
@@ -146,11 +139,7 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
             />
           </FormField>
 
-          <FormField
-            label="Email address"
-            htmlFor="trainee-email"
-            fullWidth
-          >
+          <FormField label="Email address" htmlFor="trainee-email" fullWidth>
             <Input
               id="trainee-email"
               type="email"
@@ -175,21 +164,34 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
               required
             />
           </FormField>
-          
+
           <FormField label="Gender" htmlFor="trainee-gender">
-            <select
-              id="trainee-gender"
-              className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-              value={gender}
-              onChange={(e: any) => setGender(e.target.value)}
-              required
-            >
-              <option value="">Select Gender</option>
-              <option value="MALE">Male</option>
-              <option value="FEMALE">Female</option>
-              <option value="OTHER">Other</option>
-              <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
-            </select>
+            <div className="relative">
+              <select
+                id="trainee-gender"
+                className="indus-input h-14 w-full px-5 py-2 appearance-none cursor-pointer"
+                style={{ color: gender ? "#2d3436" : "#94a3b8" }}
+                value={gender}
+                onChange={(e: any) => setGender(e.target.value)}
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="MALE">Male</option>
+                <option value="FEMALE">Female</option>
+                <option value="OTHER">Other</option>
+                <option value="PREFER_NOT_TO_SAY">Prefer not to say</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-[#4a5568]">
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
           </FormField>
 
           <FormField label="District" htmlFor="trainee-district" fullWidth>
@@ -197,7 +199,9 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
               <input
                 type="text"
                 id="trainee-district-search"
-                className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="indus-input h-14 w-full px-5 py-2"
+                onFocus={() => setShowDistrictDropdown(true)}
+                onBlur={() => setTimeout(() => setShowDistrictDropdown(false), 200)}
                 placeholder="Search district (e.g. Mumbai, Pune)..."
                 value={districtSearch}
                 onChange={(e: any) => {
@@ -205,46 +209,71 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
                   setDistrictId("");
                   setShowDistrictDropdown(true);
                 }}
-                onFocus={() => setShowDistrictDropdown(true)}
-                onBlur={() => setTimeout(() => setShowDistrictDropdown(false), 200)}
                 autoComplete="off"
                 required={!districtId}
               />
               {districtId && (
-                <span className="absolute right-3 top-3 text-green-600 text-xs font-bold">✓ Selected</span>
+                <span
+                  className="absolute right-3 top-4 text-[#22c55e] text-xs font-bold"
+                >
+                  ✓ Selected
+                </span>
               )}
               {showDistrictDropdown && (
-                <div className="absolute z-20 w-full bg-white border border-input rounded-md mt-1 shadow-lg max-h-56 overflow-y-auto">
+                <div
+                  className="absolute z-20 w-full rounded-lg mt-2 overflow-y-auto max-h-56 p-2"
+                  style={{
+                    background: "#e0e5ec",
+                    boxShadow: "var(--shadow-floating)",
+                    border: "1px solid #babecc",
+                  }}
+                >
                   {districts
-                    .filter((d: any) =>
-                      districtSearch.length === 0 ||
-                      d.name.toLowerCase().includes(districtSearch.toLowerCase()) ||
-                      d.state.toLowerCase().includes(districtSearch.toLowerCase())
+                    .filter(
+                      (d: any) =>
+                        districtSearch.length === 0 ||
+                        d.name
+                          .toLowerCase()
+                          .includes(districtSearch.toLowerCase()) ||
+                        d.state
+                          .toLowerCase()
+                          .includes(districtSearch.toLowerCase())
                     )
                     .slice(0, 30)
                     .map((d: any) => (
                       <div
                         key={d.id}
-                        className="px-3 py-2 hover:bg-muted cursor-pointer"
+                        className="px-3 py-2 rounded-md hover:bg-white cursor-pointer transition-colors"
                         onMouseDown={() => {
                           setDistrictId(d.id);
                           setDistrictSearch(`${d.name}, ${d.state}`);
                           setShowDistrictDropdown(false);
                         }}
                       >
-                        <span className="font-medium text-sm">{d.name}</span>
-                        <span className="text-xs text-muted-foreground ml-2">{d.state}</span>
+                        <span className="font-bold text-sm text-[#2d3436]">
+                          {d.name}
+                        </span>
+                        <span className="text-xs text-[#4a5568] ml-2 font-mono">
+                          {d.state}
+                        </span>
                       </div>
                     ))}
-                  {districtSearch.length > 0 && districts.filter((d: any) =>
-                    d.name.toLowerCase().includes(districtSearch.toLowerCase()) ||
-                    d.state.toLowerCase().includes(districtSearch.toLowerCase())
-                  ).length === 0 && (
-                    <div className="px-3 py-2 text-sm text-muted-foreground">No districts found</div>
-                  )}
+                  {districtSearch.length > 0 &&
+                    districts.filter(
+                      (d: any) =>
+                        d.name
+                          .toLowerCase()
+                          .includes(districtSearch.toLowerCase()) ||
+                        d.state
+                          .toLowerCase()
+                          .includes(districtSearch.toLowerCase())
+                    ).length === 0 && (
+                      <div className="px-3 py-2 text-sm font-bold text-[#ff4757]">
+                        No districts found
+                      </div>
+                    )}
                 </div>
               )}
-              {/* Hidden required input to enforce selection */}
               <input type="hidden" value={districtId} required />
             </div>
           </FormField>
@@ -261,10 +290,7 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
             />
           </FormField>
 
-          <FormField
-            label="Confirm password"
-            htmlFor="trainee-confirm-password"
-          >
+          <FormField label="Confirm password" htmlFor="trainee-confirm-password">
             <Input
               id="trainee-confirm-password"
               type="password"
@@ -278,7 +304,7 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
         </div>
 
         <Button type="submit" fullWidth disabled={isLoading}>
-          <span>{isLoading ? "Creating account..." : "Create trainee account"}</span>
+          {isLoading ? "Creating account..." : "Create trainee account"}
         </Button>
       </form>
     </AuthLayout>

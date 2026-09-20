@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/Button";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../lib/auth";
+import { ArrowLeft } from "lucide-react";
 
 const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
   const [instituteName, setInstituteName] = useState("");
@@ -23,7 +24,7 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
-    
+
     if (password !== confirmPassword) {
       setError("Passwords do not match");
       return;
@@ -51,22 +52,23 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
 
   const heroContent = (
     <div className="mb-8 lg:mb-12">
-      <div className="inline-flex items-center gap-2 px-4 py-2 bg-white text-primary text-sm font-bold uppercase tracking-wider mb-6 sm:mb-8">
-        <span className="w-2 h-2 rounded-full bg-primary animate-[pulse_2s_ease-in-out_infinite]"></span>
-        Personalized onboarding
+      <div className="inline-flex items-center gap-3 px-4 py-2 bg-white rounded-lg shadow-sm mb-6 sm:mb-8 border-2 border-border">
+        <span className="indus-led-blue"></span>
+        <span className="indus-label text-primary">Personalized Onboarding</span>
       </div>
 
-      <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4 sm:mb-6">
+      <h1
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2d3436] leading-tight tracking-tight mb-4 sm:mb-6"
+        style={{ textShadow: "0 1px 0 rgba(255,255,255,0.9)" }}
+      >
         Set up your
         <br />
-        <span className="text-white underline decoration-4 decoration-accent underline-offset-8">
-          Provider
-        </span>
+        <span className="text-[#ff4757]">Provider</span>
         <br />
         profile.
       </h1>
 
-      <p className="text-base sm:text-lg text-white font-medium leading-relaxed max-w-xl">
+      <p className="text-base sm:text-lg text-[#4a5568] font-medium leading-relaxed max-w-xl">
         Fill in your details to create the right account and start using the
         platform for tracking outcomes and impact.
       </p>
@@ -74,46 +76,37 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
   );
 
   return (
-    <AuthLayout
-      heroContent={heroContent}
-      hideHeroOnMobile
-      formMaxWidth="xl"
-    >
+    <AuthLayout heroContent={heroContent} hideHeroOnMobile formMaxWidth="xl">
       <div className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
-        <Button
+        <button
           type="button"
-          variant="secondary"
-          className="mb-6 text-sm"
+          className="flex items-center gap-1 text-[#4a5568] hover:text-[#ff4757] transition-colors indus-label mb-6"
           onClick={onBack}
         >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4">
-            <path d="M19 12H5" />
-            <path d="M11 18l-6-6 6-6" />
-          </svg>
-          Back
-        </Button>
+          <ArrowLeft className="w-4 h-4" /> Back
+        </button>
       </div>
 
       <div className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-        <span className="inline-flex items-center px-3 py-1 rounded-sm bg-purple-100 text-purple-600 text-xs font-bold uppercase tracking-wider mb-4">
-          Provider
-        </span>
-
-        <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
+        <h2 className="text-3xl sm:text-4xl font-bold text-[#2d3436] tracking-tight mb-2">
           Create provider account
         </h2>
-        <p className="text-muted-foreground font-medium text-base mb-6 sm:mb-8">
+        <p className="text-[#4a5568] indus-label mb-6 sm:mb-8">
           Manage training programs and learner outcomes.
         </p>
       </div>
 
-      <form onSubmit={handleSubmit} className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
+      <form
+        onSubmit={handleSubmit}
+        className="animate-fade-in-up"
+        style={{ animationDelay: "0.2s" }}
+      >
         {error && (
-          <div className="mb-4 p-3 rounded bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+          <div className="mb-4 p-3 rounded-lg bg-[#ff4757]/10 border border-[#ff4757]/20 text-[#ff4757] text-sm font-bold">
             {error}
           </div>
         )}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 mb-6 sm:mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <FormField
             label="Provider / institute name"
             htmlFor="provider-name"
@@ -162,11 +155,7 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
             />
           </FormField>
 
-          <FormField
-            label="Official email"
-            htmlFor="provider-email"
-            fullWidth
-          >
+          <FormField label="Official email" htmlFor="provider-email" fullWidth>
             <Input
               id="provider-email"
               type="email"
@@ -220,7 +209,7 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
         </div>
 
         <Button type="submit" fullWidth disabled={isLoading}>
-          <span>{isLoading ? "Creating account..." : "Create provider account"}</span>
+          {isLoading ? "Creating account..." : "Create provider account"}
         </Button>
       </form>
     </AuthLayout>

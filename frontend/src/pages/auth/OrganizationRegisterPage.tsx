@@ -5,22 +5,23 @@ import { Button } from "../../components/ui/Button";
 const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
   const heroContent = (
     <div className="mb-8 lg:mb-12">
-      <div className="inline-flex items-center gap-2 px-4 py-2 bg-white text-primary text-sm font-bold uppercase tracking-wider mb-6 sm:mb-8">
-        <span className="w-2 h-2 rounded-full bg-primary animate-[pulse_2s_ease-in-out_infinite]"></span>
-        Government / Admin Access
+      <div className="inline-flex items-center gap-3 px-4 py-2 bg-white rounded-lg shadow-sm mb-6 sm:mb-8 border-2 border-border">
+        <span className="indus-led-green"></span>
+        <span className="indus-label text-[#22c55e]">Government / Admin Access</span>
       </div>
 
-      <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4 sm:mb-6">
+      <h1
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2d3436] leading-tight tracking-tight mb-4 sm:mb-6"
+        style={{ textShadow: "0 1px 0 rgba(255,255,255,0.9)" }}
+      >
         Set up your
         <br />
-        <span className="text-white underline decoration-4 decoration-accent underline-offset-8">
-          Organization
-        </span>
+        <span className="text-[#22c55e]">Organization</span>
         <br />
         profile.
       </h1>
 
-      <p className="text-base sm:text-lg text-white font-medium leading-relaxed max-w-xl">
+      <p className="text-base sm:text-lg text-[#4a5568] font-medium leading-relaxed max-w-xl">
         Government admin accounts are provisioned internally by the platform administrators to ensure security and compliance.
       </p>
     </div>
@@ -48,51 +49,52 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
       </div>
 
       <div className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-        <span className="inline-flex items-center px-3 py-1 rounded-sm bg-emerald-100 text-secondary text-xs font-bold uppercase tracking-wider mb-4">
-          Organization / Admin
-        </span>
+        <div className="flex items-center gap-3 mb-4">
+          <span className="indus-led-green"></span>
+          <span className="indus-label text-[#22c55e]">Organization / Admin</span>
+        </div>
 
-        <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
+        <h2 className="text-3xl sm:text-4xl font-bold text-[#2d3436] mb-2">
           Government Admin Access
         </h2>
-        <p className="text-muted-foreground text-base mb-8 font-medium">
+        <p className="text-[#4a5568] text-base mb-8 font-medium">
           Set up your organization dashboard and governance controls.
         </p>
       </div>
 
       {/* Provisioning Notice */}
       <div className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-        <div className="p-8 rounded-lg bg-muted border-4 border-border space-y-4">
+        <div className="p-8 rounded-xl bg-[#e0e5ec] shadow-[var(--shadow-recessed)] space-y-4">
           {/* Shield icon */}
           <div className="flex items-center gap-3">
-            <div className="p-3 rounded-md bg-secondary/10">
-              <svg className="w-8 h-8 text-secondary" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <div className="p-3 rounded-lg bg-white shadow-sm border border-white/50">
+              <svg className="w-8 h-8 text-[#22c55e]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M12 2l8 4v6c0 5.25-3.5 10-8 11-4.5-1-8-5.75-8-11V6l8-4z" />
                 <path d="M9 12l2 2 4-4" />
               </svg>
             </div>
-            <p className="text-foreground font-bold text-xl">Secure Provisioning Required</p>
+            <p className="text-[#2d3436] font-bold text-xl">Secure Provisioning Required</p>
           </div>
 
-          <p className="text-foreground text-base leading-relaxed font-medium">
-            Government Admin accounts are <strong className="text-foreground">not self-registered</strong>. They are created and verified internally by platform administrators to maintain data integrity and prevent unauthorized access to sensitive skilling intelligence data.
+          <p className="text-[#2d3436] text-base leading-relaxed font-medium">
+            Government Admin accounts are <strong className="text-[#ff4757]">not self-registered</strong>. They are created and verified internally by platform administrators to maintain data integrity and prevent unauthorized access to sensitive skilling intelligence data.
           </p>
 
-          <div className="space-y-2 text-base text-muted-foreground font-medium">
-            <p className="font-bold text-foreground">To request access:</p>
-            <ol className="list-decimal list-inside space-y-1 ml-1">
+          <div className="space-y-2 text-base text-[#4a5568] font-medium mt-4">
+            <p className="font-bold text-[#2d3436] indus-label">To request access:</p>
+            <ol className="list-decimal list-inside space-y-1 ml-1 text-sm">
               <li>Contact your departmental IT administrator</li>
               <li>Request onboarding to the SkillTrack platform</li>
               <li>Your credentials will be provisioned and shared securely</li>
             </ol>
           </div>
 
-          <div className="pt-4">
+          <div className="pt-6">
             <a
               href="mailto:admin@skilltrack.gov.in"
-              className="inline-flex items-center gap-2 text-base text-primary hover:text-blue-600 transition-colors font-bold"
+              className="inline-flex items-center gap-2 text-sm text-[#3b82f6] hover:text-[#ff4757] transition-colors font-bold uppercase tracking-wider bg-white px-4 py-2 rounded-lg shadow-sm"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="5" width="18" height="14" rx="2" />
                 <path d="M3 7l9 6 9-6" />
               </svg>

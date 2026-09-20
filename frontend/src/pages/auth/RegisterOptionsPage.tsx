@@ -27,10 +27,10 @@ const registerOptions: RegisterOption[] = [
   },
 ];
 
-const iconColorMap: Record<RegistrationRole, string> = {
-  trainee: "bg-blue-100 text-primary",
-  provider: "bg-purple-100 text-purple-600",
-  organization: "bg-emerald-100 text-secondary",
+const roleConfig: Record<RegistrationRole, { accentColor: string; badge: string }> = {
+  trainee:      { accentColor: "#3b82f6", badge: "TRN" },
+  provider:     { accentColor: "#a855f7", badge: "EDU" },
+  organization: { accentColor: "#22c55e", badge: "GOV" },
 };
 
 const RoleIcon = ({ role }: { role: RegistrationRole }) => {
@@ -70,24 +70,27 @@ const RegisterOptionsPage = ({
 }: RegisterOptionsPageProps) => {
   const heroContent = (
     <div className="mb-8 lg:mb-12">
-      <div className="inline-flex items-center gap-2 px-4 py-2 bg-white text-primary text-sm font-bold uppercase tracking-wider mb-6 sm:mb-8">
-        <span className="w-2 h-2 rounded-full bg-primary animate-[pulse_2s_ease-in-out_infinite]"></span>
-        Create your access
+      {/* LED badge */}
+      <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full mb-6 sm:mb-8"
+        style={{ background: "#2d3436", boxShadow: "var(--shadow-card)" }}
+      >
+        <span className="indus-led-red" aria-label="Active" />
+        <span className="indus-label text-[#e0e5ec]">Create your access</span>
       </div>
 
-      <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4 sm:mb-6">
+      <h1
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2d3436] leading-tight tracking-tight mb-4 sm:mb-6"
+        style={{ textShadow: "0 1px 0 rgba(255,255,255,0.9)" }}
+      >
         Join the
         <br />
-        <span className="text-white underline decoration-4 decoration-accent underline-offset-8">
-          SkillTrack
-        </span>
+        <span className="text-[#ff4757]">SkillTrack</span>
         <br />
         ecosystem.
       </h1>
 
-      <p className="text-base sm:text-lg text-white font-medium leading-relaxed max-w-xl">
-        Choose the account type that matches your role and start managing
-        outcomes, performance and impact from one platform.
+      <p className="text-base sm:text-lg text-[#4a5568] font-medium leading-relaxed max-w-sm">
+        Choose the account type that matches your role and start managing outcomes, performance and impact from one platform.
       </p>
     </div>
   );
@@ -95,54 +98,96 @@ const RegisterOptionsPage = ({
   return (
     <AuthLayout heroContent={heroContent}>
       <div className="mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-        <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-2">
+        <h2
+          className="text-2xl sm:text-3xl font-bold text-[#2d3436] mb-1"
+          style={{ textShadow: "0 1px 0 rgba(255,255,255,0.8)" }}
+        >
           Create account
         </h2>
-        <p className="text-muted-foreground text-base">
+        <p className="text-[#4a5568] text-sm font-medium">
           Select your role to get started.
         </p>
       </div>
 
       <div className="flex flex-col gap-3 sm:gap-4 mb-6 sm:mb-8">
-        {registerOptions.map((option, index) => (
-          <button
-            key={option.key}
-            type="button"
-            className="group flex items-center text-left gap-4 p-4 rounded-md border-4 border-border bg-white hover:border-primary hover:scale-[1.02] transition-all duration-200 animate-fade-in-up"
-            style={{ animationDelay: `${0.15 + index * 0.08}s` }}
-            onClick={() => onSelectRole(option.key)}
-          >
-            <span
-              className={`w-14 h-14 shrink-0 rounded-md flex items-center justify-center ${iconColorMap[option.key]} transition-colors duration-200`}
+        {registerOptions.map((option, index) => {
+          const config = roleConfig[option.key];
+          return (
+            <button
+              key={option.key}
+              type="button"
+              className="group flex items-center text-left gap-4 p-4 rounded-xl transition-all duration-200 animate-fade-in-up"
+              style={{
+                animationDelay: `${0.15 + index * 0.08}s`,
+                background: "#e0e5ec",
+                boxShadow: "var(--shadow-card)",
+              }}
+              onMouseEnter={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = `var(--shadow-floating), 0 0 0 2px ${config.accentColor}`;
+                (e.currentTarget as HTMLButtonElement).style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                (e.currentTarget as HTMLButtonElement).style.boxShadow = "var(--shadow-card)";
+                (e.currentTarget as HTMLButtonElement).style.transform = "none";
+              }}
+              onClick={() => onSelectRole(option.key)}
             >
-              <RoleIcon role={option.key} />
-            </span>
-            <span className="flex-1 min-w-0">
-              <strong className="block text-foreground font-bold text-lg mb-1">
-                {option.title}
-              </strong>
-              <small className="block text-muted-foreground font-bold text-sm">
-                {option.description}
-              </small>
-            </span>
-            <span className="w-10 h-10 flex items-center justify-center border-4 border-border bg-white text-muted-foreground group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all duration-200 shrink-0">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-5 h-5">
-                <path d="M5 12h14" />
-                <path d="M13 6l6 6-6 6" />
-              </svg>
-            </span>
-          </button>
-        ))}
+              {/* Icon housing — recessed circular well */}
+              <span
+                className="w-14 h-14 shrink-0 rounded-full flex items-center justify-center transition-all duration-200"
+                style={{
+                  background: "#e0e5ec",
+                  boxShadow: "var(--shadow-floating)",
+                  color: config.accentColor,
+                }}
+              >
+                <RoleIcon role={option.key} />
+              </span>
+
+              <span className="flex-1 min-w-0">
+                <strong className="block text-[#2d3436] font-bold text-base mb-0.5">
+                  {option.title}
+                </strong>
+                <small className="block text-[#4a5568] font-medium text-sm">
+                  {option.description}
+                </small>
+              </span>
+
+              {/* Badge + arrow */}
+              <div className="flex items-center gap-2 shrink-0">
+                <span
+                  className="indus-label text-white px-2 py-0.5 rounded"
+                  style={{ background: config.accentColor }}
+                >
+                  {config.badge}
+                </span>
+                <span
+                  className="w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-200"
+                  style={{
+                    background: "#e0e5ec",
+                    boxShadow: "var(--shadow-card)",
+                    color: "#4a5568",
+                  }}
+                >
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4">
+                    <path d="M5 12h14" />
+                    <path d="M13 6l6 6-6 6" />
+                  </svg>
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
-      <div className="animate-fade-in mt-6" style={{ animationDelay: "0.45s" }}>
+      <div className="animate-fade-in" style={{ animationDelay: "0.45s" }}>
         <button
           type="button"
-          className="w-full text-center text-sm font-bold text-muted-foreground hover:text-primary transition-colors duration-200 py-2"
+          className="w-full text-center text-sm font-medium text-[#4a5568] hover:text-[#ff4757] transition-colors duration-200 py-2"
           onClick={onNavigateToLogin}
         >
           Already have an account?{" "}
-          <span className="text-primary font-bold">Sign in</span>
+          <span className="text-[#ff4757] font-bold">Sign in</span>
         </button>
       </div>
     </AuthLayout>
