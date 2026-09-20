@@ -10,7 +10,9 @@ import Contacts from "../pages/trainee/Contacts.tsx";
 import TraineesList from "../pages/dashboard/TraineesList.tsx";
 import SkillGaps from "../pages/dashboard/SkillGaps.tsx";
 import CoursesList from "../pages/dashboard/CoursesList.tsx";
+import ProviderTraineesList from "../pages/dashboard/ProviderTraineesList.tsx";
 import PublicVerify from "../pages/public/PublicVerify.tsx";
+import ReportGenerator from "../pages/reports/ReportGenerator.tsx";
 
 const PageWrapper = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -39,10 +41,12 @@ const AnimatedRoutes = () => {
         <Route path="/dashboard/admin/skill-gaps" element={<PageWrapper><SkillGaps /></PageWrapper>} />
         <Route path="/dashboard/provider" element={<PageWrapper><ProviderDashboard /></PageWrapper>} />
         <Route path="/dashboard/provider/courses" element={<PageWrapper><CoursesList /></PageWrapper>} />
+        <Route path="/dashboard/provider/trainees" element={<PageWrapper><ProviderTraineesList /></PageWrapper>} />
         <Route path="/dashboard/trainee" element={<PageWrapper><TraineeDashboard /></PageWrapper>} />
         <Route path="/trainee/skill-verification" element={<PageWrapper><SkillVerification /></PageWrapper>} />
         <Route path="/trainee/outcome-passport" element={<PageWrapper><OutcomePassport /></PageWrapper>} />
         <Route path="/trainee/contacts" element={<PageWrapper><Contacts /></PageWrapper>} />
+        <Route path="/reports" element={<PageWrapper><ReportGenerator /></PageWrapper>} />
         <Route path="/verify/:hash" element={<PageWrapper><PublicVerify /></PageWrapper>} />
       </Routes>
     </AnimatePresence>

@@ -57,7 +57,7 @@ export default function OrgDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#e0e5ec] p-6 md:p-8 space-y-8">
+    <div className="min-h-screen bg-chassis p-6 md:p-8 space-y-8">
 
       {/* ─── Header: Dark charcoal command panel ─── */}
       <div
@@ -88,12 +88,21 @@ export default function OrgDashboard() {
           </button>
           <button
             onClick={() => window.location.href = '/dashboard/admin/skill-gaps'}
-            className="rounded-xl px-5 py-3 font-bold uppercase tracking-wider text-sm text-[#2d3436] transition-all duration-150"
+            className="rounded-xl px-5 py-3 font-bold uppercase tracking-wider text-sm text-text transition-all duration-150"
             style={{ background: "#e0e5ec", boxShadow: "var(--shadow-card)" }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "var(--shadow-floating)"; (e.currentTarget as HTMLButtonElement).style.color = "#ff4757"; }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "var(--shadow-card)"; (e.currentTarget as HTMLButtonElement).style.color = "#2d3436"; }}
           >
             Skill Gaps & Anomalies
+          </button>
+          <button
+            onClick={() => window.location.href = '/reports'}
+            className="rounded-xl px-5 py-3 font-bold uppercase tracking-wider text-sm text-text transition-all duration-150"
+            style={{ background: "#e0e5ec", boxShadow: "var(--shadow-card)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "var(--shadow-floating)"; (e.currentTarget as HTMLButtonElement).style.color = "#3b82f6"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "var(--shadow-card)"; (e.currentTarget as HTMLButtonElement).style.color = "#2d3436"; }}
+          >
+            Generate Reports
           </button>
         </div>
       </div>
@@ -104,7 +113,7 @@ export default function OrgDashboard() {
           <Card key={sc.label} variants={itemVariants} showScrews showVents>
             {/* Large circular icon housing — top-left, floating */}
             <div
-              className="w-12 h-12 rounded-full flex items-center justify-center mb-4 flex-shrink-0"
+              className="w-12 h-12 rounded-full flex items-center justify-center mb-4 shrink-0"
               style={{
                 background: "#e8ecf1",
                 boxShadow: "6px 6px 12px #babecc, -6px -6px 12px #ffffff",
@@ -115,7 +124,7 @@ export default function OrgDashboard() {
             </div>
 
             {/* Label */}
-            <p className="text-sm font-semibold text-[#4a5568] mb-1">{sc.label}</p>
+            <p className="text-sm font-semibold text-text-muted mb-1">{sc.label}</p>
 
             {/* Value */}
             <div
@@ -133,12 +142,12 @@ export default function OrgDashboard() {
       <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
         {/* Bar Chart */}
         <Card variants={itemVariants} showScrews showVents>
-          <CardHeader className="border-b border-[#babecc] pb-4">
-            <CardTitle className="text-base font-bold uppercase text-[#2d3436]">District-wise Placements</CardTitle>
+          <CardHeader className="border-b border-shadow-dark pb-4">
+            <CardTitle className="text-base font-bold uppercase text-text">District-wise Placements</CardTitle>
           </CardHeader>
           <CardContent className="h-80 pt-6">
             {isLoading ? (
-              <div className="flex items-center justify-center h-full font-bold text-[#4a5568]">Loading chart...</div>
+              <div className="flex items-center justify-center h-full font-bold text-text-muted">Loading chart...</div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={placementData}>
@@ -157,8 +166,8 @@ export default function OrgDashboard() {
 
         {/* Map */}
         <Card variants={itemVariants} showScrews>
-          <CardHeader className="border-b border-[#babecc] pb-4">
-            <CardTitle className="text-base font-bold uppercase text-[#2d3436]">Geospatial Tracking</CardTitle>
+          <CardHeader className="border-b border-shadow-dark pb-4">
+            <CardTitle className="text-base font-bold uppercase text-text">Geospatial Tracking</CardTitle>
           </CardHeader>
           <CardContent className="h-80 relative overflow-hidden pt-6">
             <MapContainer center={[19.7515, 75.7139]} zoom={6} scrollWheelZoom={false} className="h-full w-full z-0 rounded-xl">
@@ -173,8 +182,8 @@ export default function OrgDashboard() {
       {/* ─── Radar Chart ─── */}
       <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
         <Card variants={itemVariants} showScrews>
-          <CardHeader className="border-b border-[#babecc] pb-4">
-            <CardTitle className="text-base font-bold uppercase text-[#2d3436]">Skill Demand vs Supply Gap</CardTitle>
+          <CardHeader className="border-b border-shadow-dark pb-4">
+            <CardTitle className="text-base font-bold uppercase text-text">Skill Demand vs Supply Gap</CardTitle>
           </CardHeader>
           <CardContent className="h-80 pt-6">
             <ResponsiveContainer width="100%" height="100%">
