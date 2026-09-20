@@ -10,15 +10,15 @@ const buttonVariants = cva(
     variants: {
       variant: {
         /* Primary — Safety-Orange accent, neumorphic red-tinted shadow */
-        default: "bg-[#ff4757] text-white border-t border-white/20 shadow-[var(--shadow-btn-accent)] hover:brightness-110 active:translate-y-[2px] active:shadow-[var(--shadow-pressed)]",
+        default: "bg-[#ff4757] text-white border-t border-white/20 shadow-(--shadow-btn-accent) hover:brightness-110 active:translate-y-[2px] active:shadow-(--shadow-pressed)",
         /* Secondary — chassis-colored neumorphic lift */
-        secondary: "bg-[#e0e5ec] text-[#2d3436] shadow-[var(--shadow-card)] hover:text-[#ff4757] hover:shadow-[var(--shadow-floating)] active:translate-y-[2px] active:shadow-[var(--shadow-pressed)]",
+        secondary: "bg-chassis text-text shadow-(--shadow-card) hover:text-[#ff4757] hover:shadow-(--shadow-floating) active:translate-y-[2px] active:shadow-(--shadow-pressed)",
         /* Outline — slight border, lifts on hover */
-        outline: "bg-transparent border-2 border-[#babecc] text-[#4a5568] shadow-sm hover:text-[#ff4757] hover:border-[#ff4757] hover:bg-white/40 active:translate-y-[2px]",
+        outline: "bg-transparent border-2 border-shadow-dark text-text-muted shadow-sm hover:text-[#ff4757] hover:border-[#ff4757] hover:bg-white/40 active:translate-y-[2px]",
         /* Ghost — flat until hovered */
-        ghost: "bg-transparent text-[#4a5568] hover:bg-[#d1d9e6] hover:text-[#2d3436] active:translate-y-[1px]",
+        ghost: "bg-transparent text-text-muted hover:bg-recessed hover:text-text active:translate-y-[1px]",
         /* Destructive — same red as accent */
-        destructive: "bg-[#ff4757] text-white shadow-[var(--shadow-btn-accent)] hover:brightness-110 active:translate-y-[2px]",
+        destructive: "bg-[#ff4757] text-white shadow-(--shadow-btn-accent) hover:brightness-110 active:translate-y-[2px]",
         /* Link */
         link: "text-[#ff4757] underline-offset-4 hover:underline",
       },

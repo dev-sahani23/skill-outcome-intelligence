@@ -33,11 +33,11 @@ function ScrewCorner({ position }: { position: "tl" | "tr" | "bl" | "br" }) {
 /* Vent slots — 3 recessed pill shapes, top-right */
 function VentSlots({ dark = false }: { dark?: boolean }) {
   return (
-    <div className="absolute top-3.5 right-10 flex gap-[3px] items-center" aria-hidden>
+    <div className="absolute top-3.5 right-10 flex gap-0.75 items-center" aria-hidden>
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="w-[3px] h-[18px] rounded-full"
+          className="w-0.75 h-4.5 rounded-full"
           style={{
             background: dark ? "#3d4446" : "#d0d6e2",
             boxShadow: dark
@@ -65,11 +65,11 @@ function Card({
       className={cn(
         // #f0f2f5 = lighter raised panel sitting on #e0e5ec chassis — exact match to reference
         "relative group/card flex flex-col overflow-hidden rounded-2xl",
-        "text-[#2d3436]",
+        "text-text",
         "transition-all duration-300 ease-out",
         elevated
-          ? "shadow-[var(--shadow-floating)]"
-          : "shadow-[var(--shadow-card)]",
+          ? "shadow-(--shadow-floating)"
+          : "shadow-(--shadow-card)",
         size === "default" ? "p-6" : "p-4",
         className
       )}
@@ -109,7 +109,7 @@ function CardTitle({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-title"
-      className={cn("font-bold leading-snug text-[#2d3436]", className)}
+      className={cn("font-bold leading-snug text-text", className)}
       {...props}
     />
   )
@@ -119,7 +119,7 @@ function CardDescription({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="card-description"
-      className={cn("text-sm text-[#4a5568] font-medium leading-relaxed", className)}
+      className={cn("text-sm text-text-muted font-medium leading-relaxed", className)}
       {...props}
     />
   )

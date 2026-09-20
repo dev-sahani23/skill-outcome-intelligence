@@ -361,16 +361,4 @@
       linear-gradient(90deg, rgba(100,116,139,0.12) 1px, transparent 1px);
     background-size: 40px 40px;
   }
-
-  /* Backward-compat aliases for pages still using old classes */
-  .glass-panel { @apply indus-panel; }
-  .glass-panel-hover {
-    transition: transform 300ms ease, box-shadow 300ms ease;
-  }
-  .glass-panel-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-floating);
-  }
-  .glass-input  { @apply indus-input; }
-  .glass-button-primary { @apply indus-button-primary; }
 }

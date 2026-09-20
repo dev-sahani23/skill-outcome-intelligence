@@ -12,7 +12,7 @@ function Input({ className, type, icon, trailing, ...props }: InputProps) {
   return (
     <div className="relative w-full">
       {icon && (
-        <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[#4a5568] [&>svg]:size-4 z-10">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-text-muted [&>svg]:size-4 z-10">
           {icon}
         </div>
       )}

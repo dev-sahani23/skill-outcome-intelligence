@@ -21,7 +21,7 @@ const FormField = ({
     <div className={fullWidth ? "sm:col-span-2" : ""}>
       <label
         htmlFor={htmlFor}
-        className="block indus-label text-[#2d3436] mb-1.5"
+        className="block indus-label text-text mb-1.5"
       >
         {label}
       </label>
