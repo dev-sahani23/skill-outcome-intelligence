@@ -46,13 +46,12 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
           <div key={i} className="flex items-center">
             <div className="flex flex-col items-center gap-1">
               <div
-                className={`w-8 h-8 flex items-center justify-center text-sm font-black transition-all ${
-                  isDone
+                className={`w-8 h-8 flex items-center justify-center text-sm font-black transition-all ${isDone
                     ? "bg-secondary text-white border-4 border-secondary"
                     : isActive
-                    ? "bg-primary text-white border-4 border-primary"
-                    : "bg-white text-muted-foreground border-4 border-border"
-                }`}
+                      ? "bg-primary text-white border-4 border-primary"
+                      : "bg-white text-muted-foreground border-4 border-border"
+                  }`}
               >
                 {isDone ? <CheckCircle2 className="w-4 h-4" /> : stepNum}
               </div>
@@ -205,7 +204,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
     window.cloudinary.openUploadWidget(
       {
         cloudName: import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || "demo",
-        uploadPreset: "skill_certificates",
+        uploadPreset: import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "skill_certificates",
         sources: ["local", "camera"],
         multiple: false,
         maxFileSize: 5000000,
@@ -364,15 +363,14 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                       key={s}
                       type="button"
                       onClick={() => patch({ status: s })}
-                      className={`flex-1 py-2.5 border-4 text-sm font-bold uppercase tracking-wider transition-all ${
-                        form.status === s
+                      className={`flex-1 py-2.5 border-4 text-sm font-bold uppercase tracking-wider transition-all ${form.status === s
                           ? s === "completed"
                             ? "bg-secondary border-secondary text-white"
                             : s === "in_progress"
-                            ? "bg-primary border-primary text-white"
-                            : "bg-destructive border-destructive text-white"
+                              ? "bg-primary border-primary text-white"
+                              : "bg-destructive border-destructive text-white"
                           : "bg-white border-border text-muted-foreground hover:bg-secondary/10 hover:text-secondary hover:border-secondary"
-                      }`}
+                        }`}
                     >
                       {s === "completed" ? "Completed" : s === "in_progress" ? "In Progress" : "Dropped Out"}
                     </button>
@@ -499,8 +497,8 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                       certificate
                         ? `📎 ${certificate.fileName}`
                         : form.noCertificate
-                        ? "Not provided"
-                        : "Not uploaded"
+                          ? "Not provided"
+                          : "Not uploaded"
                     }
                   />
                   {form.certificationName && <Row label="Cert Name" value={form.certificationName} />}
@@ -540,11 +538,10 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
               type="button"
               onClick={handleNext}
               disabled={step === 1 && !step1Valid}
-              className={`flex-1 font-bold uppercase tracking-wider border-2 transition-colors ${
-                step === 1 && !step1Valid
+              className={`flex-1 font-bold uppercase tracking-wider border-2 transition-colors ${step === 1 && !step1Valid
                   ? "bg-muted text-muted-foreground cursor-not-allowed border-muted-foreground"
                   : "bg-primary border-primary hover:bg-secondary hover:border-secondary text-white"
-              }`}
+                }`}
             >
               Next <ChevronRight className="w-4 h-4 ml-1" />
             </Button>

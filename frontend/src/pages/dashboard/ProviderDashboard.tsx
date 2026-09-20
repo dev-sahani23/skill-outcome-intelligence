@@ -86,10 +86,10 @@ export default function ProviderDashboard() {
     : 0;
 
   return (
-    <div className="min-h-screen bg-muted p-6 md:p-8 space-y-8 text-foreground relative">
-      <div className="flex flex-col md:flex-row justify-between md:items-center bg-white p-6 border-4 border-border gap-4">
+    <div className="min-h-screen bg-transparent p-6 md:p-8 space-y-8 text-slate-900 relative">
+      <div className="flex flex-col md:flex-row justify-between md:items-center glass-panel p-6 border border-black/5 gap-4">
         <div>
-          <h1 className="text-3xl font-black uppercase text-foreground">Provider Dashboard</h1>
+          <h1 className="text-3xl font-black uppercase text-slate-900">Provider Dashboard</h1>
           <p className="text-muted-foreground font-bold mt-2">Manage your training programs and track trainee enrollments.</p>
         </div>
         <Button className="bg-primary hover:bg-secondary hover:border-secondary text-white font-bold uppercase tracking-wider border-2 border-primary transition-colors" onClick={() => setShowModal(true)}>
@@ -100,7 +100,7 @@ export default function ProviderDashboard() {
       <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         <Card
           variants={itemVariants}
-          className="bg-white border-4 border-border cursor-pointer hover:bg-primary/5 hover:border-primary transition-colors group"
+          className="glass-panel cursor-pointer hover:bg-white/10 hover:border-white/30 transition-colors group"
           onClick={() => window.location.href = '/dashboard/provider/courses'}
         >
           <CardHeader className="pb-2">
@@ -116,7 +116,7 @@ export default function ProviderDashboard() {
           </CardContent>
         </Card>
 
-        <Card variants={itemVariants} className="bg-white border-4 border-border">
+        <Card variants={itemVariants} className="glass-panel">
           <CardHeader className="pb-2">
             <CardTitle className="text-muted-foreground text-sm font-bold uppercase tracking-wider flex items-center gap-2">
               <Users className="w-4 h-4 text-secondary" /> Total Trainees
@@ -129,7 +129,7 @@ export default function ProviderDashboard() {
           </CardContent>
         </Card>
 
-        <Card variants={itemVariants} className="bg-white border-4 border-border">
+        <Card variants={itemVariants} className="glass-panel">
           <CardHeader className="pb-2">
             <CardTitle className="text-muted-foreground text-sm font-bold uppercase tracking-wider flex items-center gap-2">
               <TrendingUp className="w-4 h-4 text-accent" /> Completion Rate
@@ -142,7 +142,7 @@ export default function ProviderDashboard() {
           </CardContent>
         </Card>
 
-        <Card variants={itemVariants} className="bg-white border-4 border-border">
+        <Card variants={itemVariants} className="glass-panel">
           <CardHeader className="pb-2">
             <CardTitle className="text-muted-foreground text-sm font-bold uppercase tracking-wider flex items-center gap-2">
               <Star className="w-4 h-4 text-destructive" /> Average Rating
@@ -158,10 +158,10 @@ export default function ProviderDashboard() {
       </motion.div>
 
       <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-8">
-        <Card variants={itemVariants} className="bg-white border-4 border-border">
-          <CardHeader className="border-b-4 border-border pb-4 flex flex-row justify-between items-center">
-            <CardTitle className="text-lg font-black uppercase text-foreground">Recent Trainee Enrollments</CardTitle>
-            <a href="/dashboard/provider/trainees" className="text-sm font-bold text-primary hover:text-blue-600 uppercase tracking-wider">View All &rarr;</a>
+        <Card variants={itemVariants} className="glass-panel text-slate-900">
+          <CardHeader className="border-b border-black/5 pb-4 flex flex-row justify-between items-center">
+            <CardTitle className="text-lg font-black uppercase text-slate-900">Recent Trainee Enrollments</CardTitle>
+            <a href="/dashboard/provider/trainees" className="text-sm font-bold text-[#3A86FF] hover:text-blue-800 uppercase tracking-wider">View All &rarr;</a>
           </CardHeader>
           <CardContent className="pt-6">
             {isLoadingEnrollments ? (
@@ -174,9 +174,9 @@ export default function ProviderDashboard() {
             ) : (
               <motion.div variants={containerVariants} initial="hidden" animate="show" className="space-y-4">
                 {enrollments.slice(0, 10).map((enrollment: any, idx: number) => (
-                  <motion.div variants={itemVariants} key={idx} className="flex justify-between items-start p-4 border-4 border-border bg-muted hover:bg-accent hover:border-accent hover:text-black transition-colors group">
+                  <motion.div variants={itemVariants} key={idx} className="flex justify-between items-start p-4 border border-black/5 bg-white/40 rounded-xl hover:bg-white/80 hover:border-[#3A86FF] transition-colors group">
                     <div>
-                      <h3 className="font-black text-foreground">
+                      <h3 className="font-black text-slate-900">
                         {enrollment.trainee?.fullName || enrollment.trainee?.user?.email || "Unknown"}
                       </h3>
                       <p className="text-sm font-bold text-muted-foreground mt-1 flex items-center gap-2 uppercase">
@@ -187,13 +187,12 @@ export default function ProviderDashboard() {
                         <span>{formatDate(enrollment.enrolledAt)}</span>
                       </p>
                     </div>
-                    <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-white border-2 border-border ${
-                      enrollment.status === 'COMPLETED'
-                        ? 'text-secondary'
-                        : enrollment.status === 'IN_PROGRESS'
+                    <span className={`px-2.5 py-1 text-xs font-bold uppercase tracking-wider bg-white border-2 border-border ${enrollment.status === 'COMPLETED'
+                      ? 'text-secondary'
+                      : enrollment.status === 'IN_PROGRESS'
                         ? 'text-primary'
                         : 'text-accent'
-                    }`}>
+                      }`}>
                       {enrollment.status}
                     </span>
                   </motion.div>
@@ -219,16 +218,16 @@ export default function ProviderDashboard() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-white border-4 border-border w-full max-w-lg p-6 relative"
+              className="glass-panel w-full max-w-lg p-6 relative"
             >
               <button
                 onClick={() => setShowModal(false)}
-                className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"
+                className="absolute top-4 right-4 text-slate-500 hover:text-slate-900 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
-              <h2 className="text-2xl font-black uppercase text-foreground mb-2">Create New Course</h2>
-              <p className="text-sm font-bold text-muted-foreground mb-6">
+              <h2 className="text-2xl font-black uppercase text-slate-900 mb-2">Create New Course</h2>
+              <p className="text-sm font-bold text-slate-600 mb-6">
                 Enter the configuration details for your new training program.
               </p>
 

@@ -93,7 +93,7 @@ export default function TraineeDashboard() {
 
       setUser(userRes.user);
       setEnrolledCourses(enrollmentsRes?.enrollments ?? []);
-      
+
       const outcomes = outcomesRes || [];
       if (outcomes.length > 0) {
         const latest = outcomes[0];
@@ -180,7 +180,7 @@ export default function TraineeDashboard() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-muted p-6 flex flex-col items-center justify-center text-muted-foreground space-y-4">
+      <div className="min-h-screen bg-transparent p-6 flex flex-col items-center justify-center text-slate-700 space-y-4">
         <Loader2 className="w-12 h-12 animate-spin text-primary" />
         <p className="text-lg font-bold">Loading your dashboard...</p>
       </div>
@@ -189,7 +189,7 @@ export default function TraineeDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-muted p-6 flex flex-col items-center justify-center text-muted-foreground space-y-4">
+      <div className="min-h-screen bg-transparent p-6 flex flex-col items-center justify-center text-slate-700 space-y-4">
         <AlertCircle className="w-12 h-12 text-destructive" />
         <p className="text-lg text-destructive font-bold">{error}</p>
         <Button onClick={fetchData} variant="outline" className="border-4 border-border text-foreground">
@@ -201,7 +201,7 @@ export default function TraineeDashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-muted p-6 flex items-center justify-center text-muted-foreground font-bold">
+      <div className="min-h-screen bg-transparent p-6 flex items-center justify-center text-slate-700 font-bold">
         <p>No user data found. Please log in again.</p>
       </div>
     );
@@ -209,35 +209,35 @@ export default function TraineeDashboard() {
 
   const fullName = user?.traineeProfile?.fullName || user?.email || "Trainee";
   const traineeProfile = user?.traineeProfile;
-  
+
   // Next Follow-up Logic
   const latestFollowUp = traineeProfile?.followUps?.[0];
-  const nextFollowUpDate = latestFollowUp?.scheduledDate 
+  const nextFollowUpDate = latestFollowUp?.scheduledDate
     ? formatDate(latestFollowUp.scheduledDate)
     : "Not Scheduled";
 
   // Skill Assessment Score
   const latestAssessment = traineeProfile?.skillAssessments?.[0];
-  const skillScore = latestAssessment?.skillGapScore 
+  const skillScore = latestAssessment?.skillGapScore
     ? `${100 - latestAssessment.skillGapScore}/100` // Gap score inverted to show proficiency
     : "Not Assessed";
 
   return (
     <>
-      <div className="min-h-screen bg-muted p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 text-foreground relative">
+      <div className="min-h-screen bg-transparent p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8 text-slate-900 relative">
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between md:items-center bg-white p-6 border-4 border-border gap-4">
+        <div className="flex flex-col md:flex-row justify-between md:items-center glass-panel p-6 border border-black/5 gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black uppercase text-foreground">
+            <h1 className="text-2xl sm:text-3xl font-black uppercase text-slate-900">
               Trainee Dashboard
             </h1>
-            <p className="text-muted-foreground font-bold mt-2 flex items-center gap-2 text-sm sm:text-base">
+            <p className="text-slate-600 font-bold mt-2 flex items-center gap-2 text-sm sm:text-base">
               <User className="w-4 h-4" /> Track your skills, enrollments, and professional growth.
             </p>
           </div>
-          <div className="bg-muted p-4 border-4 border-border flex flex-col justify-center items-start w-full md:w-auto">
-            <p className="text-xs sm:text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Logged In As</p>
-            <p className="text-lg sm:text-xl font-black text-foreground flex items-center gap-2">
+          <div className="bg-black/5 p-4 border border-black/5 rounded-xl flex flex-col justify-center items-start w-full md:w-auto">
+            <p className="text-xs sm:text-sm font-bold text-slate-600 uppercase tracking-wider mb-1">Logged In As</p>
+            <p className="text-lg sm:text-xl font-black text-slate-900 flex items-center gap-2">
               Welcome, {fullName}! 👋
             </p>
           </div>
@@ -245,13 +245,13 @@ export default function TraineeDashboard() {
 
         {/* Quick Actions Bar */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button 
+          <Button
             className="flex-1 bg-primary hover:bg-secondary text-white h-12 font-bold uppercase tracking-wider border-2 border-primary hover:border-secondary transition-colors"
             onClick={() => navigate('/trainee/outcome-passport')}
           >
             <FileText className="w-4 h-4 mr-2" /> View Outcome Passport
           </Button>
-          <Button 
+          <Button
             className="flex-1 bg-secondary hover:bg-primary hover:border-primary text-white h-12 font-bold uppercase tracking-wider border-2 border-secondary transition-colors"
             onClick={() => navigate('/trainee/skill-verification')}
           >
@@ -319,8 +319,8 @@ export default function TraineeDashboard() {
         {/* Detail Sections */}
         <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
           <Card variants={itemVariants} className="bg-white border-4 border-border">
-            <CardHeader className="border-b-4 border-border pb-4 flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-black uppercase text-foreground">Current Enrollments</CardTitle>
+            <CardHeader className="border-b border-black/5 pb-4 flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-black uppercase text-slate-900">Current Enrollments</CardTitle>
               <button onClick={() => setShowModal(true)}
                 className="bg-primary hover:bg-secondary hover:border-secondary text-white text-sm font-bold uppercase tracking-wider px-3 py-1.5 flex items-center gap-1 border-2 border-primary transition-colors">
                 <span>+</span> Add Record
@@ -329,28 +329,28 @@ export default function TraineeDashboard() {
             <CardContent className="pt-6">
               {enrolledCourses.length > 0 ? (
                 <motion.div variants={containerVariants} initial="hidden" animate="show">
-                {enrolledCourses.map((course: any, idx: number) => (
-                  <motion.div variants={itemVariants} key={idx} className="p-4 border-4 border-border bg-muted mb-4 hover:bg-accent hover:border-accent hover:text-black transition-colors group">
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <h3 className="font-black text-foreground text-sm sm:text-base">
-                          {course.program?.name || course.trainingNumber || "Training"}
-                        </h3>
-                        <p className="text-xs sm:text-sm font-bold text-muted-foreground mt-1 uppercase">
-                          Provider: {course.program?.provider?.instituteName || "—"}
-                        </p>
-                        {course.certificateId && (
-                          <p className="text-xs font-bold text-secondary mt-1 flex items-center gap-1 uppercase">
-                            <CheckCircle className="w-3 h-3" /> Certified
+                  {enrolledCourses.map((course: any, idx: number) => (
+                    <motion.div variants={itemVariants} key={idx} className="p-4 border border-black/5 bg-white/40 rounded-xl mb-4 hover:bg-white/80 hover:border-[#3A86FF]/30 transition-colors group">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <h3 className="font-black text-slate-900 text-sm sm:text-base">
+                            {course.program?.name || course.trainingNumber || "Training"}
+                          </h3>
+                          <p className="text-xs sm:text-sm font-bold text-muted-foreground mt-1 uppercase">
+                            Provider: {course.program?.provider?.instituteName || "—"}
                           </p>
-                        )}
+                          {course.certificateId && (
+                            <p className="text-xs font-bold text-secondary mt-1 flex items-center gap-1 uppercase">
+                              <CheckCircle className="w-3 h-3" /> Certified
+                            </p>
+                          )}
+                        </div>
+                        <span className="px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-white text-primary border-2 border-border">
+                          {course.status || "Enrolled"}
+                        </span>
                       </div>
-                      <span className="px-2 sm:px-2.5 py-1 text-[10px] sm:text-xs font-bold uppercase tracking-wider bg-white text-primary border-2 border-border">
-                        {course.status || "Enrolled"}
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  ))}
                 </motion.div>
               ) : (
                 <div className="text-center py-6 text-muted-foreground mb-4 border-4 border-dashed border-border bg-muted">
@@ -372,7 +372,7 @@ export default function TraineeDashboard() {
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Company / Business</p>
                     <p className="text-xl font-black text-foreground mt-1">{latestOutcome.employerName || latestOutcome.businessActivity || "Unknown"}</p>
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Designation</p>
@@ -394,7 +394,7 @@ export default function TraineeDashboard() {
                       <p className="text-foreground font-bold text-sm">{latestOutcome.createdAt ? formatDate(latestOutcome.createdAt) : "—"}</p>
                     </div>
                   </div>
-                  
+
                   <div>
                     <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Training Relevance</p>
                     <span className="bg-white text-secondary border-2 border-secondary px-2 py-1 text-xs font-bold uppercase tracking-wider">
@@ -412,17 +412,17 @@ export default function TraineeDashboard() {
               )}
               <div className="mt-auto pt-6">
                 <Button
-                className="w-full bg-primary hover:bg-secondary hover:border-secondary text-white font-bold uppercase tracking-wider border-2 border-primary transition-colors"
-                onClick={() => {
-                  if (employmentStatus !== "Pending" && employmentStatus !== "Unemployed") {
-                    setShowEmploymentDetailsModal(true);
-                  } else {
-                    setShowEmploymentModal(true);
-                  }
-                }}
-              >
-                {latestOutcome ? "Update Record" : "Report Employment"}
-              </Button>
+                  className="w-full bg-primary hover:bg-secondary hover:border-secondary text-white font-bold uppercase tracking-wider border-2 border-primary transition-colors"
+                  onClick={() => {
+                    if (employmentStatus !== "Pending" && employmentStatus !== "Unemployed") {
+                      setShowEmploymentDetailsModal(true);
+                    } else {
+                      setShowEmploymentModal(true);
+                    }
+                  }}
+                >
+                  {latestOutcome ? "Update Record" : "Report Employment"}
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -439,7 +439,7 @@ export default function TraineeDashboard() {
           />
         )}
       </AnimatePresence>
-      
+
       <AnimatePresence>
         {showEmploymentModal && (
           <motion.div
@@ -454,30 +454,30 @@ export default function TraineeDashboard() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-white border-4 border-border w-full max-w-md p-6 relative"
+              className="glass-panel w-full max-w-md p-6 relative"
             >
-               <button onClick={() => setShowEmploymentModal(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X className="w-6 h-6" /></button>
-               <h2 className="text-xl font-black uppercase text-foreground mb-4">Update Status</h2>
-               <div className="space-y-3">
-                 {['Employed', 'Self-Employed', 'Apprenticeship', 'Unemployed'].map((status) => (
-                   <button
-                     key={status}
-                     onClick={() => {
-                       setEmploymentStatus(status);
-                       setShowEmploymentModal(false);
-                       setStatusUpdatedText("Status updated");
-                       if (status === 'Unemployed') {
-                         auth.reportOutcome({ type: "UNEMPLOYED" }).then(outcome => setLatestOutcome(outcome)).catch(console.error);
-                       } else {
-                         setShowEmploymentDetailsModal(true);
-                       }
-                     }}
-                     className="w-full text-left px-4 py-3 bg-muted border-4 border-border hover:border-primary font-bold text-foreground"
-                   >
-                     {status}
-                   </button>
-                 ))}
-               </div>
+              <button onClick={() => setShowEmploymentModal(false)} className="absolute top-4 right-4 text-slate-500 hover:text-slate-900"><X className="w-6 h-6" /></button>
+              <h2 className="text-xl font-black uppercase text-slate-900 mb-4">Update Status</h2>
+              <div className="space-y-3">
+                {['Employed', 'Self-Employed', 'Apprenticeship', 'Unemployed'].map((status) => (
+                  <button
+                    key={status}
+                    onClick={() => {
+                      setEmploymentStatus(status);
+                      setShowEmploymentModal(false);
+                      setStatusUpdatedText("Status updated");
+                      if (status === 'Unemployed') {
+                        auth.reportOutcome({ type: "UNEMPLOYED" }).then(outcome => setLatestOutcome(outcome)).catch(console.error);
+                      } else {
+                        setShowEmploymentDetailsModal(true);
+                      }
+                    }}
+                    className="w-full text-left px-4 py-3 bg-white/40 border border-black/5 hover:border-[#3A86FF] font-bold text-slate-800 rounded-lg transition-colors"
+                  >
+                    {status}
+                  </button>
+                ))}
+              </div>
             </motion.div>
           </motion.div>
         )}
@@ -496,113 +496,113 @@ export default function TraineeDashboard() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="bg-white border-4 border-border w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto"
+              className="glass-panel w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto"
             >
-               <button onClick={() => setShowEmploymentDetailsModal(false)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground"><X className="w-6 h-6" /></button>
-               <h2 className="text-xl font-black uppercase text-foreground mb-4">Provide Details</h2>
-               
-               <form onSubmit={handleEmpFormSubmit} className="space-y-4">
-                 {outcomeError && (
-                   <div className="p-3 bg-red-100 text-red-600 font-bold text-sm">
-                     {outcomeError}
-                   </div>
-                 )}
+              <button onClick={() => setShowEmploymentDetailsModal(false)} className="absolute top-4 right-4 text-slate-500 hover:text-slate-900"><X className="w-6 h-6" /></button>
+              <h2 className="text-xl font-black uppercase text-slate-900 mb-4">Provide Details</h2>
 
-                 {employmentStatus === "Employed" && (
-                   <>
-                     <div className="relative">
-                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Search Employer</label>
-                       <input 
-                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
-                         placeholder="e.g. Tata Motors" 
-                         value={empFormData.companyName}
-                         onChange={(e) => {
-                           setEmpFormData({...empFormData, companyName: e.target.value, employerId: ""})
-                         }}
-                         required
-                       />
-                       {showEmployerDropdown && employerResults.length > 0 && (
-                         <div className="absolute z-10 w-full bg-white border-2 border-border mt-1 shadow-lg max-h-48 overflow-y-auto">
-                           {employerResults.map((emp) => (
-                             <div 
-                               key={emp.id} 
-                               className="p-2 hover:bg-muted cursor-pointer"
-                               onClick={() => {
-                                 setEmpFormData({...empFormData, companyName: emp.name, employerId: emp.id});
-                                 setShowEmployerDropdown(false);
-                               }}
-                             >
-                               <p className="font-bold">{emp.name}</p>
-                               <p className="text-xs text-muted-foreground">{emp.sector} {emp.isVerified && "✓"}</p>
-                             </div>
-                           ))}
-                         </div>
-                       )}
-                     </div>
-                     <div>
-                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Designation</label>
-                       <input 
-                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
-                         value={empFormData.designation}
-                         onChange={(e) => setEmpFormData({...empFormData, designation: e.target.value})}
-                         required
-                       />
-                     </div>
-                     <div>
-                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Monthly Wage (INR)</label>
-                       <input 
-                         type="number"
-                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
-                         value={empFormData.monthlyWage}
-                         onChange={(e) => setEmpFormData({...empFormData, monthlyWage: e.target.value})}
-                         required
-                       />
-                     </div>
-                     <div>
-                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Aadhaar Number (Optional, 12 digits)</label>
-                       <input 
-                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
-                         placeholder="e.g. 1234 5678 9012" 
-                         value={empFormData.aadhaarNo}
-                         onChange={(e) => setEmpFormData({...empFormData, aadhaarNo: e.target.value})}
-                         pattern="[0-9\s]{12,14}"
-                       />
-                     </div>
-                     <div>
-                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">UAN Number (Optional, 12 digits)</label>
-                       <input 
-                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
-                         placeholder="e.g. 100000000000" 
-                         value={empFormData.UANNo}
-                         onChange={(e) => setEmpFormData({...empFormData, UANNo: e.target.value})}
-                         pattern="[0-9]{12}"
-                       />
-                     </div>
-                   </>
-                 )}
+              <form onSubmit={handleEmpFormSubmit} className="space-y-4">
+                {outcomeError && (
+                  <div className="p-3 bg-red-100 text-red-600 font-bold text-sm">
+                    {outcomeError}
+                  </div>
+                )}
 
-                 {employmentStatus === "Self-Employed" && (
-                   <>
-                     <div>
-                       <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Business Name</label>
-                       <input 
-                         className="w-full border-2 border-border p-2 focus:border-primary outline-none" 
-                         value={empFormData.companyName}
-                         onChange={(e) => setEmpFormData({...empFormData, companyName: e.target.value})}
-                         required
-                       />
-                     </div>
-                   </>
-                 )}
+                {employmentStatus === "Employed" && (
+                  <>
+                    <div className="relative">
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Search Employer</label>
+                      <input
+                        className="w-full border-2 border-border p-2 focus:border-primary outline-none"
+                        placeholder="e.g. Tata Motors"
+                        value={empFormData.companyName}
+                        onChange={(e) => {
+                          setEmpFormData({ ...empFormData, companyName: e.target.value, employerId: "" })
+                        }}
+                        required
+                      />
+                      {showEmployerDropdown && employerResults.length > 0 && (
+                        <div className="absolute z-10 w-full bg-white border-2 border-border mt-1 shadow-lg max-h-48 overflow-y-auto">
+                          {employerResults.map((emp) => (
+                            <div
+                              key={emp.id}
+                              className="p-2 hover:bg-muted cursor-pointer"
+                              onClick={() => {
+                                setEmpFormData({ ...empFormData, companyName: emp.name, employerId: emp.id });
+                                setShowEmployerDropdown(false);
+                              }}
+                            >
+                              <p className="font-bold">{emp.name}</p>
+                              <p className="text-xs text-muted-foreground">{emp.sector} {emp.isVerified && "✓"}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Designation</label>
+                      <input
+                        className="w-full border-2 border-border p-2 focus:border-primary outline-none"
+                        value={empFormData.designation}
+                        onChange={(e) => setEmpFormData({ ...empFormData, designation: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Monthly Wage (INR)</label>
+                      <input
+                        type="number"
+                        className="w-full border-2 border-border p-2 focus:border-primary outline-none"
+                        value={empFormData.monthlyWage}
+                        onChange={(e) => setEmpFormData({ ...empFormData, monthlyWage: e.target.value })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Aadhaar Number (Optional, 12 digits)</label>
+                      <input
+                        className="w-full border-2 border-border p-2 focus:border-primary outline-none"
+                        placeholder="e.g. 1234 5678 9012"
+                        value={empFormData.aadhaarNo}
+                        onChange={(e) => setEmpFormData({ ...empFormData, aadhaarNo: e.target.value })}
+                        pattern="[0-9\s]{12,14}"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">UAN Number (Optional, 12 digits)</label>
+                      <input
+                        className="w-full border-2 border-border p-2 focus:border-primary outline-none"
+                        placeholder="e.g. 100000000000"
+                        value={empFormData.UANNo}
+                        onChange={(e) => setEmpFormData({ ...empFormData, UANNo: e.target.value })}
+                        pattern="[0-9]{12}"
+                      />
+                    </div>
+                  </>
+                )}
 
-                 <Button 
-                   type="submit" 
-                   disabled={isSubmittingOutcome}
-                   className="w-full bg-primary hover:bg-secondary text-white font-bold uppercase tracking-wider border-2 border-primary"
-                 >
-                   {isSubmittingOutcome ? "Saving..." : "Save Details"}
-                 </Button>
-               </form>
+                {employmentStatus === "Self-Employed" && (
+                  <>
+                    <div>
+                      <label className="block text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Business Name</label>
+                      <input
+                        className="w-full border-2 border-border p-2 focus:border-primary outline-none"
+                        value={empFormData.companyName}
+                        onChange={(e) => setEmpFormData({ ...empFormData, companyName: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={isSubmittingOutcome}
+                  className="w-full bg-primary hover:bg-secondary text-white font-bold uppercase tracking-wider border-2 border-primary"
+                >
+                  {isSubmittingOutcome ? "Saving..." : "Save Details"}
+                </Button>
+              </form>
             </motion.div>
           </motion.div>
         )}

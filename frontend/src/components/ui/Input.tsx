@@ -20,7 +20,7 @@ function Input({ className, type, icon, trailing, ...props }: InputProps) {
         type={type}
         data-slot="input"
         className={cn(
-          "h-14 w-full min-w-0 rounded-md border-0 bg-muted px-4 py-2 text-base font-medium text-foreground placeholder:text-muted-foreground transition-all duration-200 outline-none file:inline-flex file:h-6 file:border-0 file:bg-transparent file:text-sm file:font-medium hover:bg-accent/10 focus:bg-background focus:ring-0 focus:border-2 focus:border-accent disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-red-500",
+          "glass-input h-14 w-full min-w-0 px-4 py-2 text-base disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-red-500",
           icon && "pl-12",
           trailing && "pr-12",
           className

@@ -20,44 +20,43 @@ const AuthLayout = ({
   const formWidthClass = formMaxWidth === "xl" ? "max-w-xl" : "max-w-md";
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-background font-sans relative overflow-hidden">
-      {/* Left panel - Bold Primary Color Block */}
+    <div className="min-h-screen flex flex-col lg:flex-row bg-transparent font-sans relative overflow-hidden">
+      {/* Left panel - Transparent to show global mesh gradient */}
       <motion.section
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className={`flex-1 relative bg-primary text-white flex flex-col justify-between p-8 sm:p-12 lg:p-24 overflow-hidden z-10 ${
-          hideHeroOnMobile ? "hidden lg:flex" : "flex"
-        }`}
+        className={`flex-1 relative bg-transparent text-slate-900 flex flex-col justify-between p-8 sm:p-12 lg:p-24 overflow-hidden z-10 ${hideHeroOnMobile ? "hidden lg:flex" : "flex"
+          }`}
       >
-        {/* Geometric Decorative Shapes (Flat Design) */}
-        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-white/5 pointer-events-none"></div>
-        <div className="absolute bottom-[-20%] right-[-10%] w-[70%] h-[70%] bg-white/5 rotate-45 pointer-events-none"></div>
-        <div className="absolute top-[20%] right-[10%] w-24 h-24 bg-secondary/80 pointer-events-none"></div>
+        {/* Subtle glass glowing orbs (bright pastel palette) */}
+        <div className="absolute top-[10%] left-[10%] w-[40%] h-[40%] rounded-full bg-[#3A86FF]/20 blur-[120px] pointer-events-none"></div>
+        <div className="absolute bottom-[10%] right-[10%] w-[50%] h-[50%] bg-[#BDB2FF]/20 blur-[120px] pointer-events-none"></div>
 
         <div className="relative z-10 mb-12">
           <AuthBranding />
         </div>
 
-        <div className="relative z-10 my-auto">
+        <div className="relative z-10 my-auto drop-shadow-[0_4px_12px_rgba(58,134,255,0.1)]">
           {heroContent}
         </div>
 
         {heroFooter && (
-          <div className="relative z-10 mt-12 flex items-center gap-3 font-semibold text-lg hidden lg:flex">
+          <div className="relative z-10 mt-12 flex items-center gap-3 font-semibold text-lg hidden lg:flex text-slate-600">
             {heroFooter}
           </div>
         )}
       </motion.section>
 
-      {/* Right form panel - White Background */}
-      <motion.section 
+      {/* Right form panel - Centering Content */}
+      <motion.section
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }}
-        className="flex-1 flex flex-col justify-center items-center bg-white p-6 sm:p-8 lg:p-12 z-20"
+        className="flex-1 flex flex-col justify-center items-center p-6 sm:p-8 lg:p-12 z-20"
       >
-        <div className={`w-full ${formWidthClass} relative`}>
+        {/* Glassmorphism Inner Card */}
+        <div className={`w-full ${formWidthClass} glass-panel p-8 sm:p-10 relative`}>
           {children}
         </div>
       </motion.section>

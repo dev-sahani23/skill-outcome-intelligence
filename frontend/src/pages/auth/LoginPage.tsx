@@ -180,13 +180,13 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
   const handleSendOtp = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     setForgotPasswordError("");
-    
+
     const targetEmail = forgotPasswordStep === "otp" && otpTargetEmail ? otpTargetEmail : forgotPasswordEmail.trim();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(targetEmail)) {
       setForgotPasswordError("Please enter a valid email address");
       return;
     }
-    
+
     setForgotPasswordLoading(true);
     try {
       await auth.sendOtp({ email: targetEmail });
@@ -198,9 +198,9 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         setForgotPasswordError("Couldn't reach the server, check your connection");
       } else if (err.status === 429) {
         if (err.message.includes("15 minutes")) {
-           setForgotPasswordError("Too many OTP requests from this email address, please try again after 15 minutes");
+          setForgotPasswordError("Too many OTP requests from this email address, please try again after 15 minutes");
         } else {
-           setForgotPasswordError(err.message || "Please wait before requesting another OTP");
+          setForgotPasswordError(err.message || "Please wait before requesting another OTP");
         }
       } else {
         setForgotPasswordError(err.message || "Failed to send OTP. Please try again.");
@@ -213,13 +213,13 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
   const handleVerifyOtp = async (e: React.FormEvent) => {
     e.preventDefault();
     setForgotPasswordError("");
-    
+
     const cleanOtp = forgotPasswordOtp.trim();
     if (!/^\d{6}$/.test(cleanOtp)) {
       setForgotPasswordError("OTP must be exactly 6 digits");
       return;
     }
-    
+
     setForgotPasswordLoading(true);
     try {
       const result = await auth.verifyOtp({ email: otpTargetEmail, otp: cleanOtp });
@@ -280,26 +280,26 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
   const heroContent = (
     <div className="mb-8 lg:mb-12">
-      <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-white leading-tight tracking-tight mb-4 sm:mb-6">
+      <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold text-slate-900 leading-tight tracking-tight mb-4 sm:mb-6">
         Measure skills.
         <br />
-        <span className="text-accent">
+        <span className="text-[#3A86FF]">
           Track outcomes.
         </span>
         <br />
         Build India's future.
       </h1>
 
-      <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-xl mb-8 sm:mb-12">
+      <p className="text-base sm:text-lg text-slate-600 leading-relaxed max-w-xl mb-8 sm:mb-12">
         A unified platform for tracking the complete skilling journey — from
         training and certification to employment, income and long-term career
         outcomes.
       </p>
 
-      <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-4 sm:gap-6 p-6 sm:p-8 rounded-lg bg-white text-foreground w-full sm:w-max sm:max-w-full border-4 border-foreground">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap items-start sm:items-center gap-4 sm:gap-6 p-6 sm:p-8 rounded-lg glass-panel text-slate-900 w-full sm:w-max sm:max-w-full border border-black/5">
         <div className="flex flex-col gap-1">
-          <strong className="text-xl sm:text-2xl font-bold text-primary">360°</strong>
-          <span className="text-xs sm:text-sm text-foreground font-semibold uppercase tracking-wider">
+          <strong className="text-xl sm:text-2xl font-bold text-[#3A86FF]">360°</strong>
+          <span className="text-xs sm:text-sm text-slate-600 font-semibold uppercase tracking-wider">
             Outcome Tracking
           </span>
         </div>
@@ -308,8 +308,8 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         <div className="sm:hidden w-full h-px bg-white/10"></div>
 
         <div className="flex flex-col gap-1">
-          <strong className="text-xl sm:text-2xl font-bold text-secondary">AI</strong>
-          <span className="text-xs sm:text-sm text-foreground font-semibold uppercase tracking-wider">
+          <strong className="text-xl sm:text-2xl font-bold text-emerald-600">AI</strong>
+          <span className="text-xs sm:text-sm text-slate-600 font-semibold uppercase tracking-wider">
             Powered Insights
           </span>
         </div>
@@ -318,8 +318,8 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         <div className="sm:hidden w-full h-px bg-white/10"></div>
 
         <div className="flex flex-col gap-1">
-          <strong className="text-xl sm:text-2xl font-bold text-accent">100%</strong>
-          <span className="text-xs sm:text-sm text-foreground font-semibold uppercase tracking-wider">
+          <strong className="text-xl sm:text-2xl font-bold text-amber-500">100%</strong>
+          <span className="text-xs sm:text-sm text-slate-600 font-semibold uppercase tracking-wider">
             Data Driven
           </span>
         </div>
@@ -332,7 +332,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
       <span className="text-xl">🇮🇳</span>
       <p>
         Empowering India's workforce through
-        <strong className="text-slate-300 font-medium">
+        <strong className="text-slate-700 font-medium">
           {" "}
           measurable impact
         </strong>
@@ -414,8 +414,8 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
               {forgotPasswordLoading ? "Verifying..." : "Verify OTP"}
             </Button>
             <div className="mt-4 text-center">
-              <button 
-                type="button" 
+              <button
+                type="button"
                 disabled={resendCooldown > 0 || forgotPasswordLoading}
                 onClick={() => handleSendOtp()}
                 className={`text-sm font-bold uppercase tracking-wider transition-colors ${resendCooldown > 0 ? "text-muted-foreground cursor-not-allowed" : "text-primary hover:text-accent"}`}
@@ -497,7 +497,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
         {/* Quick Test / Demo Accounts */}
         <div
-          className="mb-6 p-6 rounded-lg bg-muted border-4 border-border shadow-none animate-fade-in-up"
+          className="mb-6 p-6 rounded-lg glass-panel animate-fade-in-up"
           style={{ animationDelay: "0.12s" }}
         >
           <div className="flex items-center justify-between mb-4">
@@ -506,11 +506,11 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-3 w-3 bg-primary"></span>
               </span>
-              <span className="text-sm font-bold uppercase tracking-wider text-foreground">
+              <span className="text-sm font-bold uppercase tracking-wider text-slate-900">
                 Demo Accounts
               </span>
             </div>
-            <span className="text-sm text-foreground bg-white px-2 py-1 rounded-sm font-bold border-2 border-border">
+            <span className="text-sm text-slate-800 bg-black/5 px-2 py-1 rounded-md font-bold border border-black/10">
               pwd: password123
             </span>
           </div>
@@ -531,15 +531,15 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                     setPassword(acc.password);
                     setError("");
                   }}
-                  className={`relative flex flex-col items-start p-3 rounded-md border-4 transition-all duration-200 text-left bg-white ${isSelected
-                      ? "border-primary bg-blue-50"
-                      : "border-border hover:border-gray-300 hover:scale-[1.02]"
+                  className={`relative flex flex-col items-start p-3 rounded-xl border transition-all duration-300 text-left bg-white/60 backdrop-blur-sm ${isSelected
+                    ? "z-10 border-[#3A86FF] shadow-[0_0_15px_rgba(58,134,255,0.4)] translate-y-[-2px] bg-white/90"
+                    : "z-0 border-black/5 hover:border-[#3A86FF]/50 hover:-translate-y-1 hover:bg-white/80 hover:shadow-[0_4px_12px_rgba(58,134,255,0.1)]"
                     }`}
                 >
                   <div className="flex items-center justify-between w-full mb-1.5">
                     <div className="flex items-center gap-1.5">
                       {acc.icon}
-                      <span className="text-sm font-bold text-foreground">
+                      <span className="text-sm font-bold text-slate-900 drop-shadow-sm">
                         {acc.shortRole}
                       </span>
                     </div>
@@ -661,16 +661,16 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         </form>
 
         <div className="relative flex items-center justify-center my-6 sm:my-8 animate-fade-in" style={{ animationDelay: "0.35s" }}>
-          <div className="flex-1 h-1 bg-muted"></div>
-          <span className="px-4 text-sm text-muted-foreground font-bold uppercase tracking-wider">
+          <div className="flex-1 h-px bg-black/10"></div>
+          <span className="px-4 text-sm text-slate-500 font-bold uppercase tracking-wider">
             or continue with
           </span>
-          <div className="flex-1 h-1 bg-muted"></div>
+          <div className="flex-1 h-px bg-black/10"></div>
         </div>
 
         <div className="animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
           <Button type="button" variant="ghost" fullWidth>
-            <div className="w-5 h-5 text-indigo-400">
+            <div className="w-5 h-5 text-[#3A86FF]">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -729,12 +729,12 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
         <footer className="mt-6 sm:mt-8 flex items-center justify-center gap-3 text-sm text-slate-500">
           <span>© 2026 SkillTrack</span>
-          <span className="text-slate-700">•</span>
-          <button type="button" className="hover:text-slate-300 transition-colors duration-200">
+          <span className="text-slate-300">•</span>
+          <button type="button" className="hover:text-slate-800 transition-colors duration-200">
             Privacy
           </button>
-          <span className="text-slate-700">•</span>
-          <button type="button" className="hover:text-slate-300 transition-colors duration-200">
+          <span className="text-slate-300">•</span>
+          <button type="button" className="hover:text-slate-800 transition-colors duration-200">
             Terms
           </button>
         </footer>
