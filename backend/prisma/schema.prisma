@@ -295,6 +295,7 @@ model TrainingProgram {
   enrollments       Enrollment[]
   courseRatings     CourseRating[] // NEW
 
+  @@index([providerId])
   @@map("training_programs")
 }
 
@@ -319,6 +320,8 @@ model Enrollment {
   skillAssessments  SkillAssessment[]
   certification     Certification?   // Cloudinary document + formal cert metadata
 
+  @@index([traineeId])
+  @@index([programId])
   @@map("enrollments")
 }
 
@@ -408,6 +411,9 @@ model EmploymentOutcome {
   validations       Validation[]       // NEW
   attritionRecords  AttritionRecord[]  // NEW
 
+  @@index([traineeId])
+  @@index([employerId])
+  @@index([districtId])
   @@map("employment_outcomes")
 }
 
