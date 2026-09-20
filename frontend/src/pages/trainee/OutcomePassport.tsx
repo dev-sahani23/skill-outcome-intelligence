@@ -50,7 +50,7 @@ export default function OutcomePassport() {
   }, []);
 
   const PageWrapper = ({ children }: { children: React.ReactNode }) => (
-    <div className="min-h-screen bg-[#e0e5ec] p-6 sm:p-8 md:p-12 flex flex-col items-center relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-chassis p-6 sm:p-8 md:p-12 flex flex-col items-center relative overflow-hidden font-sans">
       <div className="absolute inset-0 pointer-events-none indus-schematic-bg opacity-60" aria-hidden />
       <div
         className="absolute -top-32 -left-32 w-96 h-96 rounded-full pointer-events-none"
@@ -68,7 +68,7 @@ export default function OutcomePassport() {
   if (isLoading) {
     return (
       <PageWrapper>
-        <div className="flex flex-col items-center justify-center space-y-4 text-[#4a5568] min-h-[60vh]">
+        <div className="flex flex-col items-center justify-center space-y-4 text-text-muted min-h-[60vh]">
           <Loader2 className="w-12 h-12 animate-spin text-[#ff4757]" />
           <p className="indus-label">{t('outcomePassport.loading')}</p>
         </div>
@@ -81,7 +81,7 @@ export default function OutcomePassport() {
       <PageWrapper>
         <Card elevated className="max-w-md w-full p-8 flex flex-col items-center justify-center text-center">
           <AlertCircle className="w-12 h-12 text-[#ff4757] mb-4" />
-          <p className="text-lg text-[#2d3436] font-bold mb-6">{t('outcomePassport.error')}</p>
+          <p className="text-lg text-text font-bold mb-6">{t('outcomePassport.error')}</p>
           <Button onClick={fetchData} variant="secondary">
             {t('outcomePassport.retry')}
           </Button>
@@ -94,7 +94,7 @@ export default function OutcomePassport() {
     return (
       <PageWrapper>
         <div className="w-full max-w-xl mb-8 flex justify-between items-center">
-          <button onClick={() => navigate('/dashboard/trainee')} className="flex items-center text-[#4a5568] hover:text-[#ff4757] transition-colors text-sm font-bold uppercase tracking-wider">
+          <button onClick={() => navigate('/dashboard/trainee')} className="flex items-center text-text-muted hover:text-[#ff4757] transition-colors text-sm font-bold uppercase tracking-wider">
             <ArrowLeft className="w-4 h-4 mr-1" /> {t('outcomePassport.backToDashboard')}
           </button>
           <LanguageSelector />
@@ -104,8 +104,8 @@ export default function OutcomePassport() {
           <div className="w-20 h-20 rounded-full mb-6 flex items-center justify-center" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
             <ShieldCheck className="w-10 h-10 text-[#a0aec0]" />
           </div>
-          <h2 className="text-2xl font-bold text-[#2d3436] mb-3">{t('outcomePassport.noVerifiedCert')}</h2>
-          <p className="text-[#4a5568] font-medium mb-8 max-w-md leading-relaxed">
+          <h2 className="text-2xl font-bold text-text mb-3">{t('outcomePassport.noVerifiedCert')}</h2>
+          <p className="text-text-muted font-medium mb-8 max-w-md leading-relaxed">
             {t('outcomePassport.noVerifiedCertDesc')}
           </p>
           <Button onClick={() => navigate('/dashboard/trainee')} variant="default" fullWidth>
@@ -143,7 +143,7 @@ export default function OutcomePassport() {
         <div>
           <button
             onClick={() => navigate('/dashboard/trainee')}
-            className="flex items-center text-[#4a5568] hover:text-[#ff4757] transition-colors mb-6 text-sm font-bold uppercase tracking-wider"
+            className="flex items-center text-text-muted hover:text-[#ff4757] transition-colors mb-6 text-sm font-bold uppercase tracking-wider"
           >
             <ArrowLeft className="w-4 h-4 mr-1" /> {t('outcomePassport.backToDashboard')}
           </button>
@@ -153,10 +153,10 @@ export default function OutcomePassport() {
             <span className="indus-label text-[#22c55e]">Verified Identity</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-bold text-[#2d3436] tracking-tight mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-text tracking-tight mb-2">
             {t('outcomePassport.title')}
           </h1>
-          <p className="text-[#4a5568] font-medium text-sm sm:text-base">
+          <p className="text-text-muted font-medium text-sm sm:text-base">
             Your universally verifiable proof of skill and employment.
           </p>
         </div>
@@ -170,9 +170,9 @@ export default function OutcomePassport() {
             {/* Left Column: Details */}
             <div className="flex-1 p-8 sm:p-10 space-y-8">
               <div>
-                <p className="indus-label text-[#4a5568] mb-1">Passport Holder</p>
-                <h2 className="text-3xl font-bold text-[#2d3436] mb-1">{fullName}</h2>
-                <p className="text-sm font-medium text-[#4a5568] flex items-center gap-1">
+                <p className="indus-label text-text-muted mb-1">Passport Holder</p>
+                <h2 className="text-3xl font-bold text-text mb-1">{fullName}</h2>
+                <p className="text-sm font-medium text-text-muted flex items-center gap-1">
                   <MapPin className="w-4 h-4" /> {district}, MH
                 </p>
               </div>
@@ -180,18 +180,18 @@ export default function OutcomePassport() {
               <div className="space-y-4">
                 {/* Recessed Info Blocks */}
                 <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
-                  <p className="indus-label text-[#4a5568] mb-1">{t('outcomePassport.certifiedCourse')}</p>
-                  <p className="font-bold text-[#2d3436] text-base mb-1">{courseName}</p>
-                  <p className="text-sm font-mono text-[#4a5568]">{t('outcomePassport.completionDate')}: {certDate}</p>
+                  <p className="indus-label text-text-muted mb-1">{t('outcomePassport.certifiedCourse')}</p>
+                  <p className="font-bold text-text text-base mb-1">{courseName}</p>
+                  <p className="text-sm font-mono text-text-muted">{t('outcomePassport.completionDate')}: {certDate}</p>
                 </div>
 
                 <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
-                  <p className="indus-label text-[#4a5568] mb-1 flex items-center gap-1">
+                  <p className="indus-label text-text-muted mb-1 flex items-center gap-1">
                     <Briefcase className="w-4 h-4" /> Employment Status
                   </p>
                   <p className="font-bold text-[#3b82f6] text-base mb-1">{getOutcomeText()}</p>
                   {outcome?.monthlyWage && (
-                    <p className="text-sm font-mono text-[#2d3436]">
+                    <p className="text-sm font-mono text-text">
                       {t('outcomePassport.salary')}: {formatINR(outcome.monthlyWage)}
                     </p>
                   )}
@@ -199,12 +199,12 @@ export default function OutcomePassport() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
-                    <p className="indus-label text-[#4a5568] mb-1">{t('outcomePassport.skillVerificationScore')}</p>
+                    <p className="indus-label text-text-muted mb-1">{t('outcomePassport.skillVerificationScore')}</p>
                     <p className="font-bold text-[#22c55e] text-2xl font-mono">{skillScore}</p>
                   </div>
                   <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
-                    <p className="indus-label text-[#4a5568] mb-1">Issuer</p>
-                    <p className="font-bold text-[#2d3436] text-sm truncate" title={enrollment.program?.provider?.instituteName || "Govt of MH"}>
+                    <p className="indus-label text-text-muted mb-1">Issuer</p>
+                    <p className="font-bold text-text text-sm truncate" title={enrollment.program?.provider?.instituteName || "Govt of MH"}>
                       {enrollment.program?.provider?.instituteName || "Govt of MH"}
                     </p>
                   </div>
@@ -215,7 +215,7 @@ export default function OutcomePassport() {
             {/* Right Column: QR Code */}
             <div className="flex flex-col items-center justify-center p-8 sm:p-10 shrink-0 md:w-[320px] bg-[#d8dde8] relative overflow-hidden">
                {/* Vertical divider line for desktop */}
-              <div className="hidden md:block absolute left-0 top-12 bottom-12 w-px bg-gradient-to-b from-transparent via-[#babecc] to-transparent" />
+              <div className="hidden md:block absolute left-0 top-12 bottom-12 w-px bg-linear-to-b from-transparent via-[#babecc] to-transparent" />
               
               <div 
                 className="p-6 rounded-2xl bg-[#f0f2f5] mb-6"
@@ -233,9 +233,9 @@ export default function OutcomePassport() {
 
               <div className="flex items-center gap-2 mb-2">
                 <ShieldCheck className="w-5 h-5 text-[#22c55e]" />
-                <span className="font-bold text-[#2d3436]">Cryptographically Secure</span>
+                <span className="font-bold text-text">Cryptographically Secure</span>
               </div>
-              <p className="indus-label text-[#4a5568] text-center max-w-[200px]">
+              <p className="indus-label text-text-muted text-center max-w-50">
                 {t('outcomePassport.scanToVerify')}
               </p>
             </div>
@@ -245,7 +245,7 @@ export default function OutcomePassport() {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }} className="w-full max-w-3xl flex justify-end">
         <Button variant="secondary" className="group">
-          <Download className="w-5 h-5 mr-2 text-[#4a5568] group-hover:text-[#ff4757] transition-colors" /> 
+          <Download className="w-5 h-5 mr-2 text-text-muted group-hover:text-[#ff4757] transition-colors" /> 
           {t('outcomePassport.downloadPdf')}
         </Button>
       </motion.div>

@@ -40,7 +40,7 @@ export default function PublicVerify() {
   }, [hash]);
 
   const PageWrapper = ({ children }: { children: React.ReactNode }) => (
-    <div className="min-h-screen bg-[#e0e5ec] p-6 sm:p-8 md:p-12 flex flex-col items-center relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-chassis p-6 sm:p-8 md:p-12 flex flex-col items-center relative overflow-hidden font-sans">
       <div className="absolute inset-0 pointer-events-none indus-schematic-bg opacity-60" aria-hidden />
       <div
         className="absolute -top-32 -left-32 w-96 h-96 rounded-full pointer-events-none"
@@ -58,7 +58,7 @@ export default function PublicVerify() {
   if (isLoading) {
     return (
       <PageWrapper>
-        <div className="flex flex-col items-center justify-center space-y-4 text-[#4a5568] min-h-[60vh]">
+        <div className="flex flex-col items-center justify-center space-y-4 text-text-muted min-h-[60vh]">
           <Loader2 className="w-12 h-12 animate-spin text-[#ff4757]" />
           <p className="indus-label">Verifying cryptographic hash on the network...</p>
         </div>
@@ -73,8 +73,8 @@ export default function PublicVerify() {
           <div className="w-20 h-20 rounded-full mb-6 flex items-center justify-center" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
             <XCircle className="w-10 h-10 text-[#ff4757]" />
           </div>
-          <h2 className="text-2xl font-bold text-[#2d3436] mb-3">Verification Failed</h2>
-          <p className="text-[#4a5568] font-medium mb-8 max-w-md leading-relaxed">
+          <h2 className="text-2xl font-bold text-text mb-3">Verification Failed</h2>
+          <p className="text-text-muted font-medium mb-8 max-w-md leading-relaxed">
             {error || "The provided certificate hash could not be verified on the ledger."}
           </p>
           <Button onClick={() => navigate("/")} variant="secondary">
@@ -91,7 +91,7 @@ export default function PublicVerify() {
         <div>
           <button
             onClick={() => navigate("/")}
-            className="flex items-center text-[#4a5568] hover:text-[#ff4757] transition-colors mb-6 text-sm font-bold uppercase tracking-wider"
+            className="flex items-center text-text-muted hover:text-[#ff4757] transition-colors mb-6 text-sm font-bold uppercase tracking-wider"
           >
             <ArrowLeft className="w-4 h-4 mr-1" /> Back
           </button>
@@ -101,10 +101,10 @@ export default function PublicVerify() {
             <span className="indus-label text-[#22c55e]">Verified on Ledger</span>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-bold text-[#2d3436] tracking-tight mb-2">
+          <h1 className="text-3xl sm:text-4xl font-bold text-text tracking-tight mb-2">
             Public Verification
           </h1>
-          <p className="text-[#4a5568] font-medium text-sm sm:text-base">
+          <p className="text-text-muted font-medium text-sm sm:text-base">
             Cryptographically signed and tamper-proof skill record.
           </p>
         </div>
@@ -118,35 +118,35 @@ export default function PublicVerify() {
           </div>
           <CardContent className="p-6 sm:p-8 space-y-8 pt-8">
             <div className="text-center">
-              <p className="indus-label text-[#4a5568] mb-1">Trainee Name</p>
-              <h2 className="text-3xl font-bold text-[#2d3436] mb-1">{result.traineeName}</h2>
+              <p className="indus-label text-text-muted mb-1">Trainee Name</p>
+              <h2 className="text-3xl font-bold text-text mb-1">{result.traineeName}</h2>
             </div>
 
             <div className="space-y-4">
               <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
-                <p className="indus-label text-[#4a5568] mb-1 flex items-center gap-1">
+                <p className="indus-label text-text-muted mb-1 flex items-center gap-1">
                   <Building className="w-4 h-4" /> Issuing Institute
                 </p>
-                <p className="font-bold text-[#2d3436] text-base">{result.instituteName}</p>
+                <p className="font-bold text-text text-base">{result.instituteName}</p>
               </div>
               
               <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
-                <p className="indus-label text-[#4a5568] mb-1">Training Program</p>
-                <p className="font-bold text-[#2d3436] text-base">{result.programName}</p>
+                <p className="indus-label text-text-muted mb-1">Training Program</p>
+                <p className="font-bold text-text text-base">{result.programName}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
-                  <p className="indus-label text-[#4a5568] mb-1 flex items-center gap-1">
+                  <p className="indus-label text-text-muted mb-1 flex items-center gap-1">
                     <Calendar className="w-4 h-4" /> Completion Date
                   </p>
-                  <p className="font-bold text-[#2d3436] font-mono text-sm">
+                  <p className="font-bold text-text font-mono text-sm">
                     {new Date(result.completedAt).toLocaleDateString()}
                   </p>
                 </div>
                 <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
-                  <p className="indus-label text-[#4a5568] mb-1">Verification Hash</p>
-                  <p className="font-bold text-[#4a5568] font-mono text-xs break-all">
+                  <p className="indus-label text-text-muted mb-1">Verification Hash</p>
+                  <p className="font-bold text-text-muted font-mono text-xs break-all">
                     {hash}
                   </p>
                 </div>

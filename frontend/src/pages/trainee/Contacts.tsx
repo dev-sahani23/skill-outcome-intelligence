@@ -121,26 +121,26 @@ export default function Contacts() {
   const inactiveContacts = contacts.filter((c) => !c.isActive);
 
   return (
-    <div className="min-h-screen bg-[#e0e5ec] indus-schematic-bg p-6 md:p-8 space-y-8 font-sans">
+    <div className="min-h-screen bg-chassis indus-schematic-bg p-6 md:p-8 space-y-8 font-sans">
       <div className="max-w-3xl mx-auto space-y-6">
         <button
           onClick={() => navigate("/dashboard")}
-          className="flex items-center text-[#4a5568] hover:text-[#ff4757] transition-colors text-sm font-bold uppercase tracking-wider bg-[#f0f2f5] px-3 py-1.5 rounded-lg shadow-[var(--shadow-floating)] border border-white/40 w-fit"
+          className="flex items-center text-text-muted hover:text-[#ff4757] transition-colors text-sm font-bold uppercase tracking-wider bg-[#f0f2f5] px-3 py-1.5 rounded-lg shadow-(--shadow-floating) border border-white/40 w-fit"
         >
           <ArrowLeft className="w-4 h-4 mr-1.5" /> Back to Dashboard
         </button>
 
         {/* Header */}
-        <div className="flex flex-col md:flex-row justify-between md:items-center bg-[#f0f2f5] p-6 rounded-2xl shadow-[var(--shadow-floating)] border border-white/40 gap-4">
+        <div className="flex flex-col md:flex-row justify-between md:items-center bg-[#f0f2f5] p-6 rounded-2xl shadow-(--shadow-floating) border border-white/40 gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="indus-led-green"></span>
               <span className="indus-label text-[#22c55e]">Directory</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#2d3436] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl font-bold text-text tracking-tight">
               Reachability Graph
             </h1>
-            <p className="text-[#4a5568] font-medium mt-1 flex items-center gap-2 text-sm sm:text-base">
+            <p className="text-text-muted font-medium mt-1 flex items-center gap-2 text-sm sm:text-base">
               <Users className="w-4 h-4 text-[#3b82f6]" /> Manage your emergency and fallback contacts.
             </p>
           </div>
@@ -155,29 +155,29 @@ export default function Contacts() {
         {/* Stats bar */}
         {contacts.length > 0 && (
           <div className="grid grid-cols-3 gap-4">
-            <div className="p-4 bg-[#f0f2f5] rounded-xl shadow-[var(--shadow-floating)] border border-white/40 text-center">
-              <p className="text-3xl font-black text-[#2d3436]">{contacts.length}</p>
-              <p className="indus-label text-[#4a5568] mt-1">Total</p>
+            <div className="p-4 bg-[#f0f2f5] rounded-xl shadow-(--shadow-floating) border border-white/40 text-center">
+              <p className="text-3xl font-black text-text">{contacts.length}</p>
+              <p className="indus-label text-text-muted mt-1">Total</p>
             </div>
-            <div className="p-4 bg-[#f0f2f5] rounded-xl shadow-[var(--shadow-floating)] border border-white/40 text-center">
+            <div className="p-4 bg-[#f0f2f5] rounded-xl shadow-(--shadow-floating) border border-white/40 text-center">
               <p className="text-3xl font-black text-[#22c55e]">{activeContacts.length}</p>
-              <p className="indus-label text-[#4a5568] mt-1">Active</p>
+              <p className="indus-label text-text-muted mt-1">Active</p>
             </div>
-            <div className="p-4 bg-[#f0f2f5] rounded-xl shadow-[var(--shadow-floating)] border border-white/40 text-center">
-              <p className="text-3xl font-black text-[#4a5568]">{inactiveContacts.length}</p>
-              <p className="indus-label text-[#4a5568] mt-1">Inactive</p>
+            <div className="p-4 bg-[#f0f2f5] rounded-xl shadow-(--shadow-floating) border border-white/40 text-center">
+              <p className="text-3xl font-black text-text-muted">{inactiveContacts.length}</p>
+              <p className="indus-label text-text-muted mt-1">Inactive</p>
             </div>
           </div>
         )}
 
         {/* Empty state */}
         {contacts.length === 0 ? (
-          <div className="text-center py-16 bg-[#e0e5ec] rounded-2xl shadow-[var(--shadow-recessed)]">
+          <div className="text-center py-16 bg-chassis rounded-2xl shadow-(--shadow-recessed)">
             <div className="w-16 h-16 bg-white shadow-sm border border-[#e2e8f0] rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Users className="w-8 h-8 text-[#4a5568]" />
+              <Users className="w-8 h-8 text-text-muted" />
             </div>
-            <h2 className="text-xl font-bold text-[#2d3436] mb-2">No Contacts Found</h2>
-            <p className="max-w-md mx-auto font-medium text-[#4a5568]">
+            <h2 className="text-xl font-bold text-text mb-2">No Contacts Found</h2>
+            <p className="max-w-md mx-auto font-medium text-text-muted">
               You haven't added any fallback contacts yet. Add a guardian or local anchor to ensure you stay connected.
             </p>
           </div>
@@ -185,7 +185,7 @@ export default function Contacts() {
           <div className="space-y-10">
             {activeContacts.length > 0 && (
               <div>
-                <h2 className="indus-label text-[#4a5568] mb-4 flex items-center gap-2">
+                <h2 className="indus-label text-text-muted mb-4 flex items-center gap-2">
                   <span className="indus-led-green"></span> Active Cascade Chain
                 </h2>
                 <div className="space-y-6 relative">
@@ -225,12 +225,12 @@ export default function Contacts() {
         {/* Add Contact Modal */}
         {isAdding && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm px-4 font-sans">
-            <div className="bg-[#f0f2f5] shadow-[var(--shadow-floating)] rounded-2xl w-full max-w-md relative overflow-hidden border border-white/40">
+            <div className="bg-[#f0f2f5] shadow-(--shadow-floating) rounded-2xl w-full max-w-md relative overflow-hidden border border-white/40">
               
               <div className="p-6 border-b border-[#d1d9e6]">
                 <button
                   onClick={() => setIsAdding(false)}
-                  className="absolute top-6 right-6 text-[#4a5568] hover:text-[#ff4757] bg-[#e0e5ec] hover:bg-white rounded-lg p-2 shadow-sm transition-colors"
+                  className="absolute top-6 right-6 text-text-muted hover:text-[#ff4757] bg-chassis hover:bg-white rounded-lg p-2 shadow-sm transition-colors"
                 >
                   ✕
                 </button>
@@ -238,8 +238,8 @@ export default function Contacts() {
                   <span className="indus-led-green"></span>
                   <span className="indus-label text-[#22c55e]">Contact Directory</span>
                 </div>
-                <h2 className="text-xl font-bold text-[#2d3436] tracking-tight mb-1">Add Fallback Contact</h2>
-                <p className="text-sm font-medium text-[#4a5568]">
+                <h2 className="text-xl font-bold text-text tracking-tight mb-1">Add Fallback Contact</h2>
+                <p className="text-sm font-medium text-text-muted">
                   Added in cascade priority order
                 </p>
               </div>
@@ -247,7 +247,7 @@ export default function Contacts() {
               <form onSubmit={handleAddSubmit}>
                 <div className="p-6 space-y-5">
                   <div className="space-y-2">
-                    <label className="indus-label text-[#2d3436]">Contact Type</label>
+                    <label className="indus-label text-text">Contact Type</label>
                     <select
                       className="indus-input w-full h-12 px-4"
                       value={newContact.contactType}
@@ -261,7 +261,7 @@ export default function Contacts() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="indus-label text-[#2d3436]">Name</label>
+                    <label className="indus-label text-text">Name</label>
                     <Input
                       className="indus-input w-full"
                       placeholder="Full Name"
@@ -272,7 +272,7 @@ export default function Contacts() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="indus-label text-[#2d3436]">Phone Number</label>
+                    <label className="indus-label text-text">Phone Number</label>
                     <Input
                       className="indus-input w-full"
                       placeholder="10-digit phone number"
@@ -283,7 +283,7 @@ export default function Contacts() {
                   </div>
 
                   <div className="space-y-2">
-                    <label className="indus-label text-[#2d3436] flex gap-2 items-center">
+                    <label className="indus-label text-text flex gap-2 items-center">
                       Relationship <span className="text-xs text-[#a0aec0] normal-case">(optional)</span>
                     </label>
                     <Input
@@ -295,8 +295,8 @@ export default function Contacts() {
                   </div>
                 </div>
 
-                <div className="mx-6 mb-6 p-4 rounded-xl bg-white border border-[#e2e8f0] shadow-sm text-sm font-medium text-[#4a5568]">
-                  <span className="font-bold text-[#2d3436]">Priority #{contacts.length + 1}</span> — This contact will be
+                <div className="mx-6 mb-6 p-4 rounded-xl bg-white border border-[#e2e8f0] shadow-sm text-sm font-medium text-text-muted">
+                  <span className="font-bold text-text">Priority #{contacts.length + 1}</span> — This contact will be
                   attempted{" "}
                   {contacts.length === 0
                     ? "first"
@@ -304,7 +304,7 @@ export default function Contacts() {
                   in the cascade.
                 </div>
 
-                <div className="p-6 border-t border-[#d1d9e6] bg-[#e0e5ec] flex gap-4">
+                <div className="p-6 border-t border-[#d1d9e6] bg-chassis flex gap-4">
                   <Button
                     type="button"
                     variant="secondary"
@@ -354,13 +354,13 @@ function ContactCard({
 
   return (
     <Card
-      className={`bg-[#f0f2f5] border border-white/40 shadow-[var(--shadow-floating)] rounded-2xl relative z-10 sm:ml-12 overflow-visible transition-opacity ${
+      className={`bg-[#f0f2f5] border border-white/40 shadow-(--shadow-floating) rounded-2xl relative z-10 sm:ml-12 overflow-visible transition-opacity ${
         contact.isActive ? "" : "opacity-70"
       }`}
     >
       {/* Timeline node dot */}
       <div
-        className={`absolute -left-[3.25rem] top-8 w-5 h-5 rounded-full shadow-[var(--shadow-btn-accent)] hidden sm:block ${
+        className={`absolute -left-13 top-8 w-5 h-5 rounded-full shadow-(--shadow-btn-accent) hidden sm:block ${
           contact.isActive ? "bg-[#22c55e]" : "bg-[#a0aec0]"
         }`}
       />
@@ -370,11 +370,11 @@ function ContactCard({
           {/* Left: number + info */}
           <div className="flex items-start gap-5 flex-1 min-w-0">
             <div className="w-12 h-12 rounded-xl bg-white shadow-sm border border-[#e2e8f0] flex items-center justify-center shrink-0">
-              <span className="text-[#2d3436] font-black text-xl">{contact.priorityOrder}</span>
+              <span className="text-text font-black text-xl">{contact.priorityOrder}</span>
             </div>
             <div className="min-w-0">
-              <h3 className="text-lg font-bold text-[#2d3436] truncate">{contact.name}</h3>
-              <p className="text-sm font-medium text-[#4a5568] flex items-center gap-2 mt-1">
+              <h3 className="text-lg font-bold text-text truncate">{contact.name}</h3>
+              <p className="text-sm font-medium text-text-muted flex items-center gap-2 mt-1">
                 <Phone className="w-4 h-4 shrink-0 text-[#a0aec0]" /> {contact.phone}
               </p>
               {contact.relationship && (
@@ -384,7 +384,7 @@ function ContactCard({
               {/* Meta: createdAt + lastVerifiedAt */}
               <div className="flex flex-wrap gap-x-4 gap-y-2 mt-3">
                 {contact.createdAt && (
-                  <span className="text-xs font-bold text-[#4a5568] flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-text-muted flex items-center gap-1.5">
                     <Clock className="w-3.5 h-3.5 text-[#a0aec0]" /> Added {formatDate(contact.createdAt)}
                   </span>
                 )}
