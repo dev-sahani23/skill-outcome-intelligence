@@ -3,6 +3,7 @@ import { motion, type Variants } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from "recharts";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useEffect, useState } from "react";
+import { Users, TrendingUp, Wallet, BarChart2 } from "lucide-react";
 import { auth } from "../../lib/auth";
 import { formatINR } from "../../utils/formatters";
 
@@ -23,17 +24,11 @@ const SKILL_GAP_DATA = [
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.08
-    }
-  }
+  show: { opacity: 1, transition: { staggerChildren: 0.08 } }
 };
-
 const itemVariants: Variants = {
   hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } }
+  show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.175, 0.885, 0.32, 1.275] } }
 };
 
 export default function OrgDashboard() {
@@ -52,137 +47,145 @@ export default function OrgDashboard() {
       .finally(() => setIsLoading(false));
   }, []);
 
-  const placementData = stats?.districtPlacements?.length
-    ? stats.districtPlacements
-    : FALLBACK_PLACEMENT_DATA;
+  const placementData = stats?.districtPlacements?.length ? stats.districtPlacements : FALLBACK_PLACEMENT_DATA;
+
+  const statCards = [
+    { label: "Total Enrolled",  value: isLoading ? "—" : (stats?.totalEnrolled?.toLocaleString() ?? "0"), accentColor: "#ff4757", icon: <Users  className="w-5 h-5" /> },
+    { label: "Placement Rate",  value: isLoading ? "—" : `${stats?.placementRate ?? 0}%`,                  accentColor: "#22c55e", icon: <TrendingUp className="w-5 h-5" /> },
+    { label: "Avg Monthly Wage",value: isLoading ? "—" : (stats?.avgWage ? formatINR(stats.avgWage) : "N/A"), accentColor: "#f59e0b", icon: <Wallet className="w-5 h-5" /> },
+    { label: "Skill Gap Index", value: "42.5",                                                              accentColor: "#3b82f6", icon: <BarChart2 className="w-5 h-5" /> },
+  ];
 
   return (
-    <div className="min-h-screen bg-muted p-6 md:p-8 space-y-8 text-foreground relative">
-      <div className="flex flex-col md:flex-row justify-between md:items-center gap-4 bg-white p-6 border-4 border-border">
+    <div className="min-h-screen bg-[#e0e5ec] p-6 md:p-8 space-y-8">
+
+      {/* ─── Header: Dark charcoal command panel ─── */}
+      <div
+        className="rounded-2xl p-6 flex flex-col md:flex-row justify-between md:items-center gap-4"
+        style={{ background: "#2d3436", boxShadow: "8px 8px 20px rgba(0,0,0,0.3), -2px -2px 6px rgba(255,255,255,0.05)" }}
+      >
         <div>
-          <h1 className="text-3xl font-black uppercase text-foreground">Government Admin Dashboard</h1>
-          <p className="text-muted-foreground font-bold mt-2">Overview of SIH Skilling Outcomes across Maharashtra.</p>
+          <div className="flex items-center gap-3 mb-2">
+            <span className="indus-led-green" aria-label="System online" />
+            <span className="indus-label text-[#a8b2d1]">State Oversight Portal</span>
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight" style={{ textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}>
+            Government Admin Dashboard
+          </h1>
+          <p className="text-[#a8b2d1] mt-1 text-sm font-medium">
+            Overview of SIH Skilling Outcomes across Maharashtra.
+          </p>
         </div>
-        <div className="flex gap-4">
-        <button
-          onClick={() => window.location.href = '/dashboard/admin/trainees'}
-          className="bg-primary hover:bg-secondary hover:border-secondary text-white px-4 py-2 font-bold uppercase tracking-wider border-2 border-primary transition-colors"
-        >
-          View All Trainees
-        </button>
-        <button
-          onClick={() => window.location.href = '/dashboard/admin/skill-gaps'}
-          className="bg-secondary hover:bg-primary hover:border-primary text-white px-4 py-2 font-bold uppercase tracking-wider border-2 border-secondary transition-colors"
-        >
-          View Skill Gaps & Anomalies
-        </button>
+        <div className="flex gap-3 flex-wrap">
+          <button
+            onClick={() => window.location.href = '/dashboard/admin/trainees'}
+            className="rounded-xl px-5 py-3 font-bold uppercase tracking-wider text-sm text-white transition-all duration-150"
+            style={{ background: "#ff4757", boxShadow: "var(--shadow-btn-accent)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.filter = "brightness(1.1)"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.filter = "none"; }}
+          >
+            View All Trainees
+          </button>
+          <button
+            onClick={() => window.location.href = '/dashboard/admin/skill-gaps'}
+            className="rounded-xl px-5 py-3 font-bold uppercase tracking-wider text-sm text-[#2d3436] transition-all duration-150"
+            style={{ background: "#e0e5ec", boxShadow: "var(--shadow-card)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "var(--shadow-floating)"; (e.currentTarget as HTMLButtonElement).style.color = "#ff4757"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "var(--shadow-card)"; (e.currentTarget as HTMLButtonElement).style.color = "#2d3436"; }}
+          >
+            Skill Gaps & Anomalies
+          </button>
         </div>
       </div>
 
-      {/* Key Metrics */}
+      {/* ─── Key Metrics: Reference-style feature cards ─── */}
       <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid gap-4 md:grid-cols-4">
-        <Card variants={itemVariants} className="bg-white border-4 border-border border-l-8 border-l-primary">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Total Enrolled</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-black text-foreground">
-              {isLoading ? "—" : stats?.totalEnrolled?.toLocaleString() ?? "0"}
+        {statCards.map((sc) => (
+          <Card key={sc.label} variants={itemVariants} showScrews showVents>
+            {/* Large circular icon housing — top-left, floating */}
+            <div
+              className="w-12 h-12 rounded-full flex items-center justify-center mb-4 flex-shrink-0"
+              style={{
+                background: "#e8ecf1",
+                boxShadow: "6px 6px 12px #babecc, -6px -6px 12px #ffffff",
+                color: sc.accentColor,
+              }}
+            >
+              {sc.icon}
             </div>
-          </CardContent>
-        </Card>
-        <Card variants={itemVariants} className="bg-white border-4 border-border border-l-8 border-l-secondary">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Placement Rate</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-black text-foreground">
-              {isLoading ? "—" : `${stats?.placementRate ?? 0}%`}
+
+            {/* Label */}
+            <p className="text-sm font-semibold text-[#4a5568] mb-1">{sc.label}</p>
+
+            {/* Value */}
+            <div
+              className="text-3xl font-bold"
+              style={{ fontFamily: "'JetBrains Mono', monospace", color: sc.accentColor }}
+            >
+              {sc.value}
             </div>
-          </CardContent>
-        </Card>
-        <Card variants={itemVariants} className="bg-white border-4 border-border border-l-8 border-l-accent">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Avg Monthly Wage</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-black text-secondary">
-              {isLoading ? "—" : stats?.avgWage ? formatINR(stats.avgWage) : "N/A"}
-            </div>
-          </CardContent>
-        </Card>
-        <Card variants={itemVariants} className="bg-white border-4 border-border border-l-8 border-l-destructive">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Skill Gap Index</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-black text-foreground">
-              42.5
-            </div>
-          </CardContent>
-        </Card>
+          </Card>
+        ))}
       </motion.div>
 
+
+      {/* ─── Charts Row ─── */}
       <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
-        {/* Analytics Chart */}
-        <Card variants={itemVariants} className="bg-white border-4 border-border">
-          <CardHeader className="border-b-4 border-border pb-4">
-            <CardTitle className="text-lg font-black uppercase text-foreground">District-wise Placements</CardTitle>
+        {/* Bar Chart */}
+        <Card variants={itemVariants} showScrews showVents>
+          <CardHeader className="border-b border-[#babecc] pb-4">
+            <CardTitle className="text-base font-bold uppercase text-[#2d3436]">District-wise Placements</CardTitle>
           </CardHeader>
           <CardContent className="h-80 pt-6">
             {isLoading ? (
-              <div className="flex items-center justify-center h-full text-muted-foreground font-bold">Loading chart...</div>
+              <div className="flex items-center justify-center h-full font-bold text-[#4a5568]">Loading chart...</div>
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={placementData}>
-                  <XAxis dataKey="name" stroke="currentColor" className="text-muted-foreground font-bold text-xs" />
-                  <YAxis stroke="currentColor" className="text-muted-foreground font-bold text-xs" label={{ value: 'Trainees Placed', angle: -90, position: 'insideLeft', fill: 'currentColor' }} />
-                  <Tooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} contentStyle={{ backgroundColor: "#ffffff", borderColor: "#111827", borderWidth: 4, borderRadius: 0, color: "#111827", fontWeight: 'bold' }} />
-                  <Bar dataKey="Placed" fill="#3B82F6" radius={[0, 0, 0, 0]} />
+                  <XAxis dataKey="name" stroke="#4a5568" tick={{ fill: '#4a5568', fontWeight: 700, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }} />
+                  <YAxis stroke="#4a5568" tick={{ fill: '#4a5568', fontWeight: 700, fontSize: 11 }} />
+                  <Tooltip
+                    cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+                    contentStyle={{ backgroundColor: "#2d3436", border: "none", borderRadius: "8px", color: "#e0e5ec", fontWeight: 'bold', fontFamily: "'JetBrains Mono', monospace" }}
+                  />
+                  <Bar dataKey="Placed" fill="#ff4757" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             )}
           </CardContent>
         </Card>
 
-        {/* Leaflet Map */}
-        <Card variants={itemVariants} className="bg-white border-4 border-border">
-          <CardHeader className="border-b-4 border-border pb-4">
-            <CardTitle className="text-lg font-black uppercase text-foreground">Geospatial Tracking</CardTitle>
+        {/* Map */}
+        <Card variants={itemVariants} showScrews>
+          <CardHeader className="border-b border-[#babecc] pb-4">
+            <CardTitle className="text-base font-bold uppercase text-[#2d3436]">Geospatial Tracking</CardTitle>
           </CardHeader>
           <CardContent className="h-80 relative overflow-hidden pt-6">
-            <MapContainer center={[19.7515, 75.7139]} zoom={6} scrollWheelZoom={false} className="h-full w-full z-0 border-2 border-border">
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; OpenStreetMap contributors'
-              />
-              <Marker position={[18.5204, 73.8567]}>
-                <Popup>Pune: High placement rate</Popup>
-              </Marker>
-              <Marker position={[19.0760, 72.8777]}>
-                <Popup>Mumbai: Top outcomes</Popup>
-              </Marker>
+            <MapContainer center={[19.7515, 75.7139]} zoom={6} scrollWheelZoom={false} className="h-full w-full z-0 rounded-xl">
+              <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
+              <Marker position={[18.5204, 73.8567]}><Popup>Pune: High placement rate</Popup></Marker>
+              <Marker position={[19.0760, 72.8777]}><Popup>Mumbai: Top outcomes</Popup></Marker>
             </MapContainer>
           </CardContent>
         </Card>
       </motion.div>
 
+      {/* ─── Radar Chart ─── */}
       <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
-        {/* Radar Chart */}
-        <Card variants={itemVariants} className="bg-white border-4 border-border">
-          <CardHeader className="border-b-4 border-border pb-4">
-            <CardTitle className="text-lg font-black uppercase text-foreground">Skill Demand vs Supply Gap</CardTitle>
+        <Card variants={itemVariants} showScrews>
+          <CardHeader className="border-b border-[#babecc] pb-4">
+            <CardTitle className="text-base font-bold uppercase text-[#2d3436]">Skill Demand vs Supply Gap</CardTitle>
           </CardHeader>
           <CardContent className="h-80 pt-6">
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={SKILL_GAP_DATA}>
-                <PolarGrid stroke="#e5e7eb" />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: '#111827', fontSize: 12, fontWeight: 'bold' }} />
-                <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#e5e7eb" />
-                <Radar name="Demand" dataKey="A" stroke="#3B82F6" fill="#3B82F6" fillOpacity={0.6} />
-                <Radar name="Supply" dataKey="B" stroke="#10B981" fill="#10B981" fillOpacity={0.6} />
-                <Legend wrapperStyle={{ paddingTop: "20px", fontWeight: 'bold' }} />
-                <Tooltip contentStyle={{ backgroundColor: "#ffffff", borderColor: "#111827", borderWidth: 4, borderRadius: 0, color: "#111827", fontWeight: 'bold' }} />
+                <PolarGrid stroke="#babecc" />
+                <PolarAngleAxis dataKey="subject" tick={{ fill: '#2d3436', fontSize: 11, fontWeight: 700, fontFamily: "'JetBrains Mono', monospace" }} />
+                <PolarRadiusAxis angle={30} domain={[0, 100]} stroke="#babecc" />
+                <Radar name="Demand" dataKey="A" stroke="#ff4757" fill="#ff4757" fillOpacity={0.4} />
+                <Radar name="Supply" dataKey="B" stroke="#22c55e" fill="#22c55e" fillOpacity={0.4} />
+                <Legend wrapperStyle={{ paddingTop: "20px", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }} />
+                <Tooltip contentStyle={{ backgroundColor: "#2d3436", border: "none", borderRadius: "8px", color: "#e0e5ec", fontWeight: 'bold', fontFamily: "'JetBrains Mono', monospace" }} />
               </RadarChart>
             </ResponsiveContainer>
           </CardContent>

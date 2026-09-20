@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { api } from "../../lib/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/Button";
 import { Loader2, ShieldCheck, XCircle, MapPin, Building, Calendar, ArrowLeft } from "lucide-react";
@@ -20,9 +19,6 @@ export default function PublicVerify() {
       return;
     }
 
-    // Call the public verification API endpoint without auth headers
-    // Using fetch directly because our api wrapper might inject auth headers and fail if logged out,
-    // though the public endpoint should ignore it. Let's use standard fetch to be safe.
     fetch(`/api/public/verify/${hash}`)
       .then(async (res) => {
         if (!res.ok) {
@@ -43,94 +39,122 @@ export default function PublicVerify() {
       });
   }, [hash]);
 
+  const PageWrapper = ({ children }: { children: React.ReactNode }) => (
+    <div className="min-h-screen bg-[#e0e5ec] p-6 sm:p-8 md:p-12 flex flex-col items-center relative overflow-hidden font-sans">
+      <div className="absolute inset-0 pointer-events-none indus-schematic-bg opacity-60" aria-hidden />
+      <div
+        className="absolute -top-32 -left-32 w-96 h-96 rounded-full pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%)",
+        }}
+        aria-hidden
+      />
+      <div className="relative z-10 w-full max-w-2xl flex flex-col items-center">
+        {children}
+      </div>
+    </div>
+  );
+
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-muted p-6 flex flex-col items-center justify-center text-muted-foreground space-y-4">
-        <Loader2 className="w-12 h-12 animate-spin text-primary" />
-        <p className="text-lg font-bold">Verifying cryptographic hash on the network...</p>
-      </div>
+      <PageWrapper>
+        <div className="flex flex-col items-center justify-center space-y-4 text-[#4a5568] min-h-[60vh]">
+          <Loader2 className="w-12 h-12 animate-spin text-[#ff4757]" />
+          <p className="indus-label">Verifying cryptographic hash on the network...</p>
+        </div>
+      </PageWrapper>
+    );
+  }
+
+  if (error || !result) {
+    return (
+      <PageWrapper>
+        <Card elevated className="w-full p-10 flex flex-col items-center text-center">
+          <div className="w-20 h-20 rounded-full mb-6 flex items-center justify-center" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+            <XCircle className="w-10 h-10 text-[#ff4757]" />
+          </div>
+          <h2 className="text-2xl font-bold text-[#2d3436] mb-3">Verification Failed</h2>
+          <p className="text-[#4a5568] font-medium mb-8 max-w-md leading-relaxed">
+            {error || "The provided certificate hash could not be verified on the ledger."}
+          </p>
+          <Button onClick={() => navigate("/")} variant="secondary">
+            Return to Home
+          </Button>
+        </Card>
+      </PageWrapper>
     );
   }
 
   return (
-    <div className="min-h-screen bg-muted p-6 md:p-8 flex flex-col items-center justify-center text-foreground">
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }} className="w-full max-w-lg mb-8 text-center">
-        <h1 className="text-3xl font-black uppercase text-foreground mb-2">
-          Skill Verification Portal
-        </h1>
-        <p className="text-muted-foreground font-bold text-sm uppercase">
-          Government of Maharashtra Official Skilling Registry
-        </p>
+    <PageWrapper>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease: "easeOut" }} className="w-full flex justify-between items-start mb-8">
+        <div>
+          <button
+            onClick={() => navigate("/")}
+            className="flex items-center text-[#4a5568] hover:text-[#ff4757] transition-colors mb-6 text-sm font-bold uppercase tracking-wider"
+          >
+            <ArrowLeft className="w-4 h-4 mr-1" /> Back
+          </button>
+          
+          <div className="flex items-center gap-3 mb-2">
+            <span className="indus-led-green"></span>
+            <span className="indus-label text-[#22c55e]">Verified on Ledger</span>
+          </div>
+
+          <h1 className="text-3xl sm:text-4xl font-bold text-[#2d3436] tracking-tight mb-2">
+            Public Verification
+          </h1>
+          <p className="text-[#4a5568] font-medium text-sm sm:text-base">
+            Cryptographically signed and tamper-proof skill record.
+          </p>
+        </div>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }} className="w-full max-w-lg">
-      <Card className="w-full bg-white border-4 border-border relative overflow-hidden">
-        {error ? (
-          <>
-            <div className="absolute top-0 left-0 w-full h-2 bg-destructive" />
-            <CardContent className="p-8 text-center flex flex-col items-center">
-              <XCircle className="w-16 h-16 text-destructive mb-4" />
-              <h2 className="text-2xl font-black uppercase text-foreground mb-2">Verification Failed</h2>
-              <p className="text-muted-foreground font-bold mb-8 max-w-sm">
-                {error} This certificate may be forged or the hash is incorrect.
-              </p>
-              <Button onClick={() => navigate('/')} className="bg-white hover:bg-accent text-foreground hover:text-black w-full border-4 border-border hover:border-accent font-bold uppercase tracking-wider transition-colors">
-                Back to Search
-              </Button>
-            </CardContent>
-          </>
-        ) : (
-          <>
-            <div className="absolute top-0 left-0 w-full h-2 bg-secondary" />
-            <CardContent className="p-8">
-              <div className="text-center mb-8">
-                <ShieldCheck className="w-16 h-16 text-secondary mx-auto mb-4" />
-                <h2 className="text-2xl font-black uppercase text-foreground mb-1">Authentic Record</h2>
-                <span className="inline-block px-3 py-1 text-xs font-bold uppercase tracking-wider bg-white text-secondary border-2 border-secondary">
-                  {result?.status === 'valid' ? 'Verified on Registry' : result?.status}
-                </span>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }} className="w-full">
+        <Card elevated className="w-full overflow-hidden p-0">
+          <div className="bg-[#22c55e] text-white p-4 flex items-center justify-center gap-2">
+            <ShieldCheck className="w-5 h-5" />
+            <span className="font-bold uppercase tracking-wider text-sm">Valid Certificate</span>
+          </div>
+          <CardContent className="p-6 sm:p-8 space-y-8 pt-8">
+            <div className="text-center">
+              <p className="indus-label text-[#4a5568] mb-1">Trainee Name</p>
+              <h2 className="text-3xl font-bold text-[#2d3436] mb-1">{result.traineeName}</h2>
+            </div>
+
+            <div className="space-y-4">
+              <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+                <p className="indus-label text-[#4a5568] mb-1 flex items-center gap-1">
+                  <Building className="w-4 h-4" /> Issuing Institute
+                </p>
+                <p className="font-bold text-[#2d3436] text-base">{result.instituteName}</p>
               </div>
               
-              <div className="space-y-6">
-                <div className="pb-4 border-b-4 border-border">
-                  <p className="text-sm font-bold text-muted-foreground uppercase mb-1">Trainee Name</p>
-                  <p className="text-lg font-black uppercase text-foreground">{result?.traineeName}</p>
-                </div>
-                
-                <div className="pb-4 border-b-4 border-border">
-                  <p className="text-sm font-bold text-muted-foreground uppercase mb-1">Certified Course</p>
-                  <p className="text-lg font-black uppercase text-foreground">{result?.courseName}</p>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 pb-4 border-b-4 border-border">
-                  <div>
-                    <p className="text-sm font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1">
-                      <Building className="w-4 h-4" /> Issuer
-                    </p>
-                    <p className="font-black text-foreground text-sm truncate uppercase" title={result?.issuer}>{result?.issuer}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-muted-foreground uppercase mb-1 flex items-center gap-1">
-                      <Calendar className="w-4 h-4" /> Issue Date
-                    </p>
-                    <p className="font-black text-foreground text-sm uppercase">{result?.issuedDate}</p>
-                  </div>
-                </div>
-
-                <div className="bg-muted p-4 border-4 border-border break-all">
-                  <p className="text-xs font-bold text-muted-foreground mb-1 uppercase tracking-wider">Verification Hash</p>
-                  <p className="text-xs font-black text-foreground uppercase tracking-widest">{hash}</p>
-                </div>
+              <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+                <p className="indus-label text-[#4a5568] mb-1">Training Program</p>
+                <p className="font-bold text-[#2d3436] text-base">{result.programName}</p>
               </div>
 
-              <Button onClick={() => navigate('/')} className="mt-8 bg-primary hover:bg-secondary text-white w-full font-bold uppercase tracking-wider border-2 border-primary hover:border-secondary transition-colors">
-                Verify Another Candidate
-              </Button>
-            </CardContent>
-          </>
-        )}
-      </Card>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+                  <p className="indus-label text-[#4a5568] mb-1 flex items-center gap-1">
+                    <Calendar className="w-4 h-4" /> Completion Date
+                  </p>
+                  <p className="font-bold text-[#2d3436] font-mono text-sm">
+                    {new Date(result.completedAt).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+                  <p className="indus-label text-[#4a5568] mb-1">Verification Hash</p>
+                  <p className="font-bold text-[#4a5568] font-mono text-xs break-all">
+                    {hash}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </motion.div>
-    </div>
+    </PageWrapper>
   );
 }
