@@ -12,7 +12,7 @@ function Input({ className, type, icon, trailing, ...props }: InputProps) {
   return (
     <div className="relative w-full">
       {icon && (
-        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-muted-foreground [&>svg]:size-4">
+        <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-[#4a5568] [&>svg]:size-4 z-10">
           {icon}
         </div>
       )}
@@ -20,7 +20,10 @@ function Input({ className, type, icon, trailing, ...props }: InputProps) {
         type={type}
         data-slot="input"
         className={cn(
-          "glass-input h-14 w-full min-w-0 px-4 py-2 text-base disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-red-500",
+          // Industrial recessed slot — inset shadow, no border, monospace font
+          "indus-input h-14 w-full min-w-0 px-5 py-2 text-sm",
+          "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50",
+          "aria-invalid:border-red-500 aria-invalid:ring-red-500/20",
           icon && "pl-12",
           trailing && "pr-12",
           className
@@ -28,7 +31,7 @@ function Input({ className, type, icon, trailing, ...props }: InputProps) {
         {...props}
       />
       {trailing && (
-        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+        <div className="absolute inset-y-0 right-0 flex items-center pr-4 z-10">
           {trailing}
         </div>
       )}

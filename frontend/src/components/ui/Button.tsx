@@ -1,34 +1,34 @@
-import { Button as ButtonPrimitive } from "@base-ui/react/button"
 import { cva, type VariantProps } from "class-variance-authority"
-import { motion, type HTMLMotionProps } from "framer-motion"
+import { motion } from "framer-motion"
 
 import { cn } from "@/lib/utils"
 
-const MotionButton = motion.create ? motion.create(ButtonPrimitive) : (motion as any)(ButtonPrimitive);
-
 const buttonVariants = cva(
-  "group/button inline-flex shrink-0 items-center justify-center rounded-md border-transparent text-sm font-semibold uppercase tracking-wider whitespace-nowrap transition-colors duration-200 ease-out outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5 focus-visible:ring-2 focus-visible:ring-accent/50 focus-visible:ring-offset-2",
+  // Base: uppercase, tracked, 48px min height, hardware-feel
+  "group/button inline-flex shrink-0 items-center justify-center rounded-lg text-sm font-bold uppercase tracking-[0.05em] whitespace-nowrap transition-all duration-150 ease-out outline-none select-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5",
   {
     variants: {
       variant: {
-        default: "glass-button-primary",
-        outline:
-          "border border-black/10 text-slate-700 bg-white/40 hover:bg-white/80 shadow-[0_4px_12px_rgba(0,0,0,0.05)]",
-        secondary:
-          "glass-panel-hover text-slate-800",
-        ghost:
-          "hover:bg-black/5 text-slate-600 hover:text-slate-900",
-        destructive:
-          "bg-red-500/90 text-white hover:bg-red-500 border border-red-400/50 shadow-[0_0_15px_rgba(239,68,68,0.2)] backdrop-blur-md",
-        link: "text-[#3A86FF] underline-offset-4 hover:underline hover:text-blue-800",
+        /* Primary — Safety-Orange accent, neumorphic red-tinted shadow */
+        default: "bg-[#ff4757] text-white border-t border-white/20 shadow-[var(--shadow-btn-accent)] hover:brightness-110 active:translate-y-[2px] active:shadow-[var(--shadow-pressed)]",
+        /* Secondary — chassis-colored neumorphic lift */
+        secondary: "bg-[#e0e5ec] text-[#2d3436] shadow-[var(--shadow-card)] hover:text-[#ff4757] hover:shadow-[var(--shadow-floating)] active:translate-y-[2px] active:shadow-[var(--shadow-pressed)]",
+        /* Outline — slight border, lifts on hover */
+        outline: "bg-transparent border-2 border-[#babecc] text-[#4a5568] shadow-sm hover:text-[#ff4757] hover:border-[#ff4757] hover:bg-white/40 active:translate-y-[2px]",
+        /* Ghost — flat until hovered */
+        ghost: "bg-transparent text-[#4a5568] hover:bg-[#d1d9e6] hover:text-[#2d3436] active:translate-y-[1px]",
+        /* Destructive — same red as accent */
+        destructive: "bg-[#ff4757] text-white shadow-[var(--shadow-btn-accent)] hover:brightness-110 active:translate-y-[2px]",
+        /* Link */
+        link: "text-[#ff4757] underline-offset-4 hover:underline",
       },
       size: {
-        default: "h-14 px-6 gap-2",
-        sm: "h-10 px-4 text-xs gap-1.5 [&_svg:not([class*='size-'])]:size-4",
-        lg: "h-16 px-8 text-base gap-2.5",
-        icon: "size-14",
-        "icon-sm": "size-10 [&_svg:not([class*='size-'])]:size-4",
-        "icon-lg": "size-16",
+        default: "h-14 min-h-[48px] px-6 gap-2",
+        sm: "h-10 min-h-[40px] px-4 text-xs gap-1.5 [&_svg:not([class*='size-'])]:size-4",
+        lg: "h-16 min-h-[56px] px-8 text-base gap-2.5",
+        icon: "size-14 min-h-[48px]",
+        "icon-sm": "size-10 min-h-[40px] [&_svg:not([class*='size-'])]:size-4",
+        "icon-lg": "size-16 min-h-[56px]",
       },
     },
     defaultVariants: {
@@ -38,7 +38,7 @@ const buttonVariants = cva(
   }
 )
 
-export interface ButtonProps extends React.ComponentPropsWithoutRef<typeof ButtonPrimitive>, VariantProps<typeof buttonVariants> {
+export interface ButtonProps extends React.ComponentPropsWithoutRef<"button">, VariantProps<typeof buttonVariants> {
   fullWidth?: boolean;
 }
 
@@ -50,11 +50,13 @@ function Button({
   ...props
 }: ButtonProps) {
   return (
-    <MotionButton
+    <motion.button
       data-slot="button"
       className={cn(buttonVariants({ variant, size, className }), fullWidth && "w-full")}
-      whileHover={{ scale: 1.03 }}
-      whileTap={{ scale: 0.97 }}
+      /* Mechanical spring physics — slight bounce on release */
+      whileHover={{ scale: 1.02 }}
+      whileTap={{ scale: 0.95 }}
+      transition={{ type: "spring", stiffness: 500, damping: 30 }}
       {...props as any}
     />
   )
