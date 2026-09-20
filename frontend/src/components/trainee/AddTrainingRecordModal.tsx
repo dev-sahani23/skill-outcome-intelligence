@@ -48,17 +48,17 @@ function StepIndicator({ current, total }: { current: number; total: number }) {
               <div
                 className={`w-10 h-10 flex items-center justify-center text-sm font-bold rounded-full transition-all ${
                   isDone
-                    ? "bg-[#22c55e] text-white shadow-[var(--shadow-btn-accent)]"
+                    ? "bg-[#22c55e] text-white shadow-(--shadow-btn-accent)"
                     : isActive
-                    ? "bg-[#ff4757] text-white shadow-[var(--shadow-btn-accent)]"
-                    : "bg-[#e0e5ec] text-[#4a5568] shadow-[var(--shadow-recessed)]"
+                    ? "bg-[#ff4757] text-white shadow-(--shadow-btn-accent)"
+                    : "bg-chassis text-text-muted shadow-(--shadow-recessed)"
                 }`}
               >
                 {isDone ? <CheckCircle2 className="w-5 h-5" /> : stepNum}
               </div>
               <span
                 className={`text-[10px] font-bold uppercase tracking-wider whitespace-nowrap ${
-                  isActive ? "text-[#ff4757]" : isDone ? "text-[#22c55e]" : "text-[#4a5568]"
+                  isActive ? "text-[#ff4757]" : isDone ? "text-[#22c55e]" : "text-text-muted"
                 }`}
               >
                 {label}
@@ -118,7 +118,7 @@ function SkillInput({ skills, onChange }: { skills: string[]; onChange: (s: stri
           {skills.map((skill) => (
             <span
               key={skill}
-              className="inline-flex items-center gap-1.5 bg-[#f0f2f5] text-[#2d3436] font-bold uppercase tracking-wider text-xs px-3 py-1.5 rounded-md shadow-sm border border-[#e2e8f0]"
+              className="inline-flex items-center gap-1.5 bg-[#f0f2f5] text-text font-bold uppercase tracking-wider text-xs px-3 py-1.5 rounded-md shadow-sm border border-[#e2e8f0]"
             >
               <span className="indus-led-green w-1.5 h-1.5"></span>
               {skill}
@@ -272,13 +272,13 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#2d3436]/40 backdrop-blur-md px-4 font-sans">
-      <div className="bg-[#f0f2f5] shadow-[var(--shadow-floating)] rounded-2xl w-full max-w-xl relative overflow-hidden max-h-[90vh] flex flex-col border border-white/40">
+      <div className="bg-[#f0f2f5] shadow-(--shadow-floating) rounded-2xl w-full max-w-xl relative overflow-hidden max-h-[90vh] flex flex-col border border-white/40">
         
         {/* Header */}
-        <div className="p-8 pb-4 flex-shrink-0 relative border-b border-[#d1d9e6]">
+        <div className="p-8 pb-4 shrink-0 relative border-b border-[#d1d9e6]">
           <button
             onClick={handleClose}
-            className="absolute top-6 right-6 text-[#4a5568] hover:text-[#ff4757] bg-[#e0e5ec] hover:bg-white rounded-lg p-2 shadow-sm transition-colors"
+            className="absolute top-6 right-6 text-text-muted hover:text-[#ff4757] bg-chassis hover:bg-white rounded-lg p-2 shadow-sm transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -288,8 +288,8 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
             <span className="indus-label text-[#22c55e]">Training Module</span>
           </div>
           
-          <h2 className="text-2xl font-bold text-[#2d3436] tracking-tight mb-2">Add Training Record</h2>
-          <p className="text-sm font-medium text-[#4a5568]">Record your training history and upload certificates.</p>
+          <h2 className="text-2xl font-bold text-text tracking-tight mb-2">Add Training Record</h2>
+          <p className="text-sm font-medium text-text-muted">Record your training history and upload certificates.</p>
         </div>
 
         {/* Progress Indicator */}
@@ -304,7 +304,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
           {step === 1 && (
             <div className="space-y-6">
               <div className="space-y-2">
-                <label className="indus-label text-[#2d3436]">Training / Course Name *</label>
+                <label className="indus-label text-text">Training / Course Name *</label>
                 <Input
                   className="indus-input w-full"
                   placeholder="e.g. Full Stack Web Development"
@@ -315,7 +315,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
 
               <div className="grid grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="indus-label text-[#2d3436]">Institution / Provider *</label>
+                  <label className="indus-label text-text">Institution / Provider *</label>
                   <Input
                     className="indus-input w-full"
                     placeholder="e.g. Excel Skills Academy"
@@ -324,11 +324,11 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="indus-label text-[#2d3436]">Provider Type *</label>
+                  <label className="indus-label text-text">Provider Type *</label>
                   <select
                     value={form.providerType}
                     onChange={(e) => patch({ providerType: e.target.value as any })}
-                    className="indus-input w-full h-[52px] px-4"
+                    className="indus-input w-full h-13 px-4"
                   >
                     <option value="">Select type</option>
                     <option value="government">Government</option>
@@ -339,11 +339,11 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
               </div>
 
               <div className="space-y-2">
-                <label className="indus-label text-[#2d3436]">Sector *</label>
+                <label className="indus-label text-text">Sector *</label>
                 <select
                   value={form.sector}
                   onChange={(e) => patch({ sector: e.target.value })}
-                  className="indus-input w-full h-[52px] px-4"
+                  className="indus-input w-full h-13 px-4"
                 >
                   <option value="">Select sector</option>
                   {["Manufacturing", "IT", "Construction", "Healthcare", "Retail", "Agriculture", "Other"].map((s) => (
@@ -354,7 +354,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
 
               <div className="grid grid-cols-2 gap-5">
                 <div className="space-y-2">
-                  <label className="indus-label text-[#2d3436]">Start Date *</label>
+                  <label className="indus-label text-text">Start Date *</label>
                   <Input
                     type="date"
                     className="indus-input w-full"
@@ -364,7 +364,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="indus-label text-[#2d3436]">End Date</label>
+                  <label className="indus-label text-text">End Date</label>
                   <Input
                     type="date"
                     className="indus-input w-full"
@@ -376,8 +376,8 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
               </div>
 
               <div className="space-y-3">
-                <label className="indus-label text-[#2d3436]">Status *</label>
-                <div className="flex gap-3 bg-[#e0e5ec] p-2 rounded-xl shadow-[var(--shadow-recessed)]">
+                <label className="indus-label text-text">Status *</label>
+                <div className="flex gap-3 bg-chassis p-2 rounded-xl shadow-(--shadow-recessed)">
                   {(["completed", "in_progress", "dropped"] as const).map((s) => {
                     const isSelected = form.status === s;
                     return (
@@ -387,8 +387,8 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                         onClick={() => patch({ status: s })}
                         className={`flex-1 py-3 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
                           isSelected
-                            ? "bg-white text-[#2d3436] shadow-sm border border-[#e2e8f0]"
-                            : "bg-transparent text-[#4a5568] hover:bg-[#d1d9e6]"
+                            ? "bg-white text-text shadow-sm border border-[#e2e8f0]"
+                            : "bg-transparent text-text-muted hover:bg-recessed"
                         }`}
                       >
                         {s === "completed" ? "Completed" : s === "in_progress" ? "In Progress" : "Dropped"}
@@ -399,7 +399,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
               </div>
 
               <div className="space-y-2">
-                <label className="indus-label text-[#2d3436] flex justify-between">
+                <label className="indus-label text-text flex justify-between">
                   <span>Skills Learned *</span>
                   {form.status === "completed" && <span className="text-[#ff4757]">(min 1 required)</span>}
                 </label>
@@ -411,23 +411,23 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
           {/* ─── STEP 2: Certificate Upload ─── */}
           {step === 2 && (
             <div className="space-y-6">
-              <p className="text-sm font-medium text-[#4a5568] leading-relaxed">
+              <p className="text-sm font-medium text-text-muted leading-relaxed">
                 Upload the certificate you received. The file goes directly from your browser to our secure storage — no data passes through our servers.
               </p>
 
               {certificate ? (
                 <div className="bg-[#f8fafc] border border-[#e2e8f0] rounded-xl p-4 flex items-center gap-4 shadow-sm">
-                  <div className="bg-[#e0e5ec] p-3 rounded-lg text-[#2d3436]">
+                  <div className="bg-chassis p-3 rounded-lg text-text">
                     <FileText className="w-6 h-6" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-bold text-[#2d3436] truncate">{certificate.fileName}</p>
+                    <p className="text-sm font-bold text-text truncate">{certificate.fileName}</p>
                     <p className="indus-label text-[#22c55e] mt-1">Uploaded successfully</p>
                   </div>
                   <button
                     type="button"
                     onClick={() => setCertificate(null)}
-                    className="text-[#4a5568] hover:text-[#ff4757] p-2 bg-white rounded-md shadow-sm transition-colors"
+                    className="text-text-muted hover:text-[#ff4757] p-2 bg-white rounded-md shadow-sm transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -437,7 +437,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                   type="button"
                   onClick={openUploadWidget}
                   disabled={isUploading}
-                  className="w-full bg-[#f8fafc] border-2 border-dashed border-[#babecc] hover:border-[#3b82f6] hover:bg-[#ebf5ff] rounded-xl p-10 flex flex-col items-center gap-3 text-[#4a5568] hover:text-[#3b82f6] transition-colors focus-visible:ring-2 focus-visible:ring-[#3b82f6] outline-none group shadow-sm"
+                  className="w-full bg-[#f8fafc] border-2 border-dashed border-shadow-dark hover:border-[#3b82f6] hover:bg-[#ebf5ff] rounded-xl p-10 flex flex-col items-center gap-3 text-text-muted hover:text-[#3b82f6] transition-colors focus-visible:ring-2 focus-visible:ring-[#3b82f6] outline-none group shadow-sm"
                 >
                   {isUploading ? (
                     <Loader2 className="w-8 h-8 animate-spin" />
@@ -451,7 +451,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                 </button>
               ) : null}
 
-              <label className="flex items-center gap-3 cursor-pointer group bg-[#e0e5ec] p-4 rounded-xl shadow-[var(--shadow-recessed)]">
+              <label className="flex items-center gap-3 cursor-pointer group bg-chassis p-4 rounded-xl shadow-(--shadow-recessed)">
                 <input
                   type="checkbox"
                   checked={form.noCertificate}
@@ -459,9 +459,9 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                     patch({ noCertificate: e.target.checked });
                     if (e.target.checked) setCertificate(null);
                   }}
-                  className="w-5 h-5 rounded border-[#babecc] text-[#ff4757] focus:ring-[#ff4757] transition-all bg-white"
+                  className="w-5 h-5 rounded border-shadow-dark text-[#ff4757] focus:ring-[#ff4757] transition-all bg-white"
                 />
-                <span className="text-sm font-bold text-[#2d3436] group-hover:text-[#ff4757] transition-colors uppercase tracking-wider">
+                <span className="text-sm font-bold text-text group-hover:text-[#ff4757] transition-colors uppercase tracking-wider">
                   I don't have a certificate
                 </span>
               </label>
@@ -469,11 +469,11 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
               <div className="border-t border-[#d1d9e6] pt-6 space-y-5">
                 <div className="flex items-center gap-2 mb-2">
                   <span className="indus-led-green"></span>
-                  <p className="indus-label text-[#4a5568]">Optional Details</p>
+                  <p className="indus-label text-text-muted">Optional Details</p>
                 </div>
                 
                 <div className="space-y-2">
-                  <label className="indus-label text-[#2d3436]">Certification Name</label>
+                  <label className="indus-label text-text">Certification Name</label>
                   <Input
                     className="indus-input w-full"
                     placeholder="e.g. FSWD Level 1"
@@ -482,7 +482,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="indus-label text-[#2d3436]">Certification Issued Date</label>
+                  <label className="indus-label text-text">Certification Issued Date</label>
                   <Input
                     className="indus-input w-full"
                     type="date"
@@ -497,7 +497,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
           {/* ─── STEP 3: Review & Submit ─── */}
           {step === 3 && (
             <div className="space-y-6">
-              <div className="bg-[#e0e5ec] rounded-xl p-6 shadow-[var(--shadow-recessed)] space-y-4">
+              <div className="bg-chassis rounded-xl p-6 shadow-(--shadow-recessed) space-y-4">
                 <Row label="Course" value={form.programName} />
                 <Row label="Provider" value={`${form.providerName} (${form.providerType})`} />
                 <Row label="Sector" value={form.sector} />
@@ -506,17 +506,17 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
                   label="Status"
                   value={form.status === "completed" ? "✅ Completed" : form.status === "in_progress" ? "🔄 In Progress" : "❌ Dropped"}
                 />
-                <div className="pt-4 border-t border-[#babecc]">
-                  <p className="indus-label text-[#4a5568] mb-2">Skills Learned</p>
+                <div className="pt-4 border-t border-shadow-dark">
+                  <p className="indus-label text-text-muted mb-2">Skills Learned</p>
                   <div className="flex flex-wrap gap-2">
                     {form.skills.map((s) => (
-                      <span key={s} className="bg-white text-[#2d3436] font-bold text-xs px-2.5 py-1 rounded shadow-sm border border-[#e2e8f0]">
+                      <span key={s} className="bg-white text-text font-bold text-xs px-2.5 py-1 rounded shadow-sm border border-[#e2e8f0]">
                         {s}
                       </span>
                     ))}
                   </div>
                 </div>
-                <div className="pt-4 border-t border-[#babecc]">
+                <div className="pt-4 border-t border-shadow-dark">
                   <Row
                     label="Certificate"
                     value={
@@ -533,14 +533,14 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
 
               {submitError && (
                 <div className="flex items-center gap-3 bg-white border border-[#ff4757] rounded-lg p-4 shadow-sm">
-                  <AlertCircle className="w-5 h-5 text-[#ff4757] flex-shrink-0" />
+                  <AlertCircle className="w-5 h-5 text-[#ff4757] shrink-0" />
                   <p className="text-sm font-bold text-[#ff4757]">{submitError}</p>
                 </div>
               )}
 
               {toast && (
                 <div className="flex items-center gap-3 bg-white border border-[#22c55e] rounded-lg p-4 shadow-sm">
-                  <CheckCircle2 className="w-5 h-5 text-[#22c55e] flex-shrink-0" />
+                  <CheckCircle2 className="w-5 h-5 text-[#22c55e] shrink-0" />
                   <p className="text-sm font-bold text-[#22c55e]">{toast}</p>
                 </div>
               )}
@@ -549,7 +549,7 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
         </div>
 
         {/* Footer actions */}
-        <div className="p-6 border-t border-[#d1d9e6] bg-[#e0e5ec] flex-shrink-0 flex gap-4 rounded-b-2xl">
+        <div className="p-6 border-t border-[#d1d9e6] bg-chassis shrink-0 flex gap-4 rounded-b-2xl">
           {step > 1 && (
             <Button
               type="button"
@@ -597,8 +597,8 @@ export default function AddTrainingRecordModal({ isOpen, onClose, onSuccess }: P
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between items-start gap-4">
-      <span className="indus-label text-[#4a5568] flex-shrink-0">{label}</span>
-      <span className="text-sm font-bold text-[#2d3436] text-right">{value}</span>
+      <span className="indus-label text-text-muted shrink-0">{label}</span>
+      <span className="text-sm font-bold text-text text-right">{value}</span>
     </div>
   );
 }

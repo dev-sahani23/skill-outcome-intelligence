@@ -45,10 +45,10 @@ function IndustrialModal({ children, onClose, title }: { children: React.ReactNo
             style={{ background: "radial-gradient(circle at 35% 35%, #d0d5de 0%, #c5cad4 40%, #b8bdc8 60%, #a8adb8 100%)", boxShadow: "inset 1px 1px 2px rgba(255,255,255,0.5), inset -1px -1px 1px rgba(0,0,0,0.2)" }}
             aria-hidden />
         ))}
-        <button onClick={onClose} className="absolute top-4 right-4 text-[#4a5568] hover:text-[#ff4757] transition-colors p-1.5 rounded-lg hover:bg-[#d1d9e6]">
+        <button onClick={onClose} className="absolute top-4 right-4 text-text-muted hover:text-[#ff4757] transition-colors p-1.5 rounded-lg hover:bg-recessed">
           <X className="w-5 h-5" />
         </button>
-        <h2 className="text-lg font-bold uppercase tracking-wider text-[#2d3436] mb-5">{title}</h2>
+        <h2 className="text-lg font-bold uppercase tracking-wider text-text mb-5">{title}</h2>
         {children}
       </motion.div>
     </motion.div>
@@ -59,9 +59,9 @@ function IndustrialModal({ children, onClose, title }: { children: React.ReactNo
 function ModalInput({ label, ...props }: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <div>
-      <label className="block indus-label text-[#2d3436] mb-1.5">{label}</label>
+      <label className="block indus-label text-text mb-1.5">{label}</label>
       <input
-        className="w-full rounded-lg px-4 py-3 text-sm font-medium text-[#2d3436] transition-all"
+        className="w-full rounded-lg px-4 py-3 text-sm font-medium text-text transition-all"
         style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)", border: "none", fontFamily: "'JetBrains Mono', monospace", outline: "none" }}
         onFocus={(e) => { e.target.style.boxShadow = "var(--shadow-recessed), 0 0 0 2px #ff4757"; }}
         onBlur={(e) => { e.target.style.boxShadow = "var(--shadow-recessed)"; }}
@@ -170,18 +170,18 @@ export default function TraineeDashboard() {
   /* ─── Loading / Error states ─── */
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#e0e5ec] p-6 flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen bg-chassis p-6 flex flex-col items-center justify-center space-y-4">
         <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-card)" }}>
           <Loader2 className="w-8 h-8 animate-spin text-[#ff4757]" />
         </div>
-        <p className="font-bold text-[#2d3436]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Loading dashboard...</p>
+        <p className="font-bold text-text" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Loading dashboard...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#e0e5ec] p-6 flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen bg-chassis p-6 flex flex-col items-center justify-center space-y-4">
         <AlertCircle className="w-12 h-12 text-[#ff4757]" />
         <p className="text-[#ff4757] font-bold">{error}</p>
         <Button onClick={fetchData} variant="secondary">Retry</Button>
@@ -191,8 +191,8 @@ export default function TraineeDashboard() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-[#e0e5ec] p-6 flex items-center justify-center">
-        <p className="text-[#2d3436] font-bold">No user data found. Please log in again.</p>
+      <div className="min-h-screen bg-chassis p-6 flex items-center justify-center">
+        <p className="text-text font-bold">No user data found. Please log in again.</p>
       </div>
     );
   }
@@ -213,7 +213,7 @@ export default function TraineeDashboard() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#e0e5ec] p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
+      <div className="min-h-screen bg-chassis p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
 
         {/* ─── Header: Dark charcoal strip ─── */}
         <div
@@ -258,6 +258,13 @@ export default function TraineeDashboard() {
           >
             <Award className="w-4 h-4" /> Start Skill Verification
           </Button>
+          <Button
+            variant="secondary"
+            className="flex-1"
+            onClick={() => navigate('/reports')}
+          >
+            <FileText className="w-4 h-4" /> Generate Report
+          </Button>
         </div>
 
         {/* ─── Stat Cards ─── */}
@@ -289,15 +296,15 @@ export default function TraineeDashboard() {
               </div>
 
               {/* Label */}
-              <p className="text-sm font-semibold text-[#4a5568] mb-1">{card.label}</p>
+              <p className="text-sm font-semibold text-text-muted mb-1">{card.label}</p>
 
               {/* Value */}
-              <div className="text-xl font-bold text-[#2d3436] mb-1" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+              <div className="text-xl font-bold text-text mb-1" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                 {card.value}
               </div>
 
               {/* Sub-label */}
-              <p className={`indus-label ${idx === 3 && employmentStatus === "Pending" ? "text-[#f59e0b]" : "text-[#4a5568]"}`}>
+              <p className={`indus-label ${idx === 3 && employmentStatus === "Pending" ? "text-[#f59e0b]" : "text-text-muted"}`}>
                 {card.sub}
               </p>
             </Card>
@@ -314,8 +321,8 @@ export default function TraineeDashboard() {
         >
           {/* Enrollments Card */}
           <Card variants={itemVariants} showScrews showVents>
-            <CardHeader className="border-b border-[#babecc] pb-4 flex flex-row items-center justify-between">
-              <CardTitle className="text-base font-bold uppercase text-[#2d3436]">Current Enrollments</CardTitle>
+            <CardHeader className="border-b border-shadow-dark pb-4 flex flex-row items-center justify-between">
+              <CardTitle className="text-base font-bold uppercase text-text">Current Enrollments</CardTitle>
               <button
                 onClick={() => setShowModal(true)}
                 className="rounded-lg px-3 py-1.5 text-xs font-bold uppercase tracking-wider text-white transition-all"
@@ -338,10 +345,10 @@ export default function TraineeDashboard() {
                     >
                       <div className="flex justify-between items-start">
                         <div>
-                          <h3 className="font-bold text-[#2d3436] text-sm sm:text-base">
+                          <h3 className="font-bold text-text text-sm sm:text-base">
                             {course.program?.name || course.trainingNumber || "Training"}
                           </h3>
-                          <p className="indus-label text-[#4a5568] mt-1">
+                          <p className="indus-label text-text-muted mt-1">
                             Provider: {course.program?.provider?.instituteName || "—"}
                           </p>
                           {course.certificateId && (
@@ -365,8 +372,8 @@ export default function TraineeDashboard() {
                   className="text-center py-6 rounded-xl"
                   style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}
                 >
-                  <p className="font-bold text-[#2d3436]">No active enrollments</p>
-                  <p className="indus-label text-[#4a5568] mt-1">Complete Training Record Validation to see courses here.</p>
+                  <p className="font-bold text-text">No active enrollments</p>
+                  <p className="indus-label text-text-muted mt-1">Complete Training Record Validation to see courses here.</p>
                 </div>
               )}
             </CardContent>
@@ -374,25 +381,25 @@ export default function TraineeDashboard() {
 
           {/* Employment Card */}
           <Card variants={itemVariants} showScrews className="flex flex-col justify-between">
-            <CardHeader className="border-b border-[#babecc] pb-4">
-              <CardTitle className="text-base font-bold uppercase text-[#2d3436]">Employment Record Details</CardTitle>
+            <CardHeader className="border-b border-shadow-dark pb-4">
+              <CardTitle className="text-base font-bold uppercase text-text">Employment Record Details</CardTitle>
             </CardHeader>
             <CardContent className="pt-4 h-full flex flex-col justify-start text-left">
               {latestOutcome ? (
                 <div className="space-y-4">
                   <div>
-                    <p className="indus-label text-[#4a5568]">Company / Business</p>
-                    <p className="text-xl font-bold text-[#2d3436] mt-1" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                    <p className="indus-label text-text-muted">Company / Business</p>
+                    <p className="text-xl font-bold text-text mt-1" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                       {latestOutcome.employerName || latestOutcome.businessActivity || "Unknown"}
                     </p>
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="indus-label text-[#4a5568]">Designation</p>
-                      <p className="font-bold text-[#2d3436] text-sm mt-1">{latestOutcome.designation || "—"}</p>
+                      <p className="indus-label text-text-muted">Designation</p>
+                      <p className="font-bold text-text text-sm mt-1">{latestOutcome.designation || "—"}</p>
                     </div>
                     <div>
-                      <p className="indus-label text-[#4a5568]">Monthly Wage</p>
+                      <p className="indus-label text-text-muted">Monthly Wage</p>
                       <p className="text-[#22c55e] font-bold text-lg mt-1" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                         {latestOutcome.monthlyWage ? formatINR(latestOutcome.monthlyWage) : "—"}
                       </p>
@@ -400,16 +407,16 @@ export default function TraineeDashboard() {
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className="indus-label text-[#4a5568]">Employment Type</p>
-                      <p className="text-[#2d3436] font-bold text-sm mt-1">{employmentStatus}</p>
+                      <p className="indus-label text-text-muted">Employment Type</p>
+                      <p className="text-text font-bold text-sm mt-1">{employmentStatus}</p>
                     </div>
                     <div>
-                      <p className="indus-label text-[#4a5568]">Joining Date</p>
-                      <p className="text-[#2d3436] font-bold text-sm mt-1">{latestOutcome.createdAt ? formatDate(latestOutcome.createdAt) : "—"}</p>
+                      <p className="indus-label text-text-muted">Joining Date</p>
+                      <p className="text-text font-bold text-sm mt-1">{latestOutcome.createdAt ? formatDate(latestOutcome.createdAt) : "—"}</p>
                     </div>
                   </div>
                   <div>
-                    <p className="indus-label text-[#4a5568] mb-1.5">Training Relevance</p>
+                    <p className="indus-label text-text-muted mb-1.5">Training Relevance</p>
                     <span
                       className="indus-label text-white px-3 py-1 rounded-lg"
                       style={{ background: "#22c55e", boxShadow: "0 0 8px rgba(34,197,94,0.3)" }}
@@ -421,9 +428,9 @@ export default function TraineeDashboard() {
               ) : (
                 <div className="flex flex-col items-center justify-center text-center space-y-4 flex-1">
                   <div className="w-14 h-14 rounded-full flex items-center justify-center" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
-                    <TrendingUp className="w-7 h-7 text-[#4a5568]" />
+                    <TrendingUp className="w-7 h-7 text-text-muted" />
                   </div>
-                  <p className="text-sm font-medium text-[#4a5568] max-w-[280px]">
+                  <p className="text-sm font-medium text-text-muted max-w-70">
                     Help the government track skill impact by updating your latest employment outcome.
                   </p>
                 </div>
@@ -475,7 +482,7 @@ export default function TraineeDashboard() {
                       setShowEmploymentDetailsModal(true);
                     }
                   }}
-                  className="w-full text-left px-4 py-3 rounded-xl font-bold text-[#2d3436] transition-all duration-200"
+                  className="w-full text-left px-4 py-3 rounded-xl font-bold text-text transition-all duration-200"
                   style={{ background: "#e0e5ec", boxShadow: "var(--shadow-card)" }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "var(--shadow-floating)"; (e.currentTarget as HTMLButtonElement).style.color = "#ff4757"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.boxShadow = "var(--shadow-card)"; (e.currentTarget as HTMLButtonElement).style.color = "#2d3436"; }}
@@ -511,10 +518,10 @@ export default function TraineeDashboard() {
                     {showEmployerDropdown && employerResults.length > 0 && (
                       <div className="absolute z-10 w-full mt-1 rounded-xl overflow-hidden max-h-48 overflow-y-auto" style={{ background: "#f0f2f5", boxShadow: "var(--shadow-floating)" }}>
                         {employerResults.map((emp) => (
-                          <div key={emp.id} className="p-3 cursor-pointer hover:bg-[#e0e5ec] transition-colors"
+                          <div key={emp.id} className="p-3 cursor-pointer hover:bg-chassis transition-colors"
                             onClick={() => { setEmpFormData({ ...empFormData, companyName: emp.name, employerId: emp.id }); setShowEmployerDropdown(false); }}>
-                            <p className="font-bold text-[#2d3436] text-sm">{emp.name}</p>
-                            <p className="indus-label text-[#4a5568]">{emp.sector} {emp.isVerified && "✓"}</p>
+                            <p className="font-bold text-text text-sm">{emp.name}</p>
+                            <p className="indus-label text-text-muted">{emp.sector} {emp.isVerified && "✓"}</p>
                           </div>
                         ))}
                       </div>
