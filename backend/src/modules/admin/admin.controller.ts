@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { createSkillGapReport } from "./skillGap.service";
 import { prisma } from "../../lib/prisma";
+import { Prisma } from "@prisma/client";
+import { parsePagination, getPaginationMeta } from "../../utils/pagination";
 
 export const postSkillGapReport = async (req: Request, res: Response) => {
   try {
@@ -151,15 +153,37 @@ export const getAnomalyFlags = async (req: Request, res: Response) => {
 
 export const getTrainees = async (req: Request, res: Response) => {
   try {
-    const trainees = await prisma.traineeProfile.findMany({
-      include: {
-        user: { select: { email: true } },
-        enrollments: { select: { id: true, status: true, program: { select: { name: true, provider: { select: { instituteName: true } } } } } },
-        skillAssessments: { select: { skillGapScore: true }, orderBy: { createdAt: 'desc' }, take: 1 }
-      },
-      orderBy: { user: { createdAt: 'desc' } }
+    const { page, limit, search } = parsePagination(req);
+    const skip = (page - 1) * limit;
+
+    const whereClause: Prisma.TraineeProfileWhereInput = search
+      ? {
+          OR: [
+            { fullName: { contains: search, mode: "insensitive" } },
+            { user: { email: { contains: search, mode: "insensitive" } } }
+          ]
+        }
+      : {};
+
+    const [total, trainees] = await Promise.all([
+      prisma.traineeProfile.count({ where: whereClause }),
+      prisma.traineeProfile.findMany({
+        where: whereClause,
+        skip,
+        take: limit,
+        include: {
+          user: { select: { email: true } },
+          enrollments: { select: { id: true, status: true, program: { select: { name: true, provider: { select: { instituteName: true } } } } } },
+          skillAssessments: { select: { skillGapScore: true }, orderBy: { createdAt: 'desc' }, take: 1 }
+        },
+        orderBy: [{ user: { createdAt: 'desc' } }, { id: 'asc' }]
+      })
+    ]);
+
+    return res.status(200).json({ 
+      data: trainees,
+      meta: getPaginationMeta(total, page, limit)
     });
-    return res.status(200).json({ trainees });
   } catch (error: any) {
     console.error("Error fetching trainees:", error);
     return res.status(500).json({ error: "Internal server error" });

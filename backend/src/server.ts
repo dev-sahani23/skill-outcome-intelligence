@@ -11,6 +11,7 @@ import enrollmentRoutes from "./modules/enrollment/enrollment.routes";
 import traineeRoutes from "./modules/trainee/trainee.routes";
 import adminRoutes from "./modules/admin/admin.routes";
 import publicRoutes from "./modules/public/public.routes";
+import reportRoutes from "./modules/reports/reports.routes";
 import { prisma } from "./lib/prisma";
 import { responseQueue } from "./queues/responseQueue";
 import { followUpQueue } from "./queues/followUpQueue";
@@ -112,6 +113,8 @@ app.use("/api/enrollments", enrollmentRoutes);
 app.use("/api/trainees", traineeRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/public", publicRoutes);
+app.use("/api/reports", reportRoutes);
+
 
 // Test route for manual trigger
 app.post('/api/test/trigger-followup', async (req: any, res: any) => {
