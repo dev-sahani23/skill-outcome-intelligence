@@ -55,18 +55,18 @@ export default function SkillGaps() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#e0e5ec] p-6 flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen bg-chassis p-6 flex flex-col items-center justify-center space-y-4">
         <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-card)" }}>
           <Loader2 className="w-8 h-8 animate-spin text-[#ff4757]" />
         </div>
-        <p className="font-bold text-[#2d3436]" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Loading anomaly flags...</p>
+        <p className="font-bold text-text" style={{ fontFamily: "'JetBrains Mono', monospace" }}>Loading anomaly flags...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="min-h-screen bg-[#e0e5ec] p-6 flex flex-col items-center justify-center space-y-4">
+      <div className="min-h-screen bg-chassis p-6 flex flex-col items-center justify-center space-y-4">
         <AlertCircle className="w-12 h-12 text-[#ff4757]" />
         <p className="text-[#ff4757] font-bold">{error}</p>
         <Button onClick={fetchFlags} variant="secondary">Retry</Button>
@@ -75,11 +75,11 @@ export default function SkillGaps() {
   }
 
   return (
-    <div className="min-h-screen bg-[#e0e5ec] p-6 md:p-8 space-y-6">
+    <div className="min-h-screen bg-chassis p-6 md:p-8 space-y-6">
       <div className="max-w-6xl mx-auto space-y-6">
         <button
           onClick={() => navigate('/dashboard/admin')}
-          className="flex items-center gap-1 text-[#4a5568] hover:text-[#ff4757] transition-colors indus-label"
+          className="flex items-center gap-1 text-text-muted hover:text-[#ff4757] transition-colors indus-label"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Dashboard
         </button>
@@ -117,8 +117,8 @@ export default function SkillGaps() {
               style={{ background: "#e0e5ec", boxShadow: "var(--shadow-card)", color: "#22c55e" }}>
               <CheckCircle className="w-7 h-7" />
             </div>
-            <p className="font-bold text-[#2d3436]">No anomalies detected.</p>
-            <p className="indus-label text-[#4a5568] mt-1">Everything looks good.</p>
+            <p className="font-bold text-text">No anomalies detected.</p>
+            <p className="indus-label text-text-muted mt-1">Everything looks good.</p>
           </div>
         ) : (
           <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
@@ -131,27 +131,27 @@ export default function SkillGaps() {
                   aria-hidden
                 />
 
-                <CardHeader className="pb-2 border-b border-[#babecc] pt-5">
+                <CardHeader className="pb-2 border-b border-shadow-dark pt-5">
                   <div className="flex justify-between items-start gap-2">
                     <div>
-                      <CardTitle className="text-sm font-bold text-[#2d3436]">
+                      <CardTitle className="text-sm font-bold text-text">
                         {flag.anomalyType.replace(/_/g, " ")}
                       </CardTitle>
-                      <p className="indus-label text-[#4a5568] mt-1">
+                      <p className="indus-label text-text-muted mt-1">
                         Provider: {flag.provider?.instituteName || flag.provider?.user?.email}
                       </p>
                     </div>
                     {/* Status badge with LED dot */}
-                    <div className="flex items-center gap-1.5 flex-shrink-0 rounded-lg px-2.5 py-1" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
-                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: statusLedColor[flag.status] || "#4a5568" }} />
-                      <span className="indus-label text-[#2d3436]">{flag.status}</span>
+                    <div className="flex items-center gap-1.5 shrink-0 rounded-lg px-2.5 py-1" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
+                      <div className="w-2 h-2 rounded-full shrink-0" style={{ background: statusLedColor[flag.status] || "#4a5568" }} />
+                      <span className="indus-label text-text">{flag.status}</span>
                     </div>
                   </div>
                 </CardHeader>
 
                 <CardContent className="pt-4 space-y-4">
                   <p
-                    className="text-sm font-medium text-[#2d3436] p-3 rounded-lg"
+                    className="text-sm font-medium text-text p-3 rounded-lg"
                     style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}
                   >
                     {flag.description}
