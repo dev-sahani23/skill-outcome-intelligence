@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { prisma } from "../../lib/prisma";
+import { Prisma } from "@prisma/client";
+import { parsePagination, getPaginationMeta } from "../../utils/pagination";
 import { scheduleFollowUpsForTrainee } from "../../jobs/scheduleFollowUps";
 
 /**
@@ -112,44 +114,61 @@ export const getMyEnrollments = async (req: Request, res: Response, next: NextFu
  */
 export const getProviderEnrollments = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        const { page, limit, search } = parsePagination(req);
+        const skip = (page - 1) * limit;
+
         const provider = await prisma.providerProfile.findUnique({
             where: { userId: req.user!.id }
         });
 
         if (!provider) {
-            return res.status(200).json({ enrollments: [] });
+            return res.status(200).json({ data: [], meta: getPaginationMeta(0, page, limit) });
         }
 
-        const enrollments = await prisma.enrollment.findMany({
-            where: {
-                program: { providerId: provider.id }
-            },
-            include: {
-                trainee: {
-                    select: { 
-                        id: true, 
-                        userId: true, 
-                        fullName: true, 
-                        phone: true, 
-                        qualification: true, 
-                        districtId: true,
-                        user: { select: { email: true } } 
-                    }
+        const searchFilter: Prisma.EnrollmentWhereInput = search
+          ? {
+              OR: [
+                { trainee: { fullName: { contains: search, mode: "insensitive" } } },
+                { trainee: { user: { email: { contains: search, mode: "insensitive" } } } },
+                { program: { name: { contains: search, mode: "insensitive" } } }
+              ]
+            }
+          : {};
+
+        const whereClause: Prisma.EnrollmentWhereInput = {
+            program: { providerId: provider.id },
+            ...searchFilter
+        };
+
+        const [totalCount, enrollments] = await Promise.all([
+            prisma.enrollment.groupBy({
+                by: ['traineeId'],
+                where: whereClause
+            }).then(groups => groups.length),
+            prisma.enrollment.findMany({
+                where: whereClause,
+                distinct: ['traineeId'],
+                skip,
+                take: limit,
+                include: {
+                    trainee: {
+                        select: { 
+                            id: true, 
+                            userId: true, 
+                            fullName: true, 
+                            phone: true, 
+                            qualification: true, 
+                            districtId: true,
+                            user: { select: { email: true } } 
+                        }
+                    },
+                    program: true
                 },
-                program: true
-            },
-            orderBy: { enrolledAt: "desc" }
-        });
+                orderBy: [{ enrolledAt: "desc" }, { id: "asc" }]
+            })
+        ]);
 
-        // Deduplicate by traineeId for recent enrollments view
-        const seenTrainees = new Set<string>();
-        const deduplicatedEnrollments = enrollments.filter(env => {
-            if (seenTrainees.has(env.traineeId)) return false;
-            seenTrainees.add(env.traineeId);
-            return true;
-        });
-
-        res.status(200).json({ enrollments: deduplicatedEnrollments });
+        res.status(200).json({ data: enrollments, meta: getPaginationMeta(totalCount, page, limit) });
     } catch (error) {
         next(error);
     }

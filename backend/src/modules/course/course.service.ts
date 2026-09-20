@@ -27,16 +27,40 @@ export const getAllCourses = async () => {
   });
 };
 
-export const getProviderCourses = async (userId: string) => {
+export const getProviderCourses = async (userId: string, page: number, limit: number, search?: string) => {
   const provider = await prisma.providerProfile.findUnique({
     where: { userId }
   });
 
   if (!provider) {
-    return [];
+    return { data: [], total: 0 };
   }
 
-  return prisma.trainingProgram.findMany({
-    where: { providerId: provider.id },
-  });
+  const searchFilter = search
+    ? {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' as any } },
+          { sector: { contains: search, mode: 'insensitive' as any } }
+        ]
+      }
+    : {};
+
+  const whereClause = {
+    providerId: provider.id,
+    ...searchFilter
+  };
+
+  const skip = (page - 1) * limit;
+
+  const [total, courses] = await Promise.all([
+    prisma.trainingProgram.count({ where: whereClause }),
+    prisma.trainingProgram.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      orderBy: [{ name: "asc" }, { id: "asc" }]
+    })
+  ]);
+
+  return { data: courses, total };
 };
