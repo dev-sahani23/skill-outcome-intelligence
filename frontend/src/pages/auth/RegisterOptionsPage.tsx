@@ -79,7 +79,7 @@ const RegisterOptionsPage = ({
       </div>
 
       <h1
-        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2d3436] leading-tight tracking-tight mb-4 sm:mb-6"
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text leading-tight tracking-tight mb-4 sm:mb-6"
         style={{ textShadow: "0 1px 0 rgba(255,255,255,0.9)" }}
       >
         Join the
@@ -89,7 +89,7 @@ const RegisterOptionsPage = ({
         ecosystem.
       </h1>
 
-      <p className="text-base sm:text-lg text-[#4a5568] font-medium leading-relaxed max-w-sm">
+      <p className="text-base sm:text-lg text-text-muted font-medium leading-relaxed max-w-sm">
         Choose the account type that matches your role and start managing outcomes, performance and impact from one platform.
       </p>
     </div>
@@ -99,12 +99,12 @@ const RegisterOptionsPage = ({
     <AuthLayout heroContent={heroContent}>
       <div className="mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
         <h2
-          className="text-2xl sm:text-3xl font-bold text-[#2d3436] mb-1"
+          className="text-2xl sm:text-3xl font-bold text-text mb-1"
           style={{ textShadow: "0 1px 0 rgba(255,255,255,0.8)" }}
         >
           Create account
         </h2>
-        <p className="text-[#4a5568] text-sm font-medium">
+        <p className="text-text-muted text-sm font-medium">
           Select your role to get started.
         </p>
       </div>
@@ -145,10 +145,10 @@ const RegisterOptionsPage = ({
               </span>
 
               <span className="flex-1 min-w-0">
-                <strong className="block text-[#2d3436] font-bold text-base mb-0.5">
+                <strong className="block text-text font-bold text-base mb-0.5">
                   {option.title}
                 </strong>
-                <small className="block text-[#4a5568] font-medium text-sm">
+                <small className="block text-text-muted font-medium text-sm">
                   {option.description}
                 </small>
               </span>
@@ -183,7 +183,7 @@ const RegisterOptionsPage = ({
       <div className="animate-fade-in" style={{ animationDelay: "0.45s" }}>
         <button
           type="button"
-          className="w-full text-center text-sm font-medium text-[#4a5568] hover:text-[#ff4757] transition-colors duration-200 py-2"
+          className="w-full text-center text-sm font-medium text-text-muted hover:text-[#ff4757] transition-colors duration-200 py-2"
           onClick={onNavigateToLogin}
         >
           Already have an account?{" "}

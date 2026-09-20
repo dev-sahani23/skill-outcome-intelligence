@@ -248,7 +248,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
     <div className="mb-8 lg:mb-12">
       {/* Overarching heading */}
       <h1
-        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2d3436] leading-tight tracking-tight mb-4 sm:mb-6"
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text leading-tight tracking-tight mb-4 sm:mb-6"
         style={{ textShadow: "0 1px 0 rgba(255,255,255,0.9)" }}
       >
         Measure skills.
@@ -258,7 +258,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         Build India's future.
       </h1>
 
-      <p className="text-base sm:text-lg text-[#4a5568] font-medium leading-relaxed max-w-sm mb-8 sm:mb-10">
+      <p className="text-base sm:text-lg text-text-muted font-medium leading-relaxed max-w-sm mb-8 sm:mb-10">
         A unified platform for tracking the complete skilling journey — from training and certification to employment and career outcomes.
       </p>
 
@@ -307,7 +307,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
       <span className="text-xl">🇮🇳</span>
       <p>
         Empowering India's workforce through
-        <strong className="text-[#2d3436] font-medium"> measurable impact</strong>
+        <strong className="text-text font-medium"> measurable impact</strong>
       </p>
     </>
   );
@@ -315,7 +315,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
   const passwordToggle = (
     <button
       type="button"
-      className="text-[#4a5568] hover:text-[#ff4757] transition-colors duration-200 focus:outline-none"
+      className="text-text-muted hover:text-[#ff4757] transition-colors duration-200 focus:outline-none"
       onClick={() => setShowPassword(!showPassword)}
       aria-label={showPassword ? "Hide password" : "Show password"}
       tabIndex={-1}
@@ -350,13 +350,13 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         <button
           type="button"
           onClick={handleCloseForgotPassword}
-          className="absolute top-4 right-4 text-[#4a5568] hover:text-[#ff4757] transition-colors p-1 rounded-lg hover:bg-[#d1d9e6]"
+          className="absolute top-4 right-4 text-text-muted hover:text-[#ff4757] transition-colors p-1 rounded-lg hover:bg-recessed"
           aria-label="Close"
         >
           {XIcon}
         </button>
 
-        <h3 className="text-lg font-bold uppercase tracking-wider text-[#2d3436] mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
+        <h3 className="text-lg font-bold uppercase tracking-wider text-text mb-1" style={{ fontFamily: "Inter, sans-serif" }}>
           {forgotPasswordStep === "email" && "Forgot Password"}
           {forgotPasswordStep === "otp" && "Verify OTP"}
           {forgotPasswordStep === "reset" && "Set New Password"}
@@ -374,11 +374,11 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
         {forgotPasswordStep === "email" && (
           <form onSubmit={handleSendOtp}>
-            <p className="text-[#4a5568] text-sm font-medium mb-5">
+            <p className="text-text-muted text-sm font-medium mb-5">
               Enter your email address to receive a temporary OTP to reset your password.
             </p>
             <div className="mb-6">
-              <label className="block indus-label text-[#2d3436] mb-2">Email Address</label>
+              <label className="block indus-label text-text mb-2">Email Address</label>
               <Input
                 type="email"
                 placeholder="e.g. name@example.com"
@@ -394,11 +394,11 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
         {forgotPasswordStep === "otp" && (
           <form onSubmit={handleVerifyOtp}>
-            <p className="text-[#4a5568] text-sm font-medium mb-5">
-              We have sent an OTP to <strong className="text-[#2d3436]">{otpTargetEmail}</strong>. Enter it below.
+            <p className="text-text-muted text-sm font-medium mb-5">
+              We have sent an OTP to <strong className="text-text">{otpTargetEmail}</strong>. Enter it below.
             </p>
             <div className="mb-6">
-              <label className="block indus-label text-[#2d3436] mb-2">OTP Code</label>
+              <label className="block indus-label text-text mb-2">OTP Code</label>
               <Input
                 type="text"
                 maxLength={6}
@@ -416,7 +416,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                 disabled={resendCooldown > 0 || forgotPasswordLoading}
                 onClick={() => handleSendOtp()}
                 className={`indus-label transition-colors ${
-                  resendCooldown > 0 ? "text-[#4a5568] cursor-not-allowed" : "text-[#ff4757] hover:text-[#d63847]"
+                  resendCooldown > 0 ? "text-text-muted cursor-not-allowed" : "text-[#ff4757] hover:text-[#d63847]"
                 }`}
               >
                 {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : "Resend OTP"}
@@ -427,11 +427,11 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
         {forgotPasswordStep === "reset" && (
           <form onSubmit={handleResetPassword} className="animate-fade-in">
-            <p className="text-[#4a5568] text-sm font-medium mb-5">
-              OTP verified! Choose a strong new password for <strong className="text-[#2d3436]">{otpTargetEmail}</strong>.
+            <p className="text-text-muted text-sm font-medium mb-5">
+              OTP verified! Choose a strong new password for <strong className="text-text">{otpTargetEmail}</strong>.
             </p>
             <div className="mb-4">
-              <label className="block indus-label text-[#2d3436] mb-2">New Password</label>
+              <label className="block indus-label text-text mb-2">New Password</label>
               <Input
                 type="password"
                 placeholder="Min. 6 characters"
@@ -440,7 +440,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
               />
             </div>
             <div className="mb-6">
-              <label className="block indus-label text-[#2d3436] mb-2">Confirm New Password</label>
+              <label className="block indus-label text-text mb-2">Confirm New Password</label>
               <Input
                 type="password"
                 placeholder="Re-enter your new password"
@@ -469,7 +469,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                 </svg>
               </div>
             </div>
-            <p className="text-[#4a5568] font-medium text-sm mb-6 text-center">
+            <p className="text-text-muted font-medium text-sm mb-6 text-center">
               Your password has been reset successfully! You can now log in with your new password.
             </p>
             <Button type="button" fullWidth onClick={handleCloseForgotPassword}>
@@ -491,10 +491,10 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
         {/* Header */}
         <div className="mb-6 sm:mb-8 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#2d3436] mb-1" style={{ textShadow: "0 1px 0 rgba(255,255,255,0.8)" }}>
+          <h2 className="text-2xl sm:text-3xl font-bold text-text mb-1" style={{ textShadow: "0 1px 0 rgba(255,255,255,0.8)" }}>
             Welcome back
           </h2>
-          <p className="text-[#4a5568] text-sm font-medium">
+          <p className="text-text-muted text-sm font-medium">
             Sign in to continue to your{" "}
             <span className="text-[#ff4757] font-bold">SkillTrack</span> dashboard.
           </p>
@@ -508,17 +508,17 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2.5">
               <span className="indus-led-red" aria-label="Demo mode active" />
-              <span className="indus-label text-[#2d3436]">Demo Accounts</span>
+              <span className="indus-label text-text">Demo Accounts</span>
             </div>
             <span
-              className="indus-label text-[#4a5568] px-2.5 py-1 rounded-lg"
+              className="indus-label text-text-muted px-2.5 py-1 rounded-lg"
               style={{ background: "#d1d9e6", boxShadow: "var(--shadow-recessed)" }}
             >
               pwd: password123
             </span>
           </div>
 
-          <p className="text-xs font-medium text-[#4a5568] mb-3">
+          <p className="text-xs font-medium text-text-muted mb-3">
             Click any role below to autofill and test its role-specific dashboard:
           </p>
 
@@ -546,7 +546,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                   <div className="flex items-center justify-between w-full mb-1.5 relative">
                     <div className="flex items-center gap-1.5" style={{ color: acc.accentColor }}>
                       {acc.icon}
-                      <span className="text-sm font-bold text-[#2d3436]">{acc.shortRole}</span>
+                      <span className="text-sm font-bold text-text">{acc.shortRole}</span>
                     </div>
                     {isSelected && (
                       <div 
@@ -555,7 +555,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                       />
                     )}
                   </div>
-                  <span className="text-xs text-[#4a5568] font-medium truncate w-full mb-1.5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
+                  <span className="text-xs text-text-muted font-medium truncate w-full mb-1.5" style={{ fontFamily: "'JetBrains Mono', monospace" }}>
                     {acc.email}
                   </span>
                   <span
@@ -582,7 +582,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           )}
 
           <div className="mb-5 animate-fade-in-up" style={{ animationDelay: "0.15s" }}>
-            <label htmlFor="email" className="block indus-label text-[#2d3436] mb-2">
+            <label htmlFor="email" className="block indus-label text-text mb-2">
               Email address
             </label>
             <Input
@@ -598,7 +598,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
 
           <div className="mb-5 animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
             <div className="flex items-center justify-between mb-2">
-              <label htmlFor="password" className="block indus-label text-[#2d3436]">
+              <label htmlFor="password" className="block indus-label text-text">
                 Password
               </label>
               <button
@@ -643,7 +643,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                   </svg>
                 )}
               </div>
-              <span className="text-sm font-medium text-[#4a5568]">Remember me</span>
+              <span className="text-sm font-medium text-text-muted">Remember me</span>
             </label>
           </div>
 
@@ -658,13 +658,13 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         {/* Divider */}
         <div className="relative flex items-center justify-center my-6 sm:my-8 animate-fade-in" style={{ animationDelay: "0.35s" }}>
           <div className="flex-1 h-px" style={{ background: "linear-gradient(to right, transparent, #babecc, transparent)" }} />
-          <span className="px-4 indus-label text-[#4a5568]">or continue with</span>
+          <span className="px-4 indus-label text-text-muted">or continue with</span>
           <div className="flex-1 h-px" style={{ background: "linear-gradient(to left, transparent, #babecc, transparent)" }} />
         </div>
 
         <div className="animate-fade-in-up" style={{ animationDelay: "0.4s" }}>
           <Button type="button" variant="secondary" fullWidth>
-            <div className="w-5 h-5 text-[#4a5568]">
+            <div className="w-5 h-5 text-text-muted">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
                 <path d="M3 21h18" />
                 <path d="M5 21V5l7-3 7 3v16" />
@@ -679,7 +679,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           </Button>
         </div>
 
-        <div className="mt-6 sm:mt-8 text-center text-sm font-medium text-[#4a5568] animate-fade-in" style={{ animationDelay: "0.45s" }}>
+        <div className="mt-6 sm:mt-8 text-center text-sm font-medium text-text-muted animate-fade-in" style={{ animationDelay: "0.45s" }}>
           <span>Don't have an account?</span>
           <button
             type="button"
@@ -695,15 +695,15 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
             <path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7l8-4z" />
             <path d="M9 12l2 2 4-4" />
           </svg>
-          <span className="indus-label text-[#4a5568]">Secure &amp; encrypted connection</span>
+          <span className="indus-label text-text-muted">Secure &amp; encrypted connection</span>
         </div>
 
-        <footer className="mt-6 sm:mt-8 flex items-center justify-center gap-3 indus-label text-[#4a5568]">
+        <footer className="mt-6 sm:mt-8 flex items-center justify-center gap-3 indus-label text-text-muted">
           <span>© 2026 SkillTrack</span>
           <span className="text-[#babecc]">•</span>
-          <button type="button" className="hover:text-[#2d3436] transition-colors duration-200">Privacy</button>
+          <button type="button" className="hover:text-text transition-colors duration-200">Privacy</button>
           <span className="text-[#babecc]">•</span>
-          <button type="button" className="hover:text-[#2d3436] transition-colors duration-200">Terms</button>
+          <button type="button" className="hover:text-text transition-colors duration-200">Terms</button>
         </footer>
       </AuthLayout>
       {forgotPasswordModal}

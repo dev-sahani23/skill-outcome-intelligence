@@ -50,13 +50,15 @@ export const auth = {
     return api.get("/enrollments/my-enrollments");
   },
 
-  getProviderEnrollments: async () => {
-    return api.get("/enrollments/provider-enrollments");
+  getProviderEnrollments: async (page = 1, limit = 10, search = "") => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit), search });
+    return api.get(`/enrollments/provider-enrollments?${params.toString()}`);
   },
 
   // ─── Courses ─────────────────────────────────────────────────────────────
-  getMyCourses: async () => {
-    return api.get("/courses/my-courses");
+  getMyCourses: async (page = 1, limit = 10, search = "") => {
+    const params = new URLSearchParams({ page: String(page), limit: String(limit), search });
+    return api.get(`/courses/my-courses?${params.toString()}`);
   },
 
   createCourse: async (data: { name: string; description?: string; durationMonths?: number; sector?: string }) => {

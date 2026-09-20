@@ -11,7 +11,7 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
       </div>
 
       <h1
-        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2d3436] leading-tight tracking-tight mb-4 sm:mb-6"
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text leading-tight tracking-tight mb-4 sm:mb-6"
         style={{ textShadow: "0 1px 0 rgba(255,255,255,0.9)" }}
       >
         Set up your
@@ -21,7 +21,7 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
         profile.
       </h1>
 
-      <p className="text-base sm:text-lg text-[#4a5568] font-medium leading-relaxed max-w-xl">
+      <p className="text-base sm:text-lg text-text-muted font-medium leading-relaxed max-w-xl">
         Government admin accounts are provisioned internally by the platform administrators to ensure security and compliance.
       </p>
     </div>
@@ -54,17 +54,17 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
           <span className="indus-label text-[#22c55e]">Organization / Admin</span>
         </div>
 
-        <h2 className="text-3xl sm:text-4xl font-bold text-[#2d3436] mb-2">
+        <h2 className="text-3xl sm:text-4xl font-bold text-text mb-2">
           Government Admin Access
         </h2>
-        <p className="text-[#4a5568] text-base mb-8 font-medium">
+        <p className="text-text-muted text-base mb-8 font-medium">
           Set up your organization dashboard and governance controls.
         </p>
       </div>
 
       {/* Provisioning Notice */}
       <div className="animate-fade-in-up" style={{ animationDelay: "0.2s" }}>
-        <div className="p-8 rounded-xl bg-[#e0e5ec] shadow-[var(--shadow-recessed)] space-y-4">
+        <div className="p-8 rounded-xl bg-chassis shadow-(--shadow-recessed) space-y-4">
           {/* Shield icon */}
           <div className="flex items-center gap-3">
             <div className="p-3 rounded-lg bg-white shadow-sm border border-white/50">
@@ -73,15 +73,15 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
                 <path d="M9 12l2 2 4-4" />
               </svg>
             </div>
-            <p className="text-[#2d3436] font-bold text-xl">Secure Provisioning Required</p>
+            <p className="text-text font-bold text-xl">Secure Provisioning Required</p>
           </div>
 
-          <p className="text-[#2d3436] text-base leading-relaxed font-medium">
+          <p className="text-text text-base leading-relaxed font-medium">
             Government Admin accounts are <strong className="text-[#ff4757]">not self-registered</strong>. They are created and verified internally by platform administrators to maintain data integrity and prevent unauthorized access to sensitive skilling intelligence data.
           </p>
 
-          <div className="space-y-2 text-base text-[#4a5568] font-medium mt-4">
-            <p className="font-bold text-[#2d3436] indus-label">To request access:</p>
+          <div className="space-y-2 text-base text-text-muted font-medium mt-4">
+            <p className="font-bold text-text indus-label">To request access:</p>
             <ol className="list-decimal list-inside space-y-1 ml-1 text-sm">
               <li>Contact your departmental IT administrator</li>
               <li>Request onboarding to the SkillTrack platform</li>

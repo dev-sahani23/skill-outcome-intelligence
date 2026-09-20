@@ -20,7 +20,7 @@ const AuthLayout = ({
   const formWidthClass = formMaxWidth === "xl" ? "max-w-xl" : "max-w-md";
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row bg-[#e0e5ec] font-sans relative overflow-hidden">
+    <div className="min-h-screen flex flex-col lg:flex-row bg-chassis font-sans relative overflow-hidden">
 
       {/* ─── Left Panel: Chassis base with schematic grid ─── */}
       <motion.section
@@ -68,7 +68,7 @@ const AuthLayout = ({
 
         {/* Hero footer */}
         {heroFooter && (
-          <div className="relative z-10 mt-12 hidden lg:flex items-center gap-3 indus-label text-[#4a5568]">
+          <div className="relative z-10 mt-12 hidden lg:flex items-center gap-3 indus-label text-text-muted">
             {heroFooter}
           </div>
         )}
@@ -79,7 +79,7 @@ const AuthLayout = ({
         initial={{ opacity: 0, x: 50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, delay: 0.15, ease: [0.175, 0.885, 0.32, 1.275] }}
-        className="flex-1 flex flex-col justify-center items-center p-6 sm:p-8 lg:p-12 z-20 bg-[#e0e5ec]"
+        className="flex-1 flex flex-col justify-center items-center p-6 sm:p-8 lg:p-12 z-20 bg-chassis"
       >
         {/* Form card — raised neumorphic panel with corner screws */}
         <div

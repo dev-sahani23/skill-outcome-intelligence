@@ -58,7 +58,7 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
       </div>
 
       <h1
-        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-[#2d3436] leading-tight tracking-tight mb-4 sm:mb-6"
+        className="text-3xl sm:text-4xl lg:text-5xl font-bold text-text leading-tight tracking-tight mb-4 sm:mb-6"
         style={{ textShadow: "0 1px 0 rgba(255,255,255,0.9)" }}
       >
         Set up your
@@ -68,7 +68,7 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
         profile.
       </h1>
 
-      <p className="text-base sm:text-lg text-[#4a5568] font-medium leading-relaxed max-w-xl">
+      <p className="text-base sm:text-lg text-text-muted font-medium leading-relaxed max-w-xl">
         Fill in your details to create the right account and start using the
         platform for tracking outcomes and impact.
       </p>
@@ -80,7 +80,7 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
       <div className="animate-fade-in-up" style={{ animationDelay: "0.05s" }}>
         <button
           type="button"
-          className="flex items-center gap-1 text-[#4a5568] hover:text-[#ff4757] transition-colors indus-label mb-6"
+          className="flex items-center gap-1 text-text-muted hover:text-[#ff4757] transition-colors indus-label mb-6"
           onClick={onBack}
         >
           <ArrowLeft className="w-4 h-4" /> Back
@@ -88,10 +88,10 @@ const ProviderRegisterPage = ({ onBack }: RegistrationFormProps) => {
       </div>
 
       <div className="animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-        <h2 className="text-3xl sm:text-4xl font-bold text-[#2d3436] tracking-tight mb-2">
+        <h2 className="text-3xl sm:text-4xl font-bold text-text tracking-tight mb-2">
           Create provider account
         </h2>
-        <p className="text-[#4a5568] indus-label mb-6 sm:mb-8">
+        <p className="text-text-muted indus-label mb-6 sm:mb-8">
           Manage training programs and learner outcomes.
         </p>
       </div>
