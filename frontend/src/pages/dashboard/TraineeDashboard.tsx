@@ -87,7 +87,18 @@ export default function TraineeDashboard() {
   const [outcomeError, setOutcomeError] = useState("");
   const [employerResults, setEmployerResults] = useState<any[]>([]);
   const [showEmployerDropdown, setShowEmployerDropdown] = useState(false);
-  const [empFormData, setEmpFormData] = useState({ consent: false, designation: "", monthlyWage: "", aadhaarNo: "", UANNo: "", companyName: "", employerId: "", udhyamNo: "", napsNo: "" });
+  const [empFormData, setEmpFormData] = useState({
+    // Common
+    consent: false,
+    // Employed
+    companyName: "", employerId: "", designation: "", monthlyWage: "", aadhaarNo: "", UANNo: "",
+    workLocation: "", department: "", employmentNature: "", joiningDate: "",
+    // Self-Employed
+    businessType: "", numberOfEmployees: "", annualTurnover: "", gstNumber: "", businessAddress: "", yearOfEstablishment: "",
+    udhyamNo: "", companyPhone: "",
+    // Apprenticeship
+    apprenticeName: "", napsNo: "", employerName: "", sector: "", apprenticeshipDuration: "", monthlyStipend: "", startDate: "", trainingAddress: "",
+  });
   const [formData, setFormData] = useState({ trainingNumber: "", batchNumber: "", enrollmentNumber: "", provider: "", isCertified: false, certificateId: "", skills: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -153,11 +164,36 @@ export default function TraineeDashboard() {
         if (empFormData.monthlyWage) payload.monthlyWage = parseFloat(empFormData.monthlyWage);
         if (empFormData.aadhaarNo) payload.aadhaarNo = empFormData.aadhaarNo.replace(/\s/g, "");
         if (empFormData.UANNo) payload.uanNumber = empFormData.UANNo;
+        if (empFormData.workLocation) payload.workLocation = empFormData.workLocation;
+        if (empFormData.department) payload.department = empFormData.department;
+        if (empFormData.employmentNature) payload.employmentNature = empFormData.employmentNature;
+        if (empFormData.joiningDate) payload.joiningDate = empFormData.joiningDate;
       } else if (employmentStatus === "Self-Employed") {
         if (empFormData.companyName) payload.businessActivity = empFormData.companyName;
+        if (empFormData.businessType) payload.businessType = empFormData.businessType;
         if (empFormData.udhyamNo) payload.udyamRegistrationNo = empFormData.udhyamNo;
+        if (empFormData.companyPhone) payload.companyPhone = empFormData.companyPhone;
+        if (empFormData.gstNumber) payload.gstNumber = empFormData.gstNumber;
+        if (empFormData.numberOfEmployees) payload.numberOfEmployees = parseInt(empFormData.numberOfEmployees);
+        if (empFormData.annualTurnover) payload.annualTurnover = parseFloat(empFormData.annualTurnover);
+        if (empFormData.businessAddress) payload.businessAddress = empFormData.businessAddress;
+        if (empFormData.yearOfEstablishment) payload.yearOfEstablishment = empFormData.yearOfEstablishment;
       } else if (employmentStatus === "Apprenticeship") {
+        if (empFormData.apprenticeName) payload.apprenticeName = empFormData.apprenticeName;
+        const cleanAadhaar = empFormData.aadhaarNo.replace(/\s/g, "");
+        if (cleanAadhaar && cleanAadhaar.length !== 12) {
+          setOutcomeError("Aadhaar number must be exactly 12 digits.");
+          setIsSubmittingOutcome(false);
+          return;
+        }
+        if (cleanAadhaar) payload.aadhaarNo = cleanAadhaar;
         if (empFormData.napsNo) payload.napsNumber = empFormData.napsNo;
+        if (empFormData.employerName) payload.employerName = empFormData.employerName;
+        if (empFormData.sector) payload.sector = empFormData.sector;
+        if (empFormData.apprenticeshipDuration) payload.apprenticeshipDuration = empFormData.apprenticeshipDuration;
+        if (empFormData.monthlyStipend) payload.monthlyStipend = parseFloat(empFormData.monthlyStipend);
+        if (empFormData.startDate) payload.startDate = empFormData.startDate;
+        if (empFormData.trainingAddress) payload.trainingAddress = empFormData.trainingAddress;
       }
       const outcome = await auth.reportOutcome(payload);
       setLatestOutcome(outcome);
@@ -528,13 +564,97 @@ export default function TraineeDashboard() {
                     )}
                   </div>
                   <ModalInput label="Designation" value={empFormData.designation} onChange={(e) => setEmpFormData({ ...empFormData, designation: e.target.value })} required />
-                  <ModalInput label="Monthly Wage (INR)" type="number" value={empFormData.monthlyWage} onChange={(e) => setEmpFormData({ ...empFormData, monthlyWage: e.target.value })} required />
-                  <ModalInput label="Aadhaar Number (Optional)" placeholder="e.g. 1234 5678 9012" value={empFormData.aadhaarNo} onChange={(e) => setEmpFormData({ ...empFormData, aadhaarNo: e.target.value })} />
-                  <ModalInput label="UAN Number (Optional)" placeholder="e.g. 100000000000" value={empFormData.UANNo} onChange={(e) => setEmpFormData({ ...empFormData, UANNo: e.target.value })} />
+                  <ModalInput label="Monthly Wage (INR)" type="number" placeholder="e.g. 25000" value={empFormData.monthlyWage} onChange={(e) => setEmpFormData({ ...empFormData, monthlyWage: e.target.value })} required />
+                  <ModalInput label="Aadhaar Number" placeholder="e.g. 1234 5678 9012" value={empFormData.aadhaarNo} onChange={(e) => setEmpFormData({ ...empFormData, aadhaarNo: e.target.value })} required />
+                  <ModalInput label="UAN Number" placeholder="e.g. 100000000000" value={empFormData.UANNo} onChange={(e) => setEmpFormData({ ...empFormData, UANNo: e.target.value })} required />
+                  <ModalInput label="Department" placeholder="e.g. Production, IT, Sales" value={empFormData.department} onChange={(e) => setEmpFormData({ ...empFormData, department: e.target.value })} />
+                  <ModalInput label="Work Location / City" placeholder="e.g. Mumbai" value={empFormData.workLocation} onChange={(e) => setEmpFormData({ ...empFormData, workLocation: e.target.value })} />
+                  <div>
+                    <label className="block indus-label text-text mb-1.5">Nature of Employment</label>
+                    <select
+                      className="w-full rounded-lg px-4 py-3 text-sm font-medium text-text transition-all"
+                      style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)", border: "none", fontFamily: "'JetBrains Mono', monospace", outline: "none" }}
+                      value={empFormData.employmentNature}
+                      onChange={(e) => setEmpFormData({ ...empFormData, employmentNature: e.target.value })}
+                    >
+                      <option value="">Select type...</option>
+                      <option value="Permanent">Permanent</option>
+                      <option value="Contract">Contract</option>
+                      <option value="Part-time">Part-time</option>
+                      <option value="Probation">Probation</option>
+                    </select>
+                  </div>
+                  <ModalInput label="Joining Date" type="date" value={empFormData.joiningDate} onChange={(e) => setEmpFormData({ ...empFormData, joiningDate: e.target.value })} />
                 </>
               )}
               {employmentStatus === "Self-Employed" && (
-                <ModalInput label="Business Name" value={empFormData.companyName} onChange={(e) => setEmpFormData({ ...empFormData, companyName: e.target.value })} required />
+                <>
+                  <ModalInput label="Business Name" value={empFormData.companyName} onChange={(e) => setEmpFormData({ ...empFormData, companyName: e.target.value })} required />
+                  <div>
+                    <label className="block indus-label text-text mb-1.5">Business Type / Nature</label>
+                    <select
+                      className="w-full rounded-lg px-4 py-3 text-sm font-medium text-text transition-all"
+                      style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)", border: "none", fontFamily: "'JetBrains Mono', monospace", outline: "none" }}
+                      value={empFormData.businessType}
+                      onChange={(e) => setEmpFormData({ ...empFormData, businessType: e.target.value })}
+                    >
+                      <option value="">Select type...</option>
+                      <option value="Retail">Retail</option>
+                      <option value="Manufacturing">Manufacturing</option>
+                      <option value="Services">Services</option>
+                      <option value="Agriculture">Agriculture</option>
+                      <option value="Construction">Construction</option>
+                      <option value="Technology">Technology</option>
+                      <option value="Healthcare">Healthcare</option>
+                      <option value="Other">Other</option>
+                    </select>
+                  </div>
+                  <ModalInput label="Udhyam Registration No" placeholder="e.g. UDYAM-XX-00-0000000" value={empFormData.udhyamNo} onChange={(e) => setEmpFormData({ ...empFormData, udhyamNo: e.target.value })} />
+                  <ModalInput label="GST Number" placeholder="e.g. 22AAAAA0000A1Z5" value={empFormData.gstNumber} onChange={(e) => setEmpFormData({ ...empFormData, gstNumber: e.target.value })} />
+                  <ModalInput label="Company Phone No" type="tel" placeholder="e.g. 9876543210" value={empFormData.companyPhone} onChange={(e) => setEmpFormData({ ...empFormData, companyPhone: e.target.value })} />
+                  <ModalInput label="Number of Employees" type="number" placeholder="e.g. 5" value={empFormData.numberOfEmployees} onChange={(e) => setEmpFormData({ ...empFormData, numberOfEmployees: e.target.value })} />
+                  <ModalInput label="Annual Turnover (INR approx.)" type="number" placeholder="e.g. 500000" value={empFormData.annualTurnover} onChange={(e) => setEmpFormData({ ...empFormData, annualTurnover: e.target.value })} />
+                  <ModalInput label="Year of Establishment" type="number" placeholder="e.g. 2024" value={empFormData.yearOfEstablishment} onChange={(e) => setEmpFormData({ ...empFormData, yearOfEstablishment: e.target.value })} />
+                  <ModalInput label="Business Address" placeholder="City, State" value={empFormData.businessAddress} onChange={(e) => setEmpFormData({ ...empFormData, businessAddress: e.target.value })} />
+                </>
+              )}
+              {employmentStatus === "Apprenticeship" && (
+                <>
+                  <ModalInput label="Full Name" placeholder="As per Aadhaar" value={empFormData.apprenticeName} onChange={(e) => setEmpFormData({ ...empFormData, apprenticeName: e.target.value })} required />
+                  <ModalInput
+                    label="Aadhaar Number (12 digits)"
+                    placeholder="e.g. 1234 5678 9012"
+                    value={empFormData.aadhaarNo}
+                    onChange={(e) => {
+                      const val = e.target.value.replace(/[^\d\s]/g, "");
+                      setEmpFormData({ ...empFormData, aadhaarNo: val });
+                    }}
+                    maxLength={14}
+                    required
+                  />
+                  <ModalInput label="NAPS Number" placeholder="e.g. NAPS/2024/XXXXXX" value={empFormData.napsNo} onChange={(e) => setEmpFormData({ ...empFormData, napsNo: e.target.value })} required />
+                  <ModalInput label="Employer / Establishment Name" placeholder="e.g. Tata Steel Ltd." value={empFormData.employerName} onChange={(e) => setEmpFormData({ ...empFormData, employerName: e.target.value })} required />
+                  <ModalInput label="Sector / Trade" placeholder="e.g. Electronics, Hospitality" value={empFormData.sector} onChange={(e) => setEmpFormData({ ...empFormData, sector: e.target.value })} />
+                  <ModalInput label="Monthly Stipend (INR)" type="number" placeholder="e.g. 8000" value={empFormData.monthlyStipend} onChange={(e) => setEmpFormData({ ...empFormData, monthlyStipend: e.target.value })} />
+                  <div>
+                    <label className="block indus-label text-text mb-1.5">Apprenticeship Duration</label>
+                    <select
+                      className="w-full rounded-lg px-4 py-3 text-sm font-medium text-text transition-all"
+                      style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)", border: "none", fontFamily: "'JetBrains Mono', monospace", outline: "none" }}
+                      value={empFormData.apprenticeshipDuration}
+                      onChange={(e) => setEmpFormData({ ...empFormData, apprenticeshipDuration: e.target.value })}
+                    >
+                      <option value="">Select duration...</option>
+                      <option value="3 Months">3 Months</option>
+                      <option value="6 Months">6 Months</option>
+                      <option value="1 Year">1 Year</option>
+                      <option value="2 Years">2 Years</option>
+                      <option value="3 Years">3 Years</option>
+                    </select>
+                  </div>
+                  <ModalInput label="Apprenticeship Start Date" type="date" value={empFormData.startDate} onChange={(e) => setEmpFormData({ ...empFormData, startDate: e.target.value })} />
+                  <ModalInput label="Training Establishment Address" placeholder="City, State" value={empFormData.trainingAddress} onChange={(e) => setEmpFormData({ ...empFormData, trainingAddress: e.target.value })} />
+                </>
               )}
 
               <Button type="submit" disabled={isSubmittingOutcome} fullWidth>
