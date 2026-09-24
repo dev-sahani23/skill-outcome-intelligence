@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { requireAuth, requireRole } from "../../middleware/auth";
-import { postSkillGapReport, getStats, getSkillAssessments, updateAnomalyFlag, getAnomalyFlags, getTrainees } from "./admin.controller";
+import { postSkillGapReport, getStats, getSkillAssessments, updateAnomalyFlag, getAnomalyFlags, getTrainees, getLocationStats } from "./admin.controller";
 
 const router = Router();
 
@@ -12,6 +12,9 @@ router.get("/stats", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getStats);
 
 // Skill Assessments aggregate view
 router.get("/skill-assessments", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getSkillAssessments);
+
+// Location Stats
+router.get("/location-stats", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getLocationStats);
 
 // Trainees and Anomaly Flags
 router.get("/trainees", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getTrainees);

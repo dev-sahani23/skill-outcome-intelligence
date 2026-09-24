@@ -287,3 +287,55 @@ export const sendFollowUpNow = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 };
+
+export const getLocationStats = async (req: Request, res: Response) => {
+  try {
+    const totalTrainees = await prisma.traineeProfile.count();
+    
+    const locatedTrainees = await prisma.traineeLocation.groupBy({
+      by: ['traineeId'],
+      _count: { traineeId: true }
+    });
+    
+    const totalWithLocation = locatedTrainees.length;
+    const totalWithout = totalTrainees - totalWithLocation;
+    const coveragePercent = totalTrainees > 0 ? Math.round((totalWithLocation / totalTrainees) * 100) : 0;
+    
+    type DistrictStat = { districtName: string; count: bigint };
+    const byDistrictRaw = await prisma.$queryRaw<DistrictStat[]>`
+      SELECT tp.district as "districtName", COUNT(DISTINCT tl."traineeId") as count
+      FROM trainee_locations tl
+      JOIN trainee_profiles tp ON tl."traineeId" = tp.id
+      WHERE tp.district IS NOT NULL
+      GROUP BY tp.district
+    `;
+    
+    const byDistrict = byDistrictRaw.map((row: DistrictStat) => ({
+      districtName: row.districtName,
+      count: Number(row.count)
+    }));
+    
+    // Get actual coordinates for the map
+    const rawLocations = await prisma.traineeLocation.findMany({
+      select: {
+        latitude: true,
+        longitude: true,
+        trainee: { select: { district: true } }
+      },
+      distinct: ['traineeId'],
+      orderBy: { capturedAt: 'desc' }
+    });
+    
+    return res.status(200).json({
+      totalWithLocation,
+      totalWithout,
+      coveragePercent,
+      byDistrict,
+      rawLocations
+    });
+  } catch (error: any) {
+    console.error("Error fetching location stats:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+
