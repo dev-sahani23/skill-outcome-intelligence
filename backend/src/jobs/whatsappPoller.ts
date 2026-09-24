@@ -64,7 +64,13 @@ export async function startWhatsappPoller() {
         const normalizedSender = normalizePhoneNumber(senderPhone);
 
         const contact = await prisma.contact.findFirst({
-          where: { phone: normalizedSender },
+          where: { 
+            OR: [
+              { phone: normalizedSender },
+              { phone: normalizedSender.replace('+91', '') },
+              { phone: normalizedSender.replace('+', '') }
+            ]
+          },
           include: { trainee: true },
         });
 

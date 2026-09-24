@@ -9,9 +9,9 @@ export const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 //   openai/gpt-oss-120b  — highest quality, use for analysis & question generation
 //   openai/gpt-oss-20b   — faster/cheaper, use for classification & extraction
 //   qwen/qwen3.8-27b     — multilingual strength (Hindi/Marathi), use for follow-up parsing
-const PRIMARY_MODEL   = "openai/gpt-oss-120b";   // complex reasoning tasks
-const FAST_MODEL      = "openai/gpt-oss-20b";    // simple classification/extraction
-const MULTILANG_MODEL = "qwen/qwen3.8-27b";      // Hindi/Marathi follow-up parsing
+const PRIMARY_MODEL = "openai/gpt-oss-120b";   // complex reasoning tasks
+const FAST_MODEL = "openai/gpt-oss-20b";    // simple classification/extraction
+const MULTILANG_MODEL = "qwen/qwen3.8-27b";  // follow-up parsing
 
 const MAX_RETRIES = 3;
 const FALLBACK_BACKOFF_MS = 2000;

@@ -73,7 +73,13 @@ app.post('/webhook/whatsapp', async (req: any, res: any) => {
     const normalizedSender = normalizePhoneNumber(senderPhone);
 
     const contact = await prisma.contact.findFirst({
-      where: { phone: normalizedSender },
+      where: { 
+        OR: [
+          { phone: normalizedSender },
+          { phone: normalizedSender.replace('+91', '') },
+          { phone: normalizedSender.replace('+', '') }
+        ]
+      },
       include: { trainee: true }
     });
 
@@ -251,3 +257,4 @@ const startServer = async () => {
 };
 
 startServer();
+// Trigger restart

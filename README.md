@@ -26,9 +26,9 @@ A unified platform for tracking the complete skilling journey — from training 
 
 | Role | Capabilities |
 |---|---|
-| **Trainee** | Register, submit training records, report employment outcomes (Employed / Self-Employed / Apprenticeship / Unemployed), KYC via Aadhaar hash, UAN storage |
+| **Trainee** | Register, submit training records, report employment outcomes (Employed / Self-Employed / Apprenticeship / Unemployed), KYC via Aadhaar hash, UAN storage, **Opt-in Geolocation Tracking** |
 | **Training Provider** | Create and manage training programs, view enrolled trainees and completion rates |
-| **Government Admin** | View district-wise placement analytics, real-time stats (total enrolled, placement rate, avg wage) |
+| **Government Admin** | View district-wise placement analytics, real-time stats (total enrolled, placement rate, avg wage), **Historical Enrollment Trends** |
 
 ---
 
@@ -76,8 +76,9 @@ Initialize the database and seed demo data:
 ```bash
 npx prisma generate
 npx prisma db push
-npx prisma db seed
+npm run seed:all
 ```
+*(Note: `seed:all` sequentially seeds districts, demo users, historical data, and links providers. The raw historical dataset CSV and Prisma migrations are intentionally untracked in git to keep the repository light. `npx prisma db push` is sufficient for local development.)*
 
 Start the backend dev server:
 ```bash
@@ -154,6 +155,8 @@ The seed script creates the following test accounts (all with password `password
 | Method | Path | Role | Description |
 |---|---|---|---|
 | `GET` | `/stats` | Gov Admin | Aggregate stats (total enrolled, placement rate, avg wage, district-wise placements) |
+| `GET` | `/location-stats` | Gov Admin | Opt-in location stats and coordinates for trainees |
+| `GET` | `/historical-data` | Gov Admin | Historical enrollment and assessment records by district and year |
 | `POST` | `/skill-gap` | Gov Admin | Create a skill gap report |
 
 ---
