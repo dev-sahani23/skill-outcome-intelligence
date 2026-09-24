@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { requireAuth, requireRole } from "../../middleware/auth";
 import { verifyKyc, createContact, getContacts, updateContact, selfAttestContact } from "./trainee.controller";
-import { updateLocation } from "./trainee.location";
+import { updateLocation, deleteLocation } from "./trainee.location";
 import { startAssessment, submitAssessment, getAssessment } from "./skillAssessment.controller";
 import { createTrainingRecord, getTrainingRecords } from "./trainingRecord.controller";
 import { validateRequest } from "../../middleware/validate";
@@ -35,7 +35,8 @@ router.get("/contacts", requireAuth, requireRole(["TRAINEE"]), getContacts);
 router.patch("/contacts/:id", requireAuth, requireRole(["TRAINEE"]), validateRequest(updateContactSchema), updateContact);
 router.post("/contacts/:id/self-attest", requireAuth, requireRole(["TRAINEE"]), selfAttestContact);
 
-router.post("/location", requireAuth, requireRole(["TRAINEE"]), updateLocation);
+router.patch("/location", requireAuth, requireRole(["TRAINEE"]), updateLocation);
+router.delete("/location", requireAuth, requireRole(["TRAINEE"]), deleteLocation);
 
 // Skill Assessment routes
 router.post(

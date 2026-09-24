@@ -239,6 +239,7 @@ model TraineeProfile {
   consentRecords ConsentRecord[] // NEW — full consent history
   attritionRecords AttritionRecord[] // NEW
   skillAssessments SkillAssessment[] // NEW
+  locationRecords TraineeLocation[] // NEW
 
   @@map("trainee_profiles")
 }
@@ -660,3 +661,21 @@ model SkillAssessment {
 
   @@map("skill_assessments")
 }
+
+// =============================================================================
+// LOCATION TRACKING
+// =============================================================================
+
+model TraineeLocation {
+  id          String   @id @default(uuid())
+  traineeId   String
+  trainee     TraineeProfile @relation(fields: [traineeId], references: [id], onDelete: Cascade)
+  latitude    Float
+  longitude   Float
+  accuracy    Float?
+  capturedAt  DateTime
+  createdAt   DateTime @default(now())
+
+  @@map("trainee_locations")
+}
+

@@ -1,73 +1,119 @@
 import { Request, Response } from "express";
 import { prisma } from "../../lib/prisma";
+import { z } from "zod";
+
+const MAHARASHTRA_DISTRICTS = [
+  { name: "Pune", minLat: 17.9, maxLat: 18.9, minLng: 73.4, maxLng: 74.5 },
+  { name: "Mumbai", minLat: 18.8, maxLat: 19.3, minLng: 72.7, maxLng: 73.1 },
+  { name: "Nagpur", minLat: 20.9, maxLat: 21.4, minLng: 78.8, maxLng: 79.3 },
+  { name: "Aurangabad", minLat: 19.6, maxLat: 20.1, minLng: 75.1, maxLng: 75.6 },
+  { name: "Nashik", minLat: 19.8, maxLat: 20.3, minLng: 73.6, maxLng: 74.1 },
+  { name: "Thane", minLat: 19.1, maxLat: 19.4, minLng: 72.9, maxLng: 73.3 },
+];
+
+const findDistrict = (lat: number, lng: number): string | null => {
+  const match = MAHARASHTRA_DISTRICTS.find(d =>
+    lat >= d.minLat && lat <= d.maxLat &&
+    lng >= d.minLng && lng <= d.maxLng
+  );
+  return match?.name ?? null;
+};
+
+const locationSchema = z.object({
+  latitude: z.number().min(-90).max(90),
+  longitude: z.number().min(-180).max(180),
+  accuracy: z.number().nonnegative().optional(),
+  capturedAt: z.string().datetime().optional()
+});
 
 export const updateLocation = async (req: Request, res: Response) => {
   try {
     const traineeProfile = await prisma.traineeProfile.findUnique({ where: { userId: req.user?.id } });
     if (!traineeProfile) return res.status(404).json({ error: "Profile not found" });
 
-    const { latitude, longitude, accuracy } = req.body;
-
-    if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-      return res.status(400).json({ error: "Invalid coordinates provided" });
+    const parsed = locationSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: "Invalid coordinates provided", details: parsed.error.issues });
     }
 
-    // Reverse geocode to find state and district
-    // We use Nominatim OpenStreetMap API for free reverse geocoding
-    const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`, {
-      headers: {
-        'User-Agent': 'SkillOutcomeIntelligenceApp/1.0'
+    const { latitude, longitude, accuracy, capturedAt } = parsed.data;
+
+    // 1. Store raw coordinates in separate table
+    await prisma.traineeLocation.create({
+      data: {
+        traineeId: traineeProfile.id,
+        latitude,
+        longitude,
+        accuracy,
+        capturedAt: capturedAt ? new Date(capturedAt) : new Date(),
       }
     });
 
-    if (!response.ok) {
-      console.warn("Reverse geocoding failed", response.status);
-      return res.status(502).json({ error: "Failed to resolve location" });
-    }
+    // 2. Reverse geocode to find district
+    const districtName = findDistrict(latitude, longitude);
+    let districtUpdated = false;
 
-    const data = await response.json();
-    const address = data.address || {};
-    
-    // Fallbacks for district/state mapping from OSM
-    const districtName = address.state_district || address.county || address.city || "Unknown";
-    const stateName = address.state || "Unknown";
-
-    // 1. We look up or create the District in our database to normalize it.
-    // In a real production app, we might fuzzy match against a known list of districts.
-    // For this implementation, we upsert to keep it simple and preserve referential integrity.
-    let district = await prisma.district.findFirst({
-      where: {
-        name: { equals: districtName, mode: 'insensitive' },
-        state: { equals: stateName, mode: 'insensitive' }
+    if (districtName) {
+      let district = await prisma.district.findFirst({
+        where: { name: districtName }
+      });
+      
+      if (!district) {
+        district = await prisma.district.create({
+          data: { name: districtName, state: "Maharashtra" }
+        });
       }
-    });
 
-    if (!district) {
-      district = await prisma.district.create({
+      await prisma.traineeProfile.update({
+        where: { id: traineeProfile.id },
+        data: { districtId: district.id, district: districtName }
+      });
+      
+      // Log audit
+      await prisma.auditLog.create({
         data: {
-          name: districtName,
-          state: stateName
+          actorUserId: req.user?.id,
+          action: "location_updated",
+          entityType: "TraineeProfile",
+          entityId: traineeProfile.id
         }
       });
+      
+      districtUpdated = true;
     }
 
-    // Update the trainee profile with the district reference.
-    // We intentionally DO NOT store precise lat/long to respect data minimization principles.
-    await prisma.traineeProfile.update({
-      where: { id: traineeProfile.id },
-      data: {
-        districtId: district.id,
-        district: districtName // Fallback for backward compatibility in schema
-      }
-    });
-
     return res.status(200).json({
-      message: "Location successfully recorded",
-      location: { district: districtName, state: stateName }
+      districtDetected: districtName,
+      districtUpdated,
+      message: "Location successfully recorded"
     });
-
   } catch (error: any) {
     console.error("Error in updateLocation:", error.message);
     return res.status(500).json({ error: "Internal server error updating location" });
+  }
+};
+
+export const deleteLocation = async (req: Request, res: Response) => {
+  try {
+    const traineeProfile = await prisma.traineeProfile.findUnique({ where: { userId: req.user?.id } });
+    if (!traineeProfile) return res.status(404).json({ error: "Profile not found" });
+
+    await prisma.traineeLocation.deleteMany({
+      where: { traineeId: traineeProfile.id }
+    });
+
+    await prisma.auditLog.create({
+      data: {
+        actorUserId: req.user?.id,
+        action: "location_deleted",
+        entityType: "TraineeProfile",
+        entityId: traineeProfile.id
+      }
+    });
+
+    return res.status(200).json({ message: "Location data deleted" });
+  } catch (error: any) {
+    console.error("Error in deleteLocation:", error.message);
+    return res.status(500).json({ error: "Internal server error deleting location" });
   }
 };
