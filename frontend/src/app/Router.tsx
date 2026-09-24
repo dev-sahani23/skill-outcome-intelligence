@@ -7,6 +7,7 @@ import TraineeDashboard from "../pages/dashboard/TraineeDashboard.tsx";
 import SkillVerification from "../pages/trainee/SkillVerification.tsx";
 import OutcomePassport from "../pages/trainee/OutcomePassport.tsx";
 import Contacts from "../pages/trainee/Contacts.tsx";
+import PrivacySettings from "../pages/trainee/PrivacySettings.tsx";
 import TraineesList from "../pages/dashboard/TraineesList.tsx";
 import SkillGaps from "../pages/dashboard/SkillGaps.tsx";
 import CoursesList from "../pages/dashboard/CoursesList.tsx";
@@ -46,6 +47,7 @@ const AnimatedRoutes = () => {
         <Route path="/trainee/skill-verification" element={<PageWrapper><SkillVerification /></PageWrapper>} />
         <Route path="/trainee/outcome-passport" element={<PageWrapper><OutcomePassport /></PageWrapper>} />
         <Route path="/trainee/contacts" element={<PageWrapper><Contacts /></PageWrapper>} />
+        <Route path="/trainee/privacy" element={<PageWrapper><PrivacySettings /></PageWrapper>} />
         <Route path="/reports" element={<PageWrapper><ReportGenerator /></PageWrapper>} />
         <Route path="/verify/:hash" element={<PageWrapper><PublicVerify /></PageWrapper>} />
       </Routes>
