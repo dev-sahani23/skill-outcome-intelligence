@@ -197,6 +197,7 @@ model District {
   employers                Employer[]
   outcomes                 EmploymentOutcome[]
   skillGapReports          SkillGapReport[]
+  historicalData           DistrictHistoricalData[] // NEW
 
   @@unique([name, state])
   @@map("districts")
@@ -677,5 +678,18 @@ model TraineeLocation {
   createdAt   DateTime @default(now())
 
   @@map("trainee_locations")
+}
+
+// NEW — Historical Enrollment and Assessment Data
+model DistrictHistoricalData {
+  id            String   @id @default(uuid())
+  districtRef   District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  districtId    String
+  financialYear String   // e.g. "2018-19"
+  enrolled      Int      @default(0)
+  assessed      Int      @default(0)
+  
+  @@unique([districtId, financialYear])
+  @@map("district_historical_data")
 }
 

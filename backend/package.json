@@ -10,7 +10,12 @@
     "test:otp": "tsx testOtpFlow.ts",
     "seed:demo": "tsx prisma/seed-demo.ts",
     "seed:reset": "tsx prisma/seed-demo.ts --reset",
-    "seed:districts": "tsx prisma/seed-districts.ts"
+    "seed:districts": "tsx prisma/seed-districts.ts",
+    "seed:historical": "tsx prisma/seedHistorical.ts",
+    "seed:full": "tsx prisma/seed-full.ts",
+    "seed:employers": "tsx prisma/reconcile-employers.ts",
+    "seed:provider-link": "tsx prisma/link-to-default-provider.ts",
+    "seed:all": "npm run seed:districts && npm run seed:demo && npm run seed:historical && npm run seed:full && npm run seed:employers && npm run seed:provider-link"
   },
   "keywords": [],
   "author": "",
