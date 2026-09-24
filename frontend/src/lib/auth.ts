@@ -16,6 +16,10 @@ export const auth = {
     const response = await api.post("/auth/register", data);
     if (response.accessToken) {
       setAuthToken(response.accessToken);
+      import("../utils/cookies").then(({ deleteCookie }) => {
+        deleteCookie("location_consent");
+        deleteCookie("location_data");
+      });
     }
     return response;
   },
@@ -23,6 +27,10 @@ export const auth = {
   logout: async () => {
     await api.post("/auth/logout");
     removeAuthToken();
+    import("../utils/cookies").then(({ deleteCookie }) => {
+      deleteCookie("location_consent");
+      deleteCookie("location_data");
+    });
   },
 
   getMe: async () => {
@@ -88,5 +96,9 @@ export const auth = {
   // ─── Admin ───────────────────────────────────────────────────────────────
   getAdminStats: async () => {
     return api.get("/admin/stats");
+  },
+
+  getAdminLocationStats: async () => {
+    return api.get("/admin/location-stats");
   },
 };
