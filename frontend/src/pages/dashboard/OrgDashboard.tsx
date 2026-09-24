@@ -3,7 +3,7 @@ import { motion, type Variants } from "framer-motion";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from "recharts";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import { useEffect, useState } from "react";
-import { Users, TrendingUp, Wallet, BarChart2 } from "lucide-react";
+import { Users, TrendingUp, Wallet, BarChart2, MapPin } from "lucide-react";
 import { auth } from "../../lib/auth";
 import { formatINR } from "../../utils/formatters";
 
@@ -36,13 +36,20 @@ export default function OrgDashboard() {
     totalEnrolled: number;
     placementRate: number;
     avgWage: number;
-    districtPlacements: { name: string; Placed: number }[];
+    districtPlacements?: { name: string; Placed: number }[];
   } | null>(null);
+  const [locationStats, setLocationStats] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    auth.getAdminStats()
-      .then((data: any) => setStats(data))
+    Promise.all([
+      auth.getAdminStats(),
+      auth.getAdminLocationStats().catch(() => null) // fail gracefully if not deployed yet
+    ])
+      .then(([statsData, locData]) => {
+        setStats(statsData);
+        if (locData) setLocationStats(locData);
+      })
       .catch(console.error)
       .finally(() => setIsLoading(false));
   }, []);
@@ -137,6 +144,29 @@ export default function OrgDashboard() {
         ))}
       </motion.div>
 
+      {/* ─── Location Coverage Card ─── */}
+      <motion.div variants={containerVariants} initial="hidden" animate="show">
+        <Card variants={itemVariants} showScrews showVents className="bg-[#2d3436] text-white">
+          <CardContent className="pt-6">
+            <div className="flex items-center gap-4 mb-2">
+              <div className="p-3 rounded-full bg-blue-500/20 text-blue-400">
+                <MapPin className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold">Location Coverage</h3>
+                <p className="text-[#a8b2d1]">
+                  {locationStats ? `${locationStats.totalWithLocation} / ${locationStats.totalWithLocation + locationStats.totalWithout} trainees (${locationStats.coveragePercent}%) have shared location` : "Loading..."}
+                </p>
+              </div>
+            </div>
+            {locationStats && (
+              <div className="w-full bg-gray-700 rounded-full h-2.5 mt-4">
+                <div className="bg-blue-500 h-2.5 rounded-full transition-all" style={{ width: `${locationStats.coveragePercent}%` }}></div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* ─── Charts Row ─── */}
       <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
@@ -172,8 +202,18 @@ export default function OrgDashboard() {
           <CardContent className="h-80 relative overflow-hidden pt-6">
             <MapContainer center={[19.7515, 75.7139]} zoom={6} scrollWheelZoom={false} className="h-full w-full z-0 rounded-xl">
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
-              <Marker position={[18.5204, 73.8567]}><Popup>Pune: High placement rate</Popup></Marker>
-              <Marker position={[19.0760, 72.8777]}><Popup>Mumbai: Top outcomes</Popup></Marker>
+              {locationStats?.rawLocations ? (
+                locationStats.rawLocations.map((loc: any, i: number) => (
+                  <Marker key={i} position={[loc.latitude, loc.longitude]}>
+                    <Popup>Trainee from {loc.trainee?.district || "Unknown"}</Popup>
+                  </Marker>
+                ))
+              ) : (
+                <>
+                  <Marker position={[18.5204, 73.8567]}><Popup>Pune: High placement rate</Popup></Marker>
+                  <Marker position={[19.0760, 72.8777]}><Popup>Mumbai: Top outcomes</Popup></Marker>
+                </>
+              )}
             </MapContainer>
           </CardContent>
         </Card>

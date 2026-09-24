@@ -7,6 +7,9 @@ import { Briefcase, TrendingUp, User, Award, MapPin, X, CheckCircle, Calendar, F
 import { useNavigate } from "react-router-dom";
 import AddTrainingRecordModal from "../../components/trainee/AddTrainingRecordModal";
 import { formatINR, formatDate, formatFollowUpStage } from "../../utils/formatters";
+import { useLocation } from "../../hooks/useLocation";
+import { LocationConsent } from "../../components/location/LocationConsent";
+import { api } from "../../lib/api";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -101,6 +104,20 @@ export default function TraineeDashboard() {
   });
   const [formData, setFormData] = useState({ trainingNumber: "", batchNumber: "", enrollmentNumber: "", provider: "", isCertified: false, certificateId: "", skills: "" });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const [dismissedThisSession, setDismissedThisSession] = useState(false);
+  const { isPending } = useLocation();
+  const shouldShowBanner = isPending && !dismissedThisSession;
+  
+  const handleLocationGranted = async (data: any) => {
+    try {
+      await api.patch("/trainees/location", data);
+      setDismissedThisSession(true);
+    } catch (err) {
+      console.error("Failed to send location to backend:", err);
+    }
+  };
+
 
   useEffect(() => {
     if (empFormData.companyName && empFormData.companyName.length > 2 && !empFormData.employerId) {
@@ -249,6 +266,12 @@ export default function TraineeDashboard() {
 
   return (
     <>
+      {shouldShowBanner && (
+        <LocationConsent
+          onGranted={handleLocationGranted}
+          onNotNow={() => setDismissedThisSession(true)}
+        />
+      )}
       <div className="min-h-screen bg-chassis p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
 
         {/* ─── Header: Dark charcoal strip ─── */}
