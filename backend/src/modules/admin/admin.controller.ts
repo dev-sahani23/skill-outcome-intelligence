@@ -339,3 +339,27 @@ export const getLocationStats = async (req: Request, res: Response) => {
   }
 };
 
+export const getHistoricalData = async (req: Request, res: Response) => {
+  try {
+    const historicalData = await prisma.districtHistoricalData.findMany({
+      include: {
+        districtRef: {
+          select: {
+            name: true,
+            state: true
+          }
+        }
+      },
+      orderBy: [
+        { financialYear: 'asc' },
+        { districtRef: { state: 'asc' } },
+        { districtRef: { name: 'asc' } }
+      ]
+    });
+    return res.status(200).json({ historicalData });
+  } catch (error: any) {
+    console.error("Error fetching historical data:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+

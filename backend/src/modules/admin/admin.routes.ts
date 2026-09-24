@@ -19,6 +19,9 @@ router.get("/location-stats", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), ge
 // Trainees and Anomaly Flags
 router.get("/trainees", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getTrainees);
 router.get("/anomaly-flags", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), getAnomalyFlags);
+router.get("/historical-data", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), (req, res) => {
+  import("./admin.controller").then(c => c.getHistoricalData(req, res));
+});
 
 // Update Anomaly Flag
 router.patch("/anomaly-flags/:id", requireAuth, requireRole(["GOVERNMENT_ADMIN"]), updateAnomalyFlag);
