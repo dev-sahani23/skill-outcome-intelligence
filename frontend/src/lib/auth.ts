@@ -101,4 +101,8 @@ export const auth = {
   getAdminLocationStats: async () => {
     return api.get("/admin/location-stats");
   },
+
+  getAdminHistoricalData: async () => {
+    return api.get("/admin/historical-data");
+  },
 };

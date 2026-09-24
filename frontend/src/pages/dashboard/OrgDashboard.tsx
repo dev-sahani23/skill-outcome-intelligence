@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion, type Variants } from "framer-motion";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend, LineChart, Line, CartesianGrid } from "recharts";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Users, TrendingUp, Wallet, BarChart2, MapPin } from "lucide-react";
 import { auth } from "../../lib/auth";
 import { formatINR } from "../../utils/formatters";
@@ -39,16 +39,19 @@ export default function OrgDashboard() {
     districtPlacements?: { name: string; Placed: number }[];
   } | null>(null);
   const [locationStats, setLocationStats] = useState<any>(null);
+  const [historicalDataRaw, setHistoricalDataRaw] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     Promise.all([
       auth.getAdminStats(),
-      auth.getAdminLocationStats().catch(() => null) // fail gracefully if not deployed yet
+      auth.getAdminLocationStats().catch(() => null), // fail gracefully if not deployed yet
+      auth.getAdminHistoricalData().catch(() => ({ historicalData: [] }))
     ])
-      .then(([statsData, locData]) => {
+      .then(([statsData, locData, histData]) => {
         setStats(statsData);
         if (locData) setLocationStats(locData);
+        if (histData && histData.historicalData) setHistoricalDataRaw(histData.historicalData);
       })
       .catch(console.error)
       .finally(() => setIsLoading(false));
@@ -62,6 +65,24 @@ export default function OrgDashboard() {
     { label: "Avg Monthly Wage",value: isLoading ? "—" : (stats?.avgWage ? formatINR(stats.avgWage) : "N/A"), accentColor: "#f59e0b", icon: <Wallet className="w-5 h-5" /> },
     { label: "Skill Gap Index", value: "42.5",                                                              accentColor: "#3b82f6", icon: <BarChart2 className="w-5 h-5" /> },
   ];
+
+  // Aggregate historical data by year
+  const aggregatedHistoricalData = useMemo(() => {
+    if (!historicalDataRaw.length) return [];
+    
+    const byYear: Record<string, { enrolled: number; assessed: number }> = {};
+    historicalDataRaw.forEach((row) => {
+      if (!byYear[row.financialYear]) {
+        byYear[row.financialYear] = { enrolled: 0, assessed: 0 };
+      }
+      byYear[row.financialYear].enrolled += row.enrolled;
+      byYear[row.financialYear].assessed += row.assessed;
+    });
+
+    return Object.entries(byYear)
+      .map(([year, data]) => ({ financialYear: year, ...data }))
+      .sort((a, b) => a.financialYear.localeCompare(b.financialYear));
+  }, [historicalDataRaw]);
 
   return (
     <div className="min-h-screen bg-chassis p-6 md:p-8 space-y-8">
@@ -146,15 +167,15 @@ export default function OrgDashboard() {
 
       {/* ─── Location Coverage Card ─── */}
       <motion.div variants={containerVariants} initial="hidden" animate="show">
-        <Card variants={itemVariants} showScrews showVents className="bg-[#2d3436] text-white">
+        <Card variants={itemVariants} showScrews showVents>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4 mb-2">
-              <div className="p-3 rounded-full bg-blue-500/20 text-blue-400">
+              <div className="p-3 rounded-full bg-blue-500/20 text-blue-600">
                 <MapPin className="w-6 h-6" />
               </div>
               <div>
-                <h3 className="text-xl font-bold">Location Coverage</h3>
-                <p className="text-[#a8b2d1]">
+                <h3 className="text-xl font-bold text-text">Location Coverage</h3>
+                <p className="text-text-muted font-medium mt-1">
                   {locationStats ? `${locationStats.totalWithLocation} / ${locationStats.totalWithLocation + locationStats.totalWithout} trainees (${locationStats.coveragePercent}%) have shared location` : "Loading..."}
                 </p>
               </div>
@@ -219,8 +240,37 @@ export default function OrgDashboard() {
         </Card>
       </motion.div>
 
-      {/* ─── Radar Chart ─── */}
+      {/* ─── Historical Trends & Radar Chart Row ─── */}
       <motion.div variants={containerVariants} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="grid gap-6 md:grid-cols-2">
+        
+        {/* Historical Data Line Chart */}
+        <Card variants={itemVariants} showScrews showVents>
+          <CardHeader className="border-b border-shadow-dark pb-4">
+            <CardTitle className="text-base font-bold uppercase text-text">Historical Enrollment Trends</CardTitle>
+          </CardHeader>
+          <CardContent className="h-80 pt-6">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-full font-bold text-text-muted">Loading chart...</div>
+            ) : aggregatedHistoricalData.length === 0 ? (
+              <div className="flex items-center justify-center h-full font-bold text-text-muted">No historical data found</div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={aggregatedHistoricalData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#babecc" vertical={false} />
+                  <XAxis dataKey="financialYear" stroke="#4a5568" tick={{ fill: '#4a5568', fontWeight: 700, fontSize: 11, fontFamily: "'JetBrains Mono', monospace" }} />
+                  <YAxis stroke="#4a5568" tick={{ fill: '#4a5568', fontWeight: 700, fontSize: 11 }} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: "#2d3436", border: "none", borderRadius: "8px", color: "#e0e5ec", fontWeight: 'bold', fontFamily: "'JetBrains Mono', monospace" }}
+                  />
+                  <Legend wrapperStyle={{ paddingTop: "10px", fontWeight: 700, fontFamily: "'JetBrains Mono', monospace", fontSize: 11 }} />
+                  <Line type="monotone" dataKey="enrolled" stroke="#3b82f6" strokeWidth={3} activeDot={{ r: 8 }} name="Enrolled" />
+                  <Line type="monotone" dataKey="assessed" stroke="#22c55e" strokeWidth={3} name="Assessed" />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
+          </CardContent>
+        </Card>
+
         <Card variants={itemVariants} showScrews>
           <CardHeader className="border-b border-shadow-dark pb-4">
             <CardTitle className="text-base font-bold uppercase text-text">Skill Demand vs Supply Gap</CardTitle>
