@@ -99,8 +99,8 @@ const DEMO_ACCOUNTS = [
 const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [rememberMe, setRememberMe] = useState<boolean>(false);
-  const [email, setEmail] = useState<string>("admin@maharashtra.gov.in");
-  const [password, setPassword] = useState<string>("password123");
+  const [email, setEmail] = useState<string>("admin@skillportal.gov.in");
+  const [password, setPassword] = useState<string>("Demo@1234");
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -514,7 +514,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
               className="indus-label text-text-muted px-2.5 py-1 rounded-lg"
               style={{ background: "#d1d9e6", boxShadow: "var(--shadow-recessed)" }}
             >
-              pwd: password123
+              pwd: Demo@1234
             </span>
           </div>
 
