@@ -135,7 +135,7 @@ export default function SkillGaps() {
                   <div className="flex justify-between items-start gap-2">
                     <div>
                       <CardTitle className="text-sm font-bold text-text">
-                        {flag.anomalyType.replace(/_/g, " ")}
+                        {flag.flagType.replace(/_/g, " ")}
                       </CardTitle>
                       <p className="indus-label text-text-muted mt-1">
                         Provider: {flag.provider?.instituteName || flag.provider?.user?.email}
