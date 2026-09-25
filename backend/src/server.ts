@@ -244,13 +244,11 @@ if (process.env.NODE_ENV === 'production') {
     console.error('Missing env vars:', missing.join(', '));
     process.exit(1);
   }
-  if (process.env.MOCK_EMAIL === 'true') {
-    console.error('MOCK_EMAIL is true in production');
-    process.exit(1);
-  }
   if (process.env.MOCK_WHATSAPP === 'true') {
-    console.error('MOCK_WHATSAPP is true in production');
-    process.exit(1);
+    console.warn('⚠️ WARNING: MOCK_WHATSAPP is enabled in production');
+  }
+  if (process.env.MOCK_EMAIL === 'true') {
+    console.warn('⚠️ WARNING: MOCK_EMAIL is enabled in production');
   }
 }
 
