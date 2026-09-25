@@ -141,13 +141,11 @@ export const getProviderEnrollments = async (req: Request, res: Response, next: 
         };
 
         const [totalCount, enrollments] = await Promise.all([
-            prisma.enrollment.groupBy({
-                by: ['traineeId'],
+            prisma.enrollment.count({
                 where: whereClause
-            }).then(groups => groups.length),
+            }),
             prisma.enrollment.findMany({
                 where: whereClause,
-                distinct: ['traineeId'],
                 skip,
                 take: limit,
                 include: {
