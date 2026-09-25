@@ -8,13 +8,12 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
+      "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
   build: {
     outDir: 'dist',
     sourcemap: false,
-    minify: 'terser',
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
