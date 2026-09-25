@@ -19,24 +19,19 @@ export default function PublicVerify() {
       return;
     }
 
-    fetch(`/api/public/verify/${hash}`)
-      .then(async (res) => {
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.error || "Verification failed");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setResult(data);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError(err.message || "Invalid or tampered certificate hash.");
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    import("../../lib/api").then(({ api }) => {
+      api.get(`/public/verify/${hash}`)
+        .then((data) => {
+          setResult(data);
+        })
+        .catch((err) => {
+          console.error(err);
+          setError(err.message || "Invalid or tampered certificate hash.");
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    });
   }, [hash]);
 
   const PageWrapper = ({ children }: { children: React.ReactNode }) => (
