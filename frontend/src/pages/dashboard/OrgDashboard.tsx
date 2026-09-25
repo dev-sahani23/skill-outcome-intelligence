@@ -6,7 +6,17 @@ import { useEffect, useState, useMemo } from "react";
 import { Users, TrendingUp, Wallet, BarChart2, MapPin } from "lucide-react";
 import { auth } from "../../lib/auth";
 import { formatINR } from "../../utils/formatters";
+import L from "leaflet";
 
+const defaultIcon = new L.Icon({
+  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png",
+  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png",
+  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+});
 const FALLBACK_PLACEMENT_DATA = [
   { name: "Pune", Placed: 0 },
   { name: "Mumbai", Placed: 0 },
@@ -225,14 +235,14 @@ export default function OrgDashboard() {
               <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" attribution='&copy; OpenStreetMap contributors' />
               {locationStats?.rawLocations ? (
                 locationStats.rawLocations.map((loc: any, i: number) => (
-                  <Marker key={i} position={[loc.latitude, loc.longitude]}>
+                  <Marker key={i} position={[loc.latitude, loc.longitude]} icon={defaultIcon}>
                     <Popup>Trainee from {loc.trainee?.district || "Unknown"}</Popup>
                   </Marker>
                 ))
               ) : (
                 <>
-                  <Marker position={[18.5204, 73.8567]}><Popup>Pune: High placement rate</Popup></Marker>
-                  <Marker position={[19.0760, 72.8777]}><Popup>Mumbai: Top outcomes</Popup></Marker>
+                  <Marker position={[18.5204, 73.8567]} icon={defaultIcon}><Popup>Pune: High placement rate</Popup></Marker>
+                  <Marker position={[19.0760, 72.8777]} icon={defaultIcon}><Popup>Mumbai: Top outcomes</Popup></Marker>
                 </>
               )}
             </MapContainer>
