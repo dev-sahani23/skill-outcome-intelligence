@@ -6,7 +6,6 @@ import { prisma } from '../src/lib/prisma';
 import { hashPassword } from '../src/utils/password';
 import { v4 as uuidv4 } from 'uuid';
 
-
 const isResetOnly = process.argv.includes('--reset');
 
 async function cleanDemoData() {
@@ -40,22 +39,26 @@ async function main() {
 
   const defaultPassword = await hashPassword("Demo@1234");
 
-  // --- 1. ADMIN ---
-  const admin = await prisma.user.upsert({
-    where: { email: "admin@skillportal.gov.in" },
-    update: {},
-    create: {
-      email: "admin@skillportal.gov.in",
-      passwordHash: defaultPassword,
-      role: Role.GOVERNMENT_ADMIN,
-      adminProfile: {
-        create: {
-          fullName: "Govt Admin (Demo)",
-          department: "Skills Department",
+  // --- 1. ADMINS ---
+  const admins = [];
+  for (let i = 1; i <= 10; i++) {
+    const admin = await prisma.user.upsert({
+      where: { email: `admin${i}@skillportal.com` },
+      update: {},
+      create: {
+        email: `admin${i}@skillportal.com`,
+        passwordHash: defaultPassword,
+        role: Role.GOVERNMENT_ADMIN,
+        adminProfile: {
+          create: {
+            fullName: `Admin Demo ${i}`,
+            department: "Skills Department",
+          }
         }
       }
-    }
-  });
+    });
+    admins.push(admin);
+  }
 
   // --- 2. DISTRICTS ---
   const upsertDistrict = async (name: string) => 
@@ -74,167 +77,74 @@ async function main() {
   const demoDistricts = [pune, nagpur, aurangabad, mumbai, nashik, thane];
 
   // --- 3. PROVIDERS & COURSES ---
-  const providerA = await prisma.user.upsert({
-    where: { email: "providera@skillcorp.in" },
-    update: {},
-    create: {
-      email: "providera@skillcorp.in",
-      passwordHash: defaultPassword,
-      role: Role.PROVIDER,
-      providerProfile: {
-        create: {
-          instituteName: "Excel Skills Academy",
-          contactPerson: "Aditi Sharma",
-          phone: "9876543212",
-          districtId: pune.id,
-          isVerified: true
+  const providers = [];
+  const programs = [];
+  for (let i = 1; i <= 10; i++) {
+    const district = demoDistricts[i % demoDistricts.length];
+    const provider = await prisma.user.upsert({
+      where: { email: `provider${i}@skillportal.com` },
+      update: {},
+      create: {
+        email: `provider${i}@skillportal.com`,
+        passwordHash: defaultPassword,
+        role: Role.PROVIDER,
+        providerProfile: {
+          create: {
+            instituteName: `Provider ${i} Academy`,
+            contactPerson: `Contact Person ${i}`,
+            phone: `98765432${i.toString().padStart(2, '0')}`,
+            districtId: district.id,
+            isVerified: true
+          }
         }
-      }
-    },
-    include: { providerProfile: true }
-  });
-
-  let progA1 = await prisma.trainingProgram.findFirst({
-    where: { providerId: providerA.providerProfile!.id, name: "Full Stack Web Development", certificationName: "FSWD Level 1" }
-  });
-  if (!progA1) {
-    progA1 = await prisma.trainingProgram.create({
-      data: {
-        providerId: providerA.providerProfile!.id,
-        name: "Full Stack Web Development",
-        durationMonths: 6,
-        sector: "IT (Demo)",
-        certificationName: "FSWD Level 1"
-      }
+      },
+      include: { providerProfile: true }
     });
-  }
+    providers.push(provider);
 
-  let progA2 = await prisma.trainingProgram.findFirst({
-    where: { providerId: providerA.providerProfile!.id, name: "Cloud Solutions Architect", certificationName: "CSA Basics" }
-  });
-  if (!progA2) {
-    progA2 = await prisma.trainingProgram.create({
-      data: {
-        providerId: providerA.providerProfile!.id,
-        name: "Cloud Solutions Architect",
-        durationMonths: 4,
-        sector: "IT (Demo)",
-        certificationName: "CSA Basics"
-      }
+    let prog1 = await prisma.trainingProgram.findFirst({
+      where: { providerId: provider.providerProfile!.id, name: `Course A for Provider ${i}` }
     });
-  }
-
-  const providerB = await prisma.user.upsert({
-    where: { email: "providerb@badprovider.in" },
-    update: {},
-    create: {
-      email: "providerb@badprovider.in",
-      passwordHash: defaultPassword,
-      role: Role.PROVIDER,
-      providerProfile: {
-        create: {
-          instituteName: "QuickFix Training Center",
-          contactPerson: "Ravi Kumar",
-          phone: "9876543211",
-          districtId: nagpur.id,
-          isVerified: true
+    if (!prog1) {
+      prog1 = await prisma.trainingProgram.create({
+        data: {
+          providerId: provider.providerProfile!.id,
+          name: `Course A for Provider ${i}`,
+          durationMonths: 3,
+          sector: "IT (Demo)",
+          certificationName: `Cert A${i}`
         }
-      }
-    },
-    include: { providerProfile: true }
-  });
-
-  let progB1 = await prisma.trainingProgram.findFirst({
-    where: { providerId: providerB.providerProfile!.id, name: "Basic Data Entry", certificationName: "Data Entry Operator" }
-  });
-  if (!progB1) {
-    progB1 = await prisma.trainingProgram.create({
-      data: {
-        providerId: providerB.providerProfile!.id,
-        name: "Basic Data Entry",
-        durationMonths: 2,
-        sector: "IT (Demo)",
-        certificationName: "Data Entry Operator"
-      }
-    });
+      });
+    }
+    programs.push(prog1);
   }
 
-  let progB2 = await prisma.trainingProgram.findFirst({
-    where: { providerId: providerB.providerProfile!.id, name: "Digital Marketing FastTrack", certificationName: "DM Level 1" }
-  });
-  if (!progB2) {
-    progB2 = await prisma.trainingProgram.create({
-      data: {
-        providerId: providerB.providerProfile!.id,
-        name: "Digital Marketing FastTrack",
-        durationMonths: 1,
-        sector: "IT (Demo)",
-        certificationName: "DM Level 1"
+  // Anomalies for Provider 2 (just to have some anomalies in the system)
+  await prisma.providerAnomalyFlag.deleteMany({ where: { providerId: providers[1].providerProfile!.id } });
+  await prisma.providerAnomalyFlag.createMany({
+    data: [
+      {
+        providerId: providers[1].providerProfile!.id,
+        flagType: AnomalyFlagType.PLACEMENT_VARIANCE,
+        zScore: 3.4,
+        detail: "Suspiciously high identical placements reported for same employer but low retention.",
+        status: FlagStatus.OPEN
+      },
+      {
+        providerId: providers[1].providerProfile!.id,
+        flagType: AnomalyFlagType.WAGE_CLUSTERING,
+        zScore: 2.9,
+        detail: "Exact same wage reported for 40 trainees on the same date.",
+        status: FlagStatus.CONFIRMED,
+        reviewedById: admins[0].id,
+        reviewedAt: new Date()
       }
-    });
-  }
-
-  // Since courseRating has no natural unique constraint in schema currently other than id, we will just delete existing and recreate for idempotency
-  await prisma.courseRating.deleteMany({ where: { programId: { in: [progA1.id, progB1.id] } } });
-  
-  await prisma.courseRating.create({
-    data: {
-      programId: progA1.id,
-      ratingPeriodStart: new Date("2025-01-01"),
-      ratingPeriodEnd: new Date("2026-01-01"),
-      weightedPlacementScore: 88,
-      relativeLayoffScore: 92,
-      relevanceScore: 85,
-      wageProgressionScore: 80,
-      sampleSize: 120,
-      finalScore: 82.5
-    }
-  });
-
-  await prisma.courseRating.create({
-    data: {
-      programId: progB1.id,
-      ratingPeriodStart: new Date("2025-01-01"),
-      ratingPeriodEnd: new Date("2026-01-01"),
-      weightedPlacementScore: 45,
-      relativeLayoffScore: 60,
-      relevanceScore: 50,
-      wageProgressionScore: 48,
-      sampleSize: 80,
-      finalScore: 51.2
-    }
-  });
-
-  await prisma.providerAnomalyFlag.deleteMany({ where: { providerId: providerB.providerProfile!.id } });
-  
-  await prisma.providerAnomalyFlag.create({
-    data: {
-      providerId: providerB.providerProfile!.id,
-      flagType: AnomalyFlagType.PLACEMENT_VARIANCE,
-      zScore: 3.4,
-      detail: "Suspiciously high identical placements reported for same employer but low retention.",
-      status: FlagStatus.OPEN
-    }
-  });
-
-  await prisma.providerAnomalyFlag.create({
-    data: {
-      providerId: providerB.providerProfile!.id,
-      flagType: AnomalyFlagType.WAGE_CLUSTERING,
-      zScore: 2.9,
-      detail: "Exact same wage reported for 40 trainees on the same date.",
-      status: FlagStatus.CONFIRMED,
-      reviewedById: admin.id,
-      reviewedAt: new Date()
-    }
+    ]
   });
 
   // --- 4. TRAINEES & OUTCOMES ---
-  const programs = [progA1, progA2, progB1, progB2];
-  
-  for (let i = 1; i <= 15; i++) {
-    const isMainTrainee = i === 1;
-    const email = isMainTrainee ? "trainee1@skillportal.com" : `trainee${i}@skillportal.com`;
+  for (let i = 1; i <= 10; i++) {
+    const email = `trainee${i}@skillportal.com`;
     const district = demoDistricts[i % demoDistricts.length];
     const program = programs[i % programs.length];
     const hash = uuidv4();
@@ -248,13 +158,13 @@ async function main() {
         role: Role.TRAINEE,
         traineeProfile: {
           create: {
-            fullName: isMainTrainee ? "Ramesh Demo" : `Trainee Demo ${i}`,
+            fullName: `Trainee Demo ${i}`,
             phone: `999111${i.toString().padStart(4, '0')}`,
             districtId: district.id,
             district: district.name,
             contacts: {
               create: [
-                { contactType: "SELF", name: isMainTrainee ? "Ramesh Demo" : `Trainee Demo ${i}`, phone: `999111${i.toString().padStart(4, '0')}`, priorityOrder: 1 }
+                { contactType: "SELF", name: `Trainee Demo ${i}`, phone: `999111${i.toString().padStart(4, '0')}`, priorityOrder: 1 }
               ]
             }
           }
@@ -316,7 +226,7 @@ async function main() {
           ]
         });
 
-        if (i % 2 === 0 || isMainTrainee) {
+        if (i % 2 === 0) {
           await prisma.followUp.upsert({
             where: { traineeId_stage: { traineeId: trainee.traineeProfile!.id, stage: "DAY_30" } },
             update: {},
