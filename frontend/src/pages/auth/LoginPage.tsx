@@ -67,7 +67,7 @@ const DEMO_ACCOUNTS = [
   {
     roleName: "Training Provider",
     shortRole: "Provider",
-    email: "providerA@skillcorp.in",
+    email: "providera@skillcorp.in",
     password: "Demo@1234",
     badge: "EDU",
     portal: "Provider & Course Portal",

@@ -75,10 +75,10 @@ async function main() {
 
   // --- 3. PROVIDERS & COURSES ---
   const providerA = await prisma.user.upsert({
-    where: { email: "providerA@skillcorp.in" },
+    where: { email: "providera@skillcorp.in" },
     update: {},
     create: {
-      email: "providerA@skillcorp.in",
+      email: "providera@skillcorp.in",
       passwordHash: defaultPassword,
       role: Role.PROVIDER,
       providerProfile: {
@@ -125,10 +125,10 @@ async function main() {
   }
 
   const providerB = await prisma.user.upsert({
-    where: { email: "providerB@badprovider.in" },
+    where: { email: "providerb@badprovider.in" },
     update: {},
     create: {
-      email: "providerB@badprovider.in",
+      email: "providerb@badprovider.in",
       passwordHash: defaultPassword,
       role: Role.PROVIDER,
       providerProfile: {
