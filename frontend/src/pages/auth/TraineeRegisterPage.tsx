@@ -6,6 +6,7 @@ import { Button } from "../../components/ui/Button";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../lib/auth";
+import { api } from "../../lib/api";
 import { ArrowLeft } from "lucide-react";
 
 const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
@@ -25,9 +26,8 @@ const TraineeRegisterPage = ({ onBack }: RegistrationFormProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/api/public/districts")
-      .then((res) => res.json())
-      .then((data) => setDistricts(data.districts || []))
+    api.get("/public/districts")
+      .then((data: any) => setDistricts(data.districts || []))
       .catch(console.error);
   }, []);
 
