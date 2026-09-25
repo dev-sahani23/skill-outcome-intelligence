@@ -1,5 +1,5 @@
 import { Queue } from "bullmq";
-import { redisClient } from "../lib/redis";
+import { createRedisConnection } from "../lib/redis";
 import { FollowUpStage } from "@prisma/client";
 
 export interface FollowUpJobData {
@@ -13,7 +13,7 @@ export interface FollowUpJobData {
 }
 
 export const followUpQueue = new Queue<FollowUpJobData>("follow-ups", {
-  connection: redisClient,
+  connection: createRedisConnection(),
   defaultJobOptions: {
     attempts: 3,
     backoff: {

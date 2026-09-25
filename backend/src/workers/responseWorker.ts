@@ -1,5 +1,5 @@
 import { Worker, Job } from "bullmq";
-import { redisClient } from "../lib/redis";
+import { createRedisConnection } from "../lib/redis";
 import { prisma } from "../lib/prisma";
 import { ResponseJobData } from "../queues/responseQueue";
 import { structureFollowUpResponse, classifyAttritionReason } from "../services/groqService";
@@ -149,7 +149,7 @@ export const responseWorker = new Worker<ResponseJobData>(
     }
   },
   {
-    connection: redisClient,
+    connection: createRedisConnection(),
     concurrency: 3,
   }
 );

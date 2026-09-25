@@ -1,5 +1,5 @@
 import { Queue } from "bullmq";
-import { redisClient } from "../lib/redis";
+import { createRedisConnection } from "../lib/redis";
 
 export interface ResponseJobData {
   followUpId: string;
@@ -10,5 +10,5 @@ export interface ResponseJobData {
 }
 
 export const responseQueue = new Queue<ResponseJobData>("whatsapp-responses", {
-  connection: redisClient,
+  connection: createRedisConnection(),
 });
