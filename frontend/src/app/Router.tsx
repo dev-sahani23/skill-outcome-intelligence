@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import App from "./App";
@@ -56,6 +57,37 @@ const AnimatedRoutes = () => {
 };
 
 export default function AppRouter() {
+  const [serverAwake, setServerAwake] = useState(false);
+
+  useEffect(() => {
+    const wake = async () => {
+      try {
+        const baseUrl = import.meta.env.VITE_API_URL || "/api";
+        const response = await fetch(`${baseUrl}/health`);
+        if (response.ok) {
+          setServerAwake(true);
+        } else {
+          setTimeout(wake, 3000);
+        }
+      } catch {
+        setTimeout(wake, 3000);
+      }
+    };
+    wake();
+  }, []);
+
+  if (!serverAwake) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
+        <div className="text-center">
+          <div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full mx-auto mb-4" />
+          <p className="text-gray-400">Starting server, please wait...</p>
+          <p className="text-gray-500 text-sm mt-1">This takes up to 60 seconds on first load</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <BrowserRouter>
       <AnimatedRoutes />
