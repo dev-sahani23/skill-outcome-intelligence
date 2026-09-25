@@ -93,7 +93,7 @@ export default function OutcomePassport() {
   if (!enrollment) {
     return (
       <PageWrapper>
-        <div className="w-full max-w-xl mb-8 flex justify-between items-center">
+      <div className="w-full max-w-xl mb-8 flex justify-between items-center no-print">
           <button onClick={() => navigate('/dashboard/trainee')} className="flex items-center text-text-muted hover:text-[#ff4757] transition-colors text-sm font-bold uppercase tracking-wider">
             <ArrowLeft className="w-4 h-4 mr-1" /> {t('outcomePassport.backToDashboard')}
           </button>
@@ -160,7 +160,9 @@ export default function OutcomePassport() {
             Your universally verifiable proof of skill and employment.
           </p>
         </div>
-        <LanguageSelector />
+        <div className="no-print mt-4">
+          <LanguageSelector />
+        </div>
       </motion.div>
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }} className="w-full max-w-3xl mb-8">
@@ -243,8 +245,8 @@ export default function OutcomePassport() {
         </Card>
       </motion.div>
 
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }} className="w-full max-w-3xl flex justify-end">
-        <Button variant="secondary" className="group">
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2, ease: "easeOut" }} className="w-full max-w-3xl flex justify-end no-print">
+        <Button variant="secondary" className="group" onClick={() => window.print()}>
           <Download className="w-5 h-5 mr-2 text-text-muted group-hover:text-[#ff4757] transition-colors" /> 
           {t('outcomePassport.downloadPdf')}
         </Button>
