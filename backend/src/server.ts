@@ -26,12 +26,27 @@ startWhatsappPoller();
 const app = express();
 
 app.use(cors({
-  origin: "http://localhost:5173", // Allow frontend URL
+  origin: [
+    process.env.FRONTEND_URL!,
+    "http://localhost:5173",
+    "http://localhost:3000",
+  ].filter(Boolean),
   credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
 }));
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(cookieParser());
+
+// Health check
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+  });
+});
 
 // Routes
 app.get('/webhook/whatsapp', (req: any, res: any) => {
@@ -205,40 +220,47 @@ app.get("/api/public/verify/:hash", async (req, res) => {
   }
 });
 
-// Health check
-app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
-});
+
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
 // Enforce production security check for Mock SMS and Twilio configs
-if (process.env.NODE_ENV === "production") {
-  if (process.env.MOCK_EMAIL === "true") {
-    console.error("CRITICAL ERROR: Refusing to boot. MOCK_EMAIL is set to true in a production environment!");
-    process.exit(1);
-  }
-
-  const required = ["GMAIL_USER", "GMAIL_APP_PASSWORD"];
+if (process.env.NODE_ENV === 'production') {
+  const required = [
+    'DATABASE_URL',
+    'REDIS_URL',
+    'JWT_SECRET',
+    'GMAIL_USER',
+    'GMAIL_APP_PASSWORD',
+    'WHATSAPP_ACCESS_TOKEN',
+    'WHATSAPP_PHONE_NUMBER_ID',
+    'WHATSAPP_VERIFY_TOKEN',
+    'GROQ_API_KEY',
+    'FRONTEND_URL',
+  ];
   const missing = required.filter(k => !process.env[k]);
-  if (missing.length) {
-    console.error(`CRITICAL ERROR: Refusing to boot. Missing env vars: ${missing.join(", ")}`);
+  if (missing.length > 0) {
+    console.error('Missing env vars:', missing.join(', '));
     process.exit(1);
   }
-
-  if (process.env.MOCK_WHATSAPP === "true") {
-    console.error("CRITICAL ERROR: Refusing to boot. MOCK_WHATSAPP is set to true in a production environment!");
+  if (process.env.MOCK_EMAIL === 'true') {
+    console.error('MOCK_EMAIL is true in production');
     process.exit(1);
   }
-
-  const whatsappRequired = ["WHATSAPP_ACCESS_TOKEN", "WHATSAPP_PHONE_NUMBER_ID"];
-  const whatsappMissing = whatsappRequired.filter(k => !process.env[k]);
-  if (whatsappMissing.length) {
-    console.error(`CRITICAL ERROR: Refusing to boot. Missing env vars: ${whatsappMissing.join(", ")}`);
+  if (process.env.MOCK_WHATSAPP === 'true') {
+    console.error('MOCK_WHATSAPP is true in production');
     process.exit(1);
   }
 }
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+});
+process.on('uncaughtException', (error) => {
+  console.error('Uncaught Exception:', error);
+  process.exit(1);
+});
 
 const startServer = async () => {
   try {

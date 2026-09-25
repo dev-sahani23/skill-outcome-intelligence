@@ -1,5 +1,5 @@
 import { Worker, Job } from "bullmq";
-import { redisClient } from "../lib/redis";
+import { createRedisConnection } from "../lib/redis";
 import {prisma} from "../lib/prisma";
 import { FollowUpJobData, followUpQueue } from "../queues/followUpQueue";
 import { sendFollowUpWhatsApp } from "../services/whatsappService";
@@ -127,7 +127,7 @@ export const followUpWorker = new Worker<FollowUpJobData>(
     }
   },
   {
-    connection: redisClient,
+    connection: createRedisConnection(),
     concurrency: 5,
   }
 );
