@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: skilltrack-backend
+    env: node
+    region: singapore
+    plan: free
+    buildCommand: npm install && npm run build && npx prisma generate
+    startCommand: npx prisma migrate deploy && npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
