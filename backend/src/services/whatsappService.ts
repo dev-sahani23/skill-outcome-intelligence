@@ -105,7 +105,7 @@ export async function sendFollowUpWhatsApp(
       return { success: false, errorType: 'server_error' };
     }
 
-    const data = await response.json();
+    const data = (await response.json()) as any;
     return { success: true, messageId: data.messages?.[0]?.id };
   } catch (error) {
     console.error("WhatsApp Request Failed:", error);

@@ -42,7 +42,7 @@ export async function startWhatsappPoller() {
         return;
       }
 
-      const data = await response.json();
+      const data = (await response.json()) as any;
       const messages = data.data || [];
 
       for (const message of messages) {
