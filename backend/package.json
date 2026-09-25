@@ -9,7 +9,7 @@
     "migrate": "prisma migrate deploy",
     "test": "echo \"Error: no test specified\" && exit 1",
     "test:otp": "tsx testOtpFlow.ts",
-    "seed:demo": "npx ts-node prisma/seed-demo.ts",
+    "seed:demo": "tsx prisma/seed-demo.ts",
     "seed:reset": "tsx prisma/seed-demo.ts --reset",
     "seed:districts": "tsx prisma/seed-districts.ts",
     "seed:historical": "tsx prisma/seedHistorical.ts",

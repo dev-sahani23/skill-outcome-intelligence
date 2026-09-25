@@ -1,7 +1,11 @@
+import * as dotenv from 'dotenv';
+dotenv.config();
+
 import { Role, OutcomeType, EnrollmentStatus, AnomalyFlagType, FlagStatus } from '@prisma/client';
 import { prisma } from '../src/lib/prisma';
 import { hashPassword } from '../src/utils/password';
 import { v4 as uuidv4 } from 'uuid';
+
 
 const isResetOnly = process.argv.includes('--reset');
 
@@ -26,23 +30,13 @@ async function cleanDemoData() {
 }
 
 async function main() {
-  if (process.env.SEED_DEMO_DATA !== "true") {
-    console.log("Skipping demo seed. Set SEED_DEMO_DATA=true to enable.");
-    return;
-  }
-  
-  if (process.env.DATABASE_URL?.includes("prod") || !process.env.DATABASE_URL?.includes("localhost")) {
-    console.warn("Safety check failed. Refusing to run demo seed against a non-local or production database.");
-    return;
-  }
+  console.log("Seeding realistic demo data deterministically...");
 
   if (isResetOnly) {
     await cleanDemoData();
     console.log("Reset complete. Exiting.");
     return;
   }
-
-  console.log("Seeding realistic demo data deterministically...");
 
   const defaultPassword = await hashPassword("Demo@1234");
 

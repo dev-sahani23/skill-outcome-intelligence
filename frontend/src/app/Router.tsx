@@ -63,7 +63,8 @@ export default function AppRouter() {
     const wake = async () => {
       try {
         const baseUrl = import.meta.env.VITE_API_URL || "/api";
-        const response = await fetch(`${baseUrl}/health`);
+        const serverRoot = baseUrl.replace(/\/api$/, "") || baseUrl;
+        const response = await fetch(`${serverRoot}/health`);
         if (response.ok) {
           setServerAwake(true);
         } else {

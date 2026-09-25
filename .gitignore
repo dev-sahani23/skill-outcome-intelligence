@@ -1,0 +1,16 @@
+.neon
+.env.local
+node_modules/
+
+# Environment files — NEVER commit secrets
+backend/.env
+backend/.env.*
+frontend/.env
+frontend/.env.*
+
+# Build output
+backend/dist/
+frontend/dist/
+
+# Logs
+*.log

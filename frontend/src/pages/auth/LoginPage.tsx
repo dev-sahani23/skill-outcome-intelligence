@@ -53,8 +53,8 @@ const DEMO_ACCOUNTS = [
   {
     roleName: "Government Admin",
     shortRole: "Admin",
-    email: "admin@maharashtra.gov.in",
-    password: "password123",
+    email: "admin@skillportal.gov.in",
+    password: "Demo@1234",
     badge: "GOV",
     portal: "State Oversight Portal",
     accentColor: "#f59e0b",
@@ -67,8 +67,8 @@ const DEMO_ACCOUNTS = [
   {
     roleName: "Training Provider",
     shortRole: "Provider",
-    email: "provider@example.com",
-    password: "password123",
+    email: "providerA@skillcorp.in",
+    password: "Demo@1234",
     badge: "EDU",
     portal: "Provider & Course Portal",
     accentColor: "#3b82f6",
@@ -82,8 +82,8 @@ const DEMO_ACCOUNTS = [
   {
     roleName: "Candidate / Trainee",
     shortRole: "Trainee",
-    email: "trainee@example.com",
-    password: "password123",
+    email: "trainee1@skillportal.com",
+    password: "Demo@1234",
     badge: "TRN",
     portal: "Trainee Dashboard",
     accentColor: "#22c55e",

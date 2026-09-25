@@ -873,23 +873,12 @@ const ALL_INDIA_DISTRICTS: { name: string; state: string }[] = [
 async function main() {
   console.log(`Seeding ${ALL_INDIA_DISTRICTS.length} districts...`);
 
-  let created = 0;
-  let skipped = 0;
+  const result = await prisma.district.createMany({
+    data: ALL_INDIA_DISTRICTS,
+    skipDuplicates: true,
+  });
 
-  for (const district of ALL_INDIA_DISTRICTS) {
-    const existing = await prisma.district.findFirst({
-      where: { name: district.name, state: district.state },
-    });
-
-    if (!existing) {
-      await prisma.district.create({ data: district });
-      created++;
-    } else {
-      skipped++;
-    }
-  }
-
-  console.log(`Done. Created: ${created}, Skipped (already existed): ${skipped}`);
+  console.log(`Done. Created: ${result.count}, Skipped (already existed): ${ALL_INDIA_DISTRICTS.length - result.count}`);
 }
 
 main()
