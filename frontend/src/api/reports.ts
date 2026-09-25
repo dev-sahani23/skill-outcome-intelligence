@@ -18,26 +18,28 @@ const getQueryString = (filters?: { year?: string; from?: string; to?: string })
   return str ? `?${str}` : "";
 };
 
+const API_BASE = import.meta.env.VITE_API_URL || "/api";
+
 export const fetchTraineeReport = async (traineeId: string, filters?: any) => {
-  const res = await fetch(`/api/reports/trainee/${traineeId}${getQueryString(filters)}`, { headers: getHeaders() });
+  const res = await fetch(`${API_BASE}/reports/trainee/${traineeId}${getQueryString(filters)}`, { headers: getHeaders() });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 };
 
 export const fetchCourseReport = async (courseId: string, filters?: any) => {
-  const res = await fetch(`/api/reports/course/${courseId}${getQueryString(filters)}`, { headers: getHeaders() });
+  const res = await fetch(`${API_BASE}/reports/course/${courseId}${getQueryString(filters)}`, { headers: getHeaders() });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 };
 
 export const fetchProviderReport = async (providerId: string, filters?: any) => {
-  const res = await fetch(`/api/reports/provider/${providerId}${getQueryString(filters)}`, { headers: getHeaders() });
+  const res = await fetch(`${API_BASE}/reports/provider/${providerId}${getQueryString(filters)}`, { headers: getHeaders() });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 };
 
 export const fetchSystemReport = async (filters?: any) => {
-  const res = await fetch(`/api/reports/system${getQueryString(filters)}`, { headers: getHeaders() });
+  const res = await fetch(`${API_BASE}/reports/system${getQueryString(filters)}`, { headers: getHeaders() });
   if (!res.ok) throw new Error(await res.text());
   return res.json();
 };
