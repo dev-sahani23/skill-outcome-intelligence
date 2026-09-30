@@ -90,7 +90,7 @@ export default function PublicVerify() {
           >
             <ArrowLeft className="w-4 h-4 mr-1" /> Back
           </button>
-          
+
           <div className="flex items-center gap-3 mb-2">
             <span className="indus-led-green"></span>
             <span className="indus-label text-[#22c55e]">Verified on Ledger</span>
@@ -124,7 +124,7 @@ export default function PublicVerify() {
                 </p>
                 <p className="font-bold text-text text-base">{result.instituteName}</p>
               </div>
-              
+
               <div className="rounded-xl p-5" style={{ background: "#e0e5ec", boxShadow: "var(--shadow-recessed)" }}>
                 <p className="indus-label text-text-muted mb-1">Training Program</p>
                 <p className="font-bold text-text text-base">{result.programName}</p>
