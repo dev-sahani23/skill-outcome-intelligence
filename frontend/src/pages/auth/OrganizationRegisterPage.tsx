@@ -84,21 +84,21 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
             <p className="font-bold text-text indus-label">To request access:</p>
             <ol className="list-decimal list-inside space-y-1 ml-1 text-sm">
               <li>Contact your departmental IT administrator</li>
-              <li>Request onboarding to the SkillTrack platform</li>
+              <li>Request onboarding to the SkillParinam.AI platform</li>
               <li>Your credentials will be provisioned and shared securely</li>
             </ol>
           </div>
 
           <div className="pt-6">
             <a
-              href="mailto:admin@skilltrack.gov.in"
+              href="mailto:admin@skillparinam.gov.in"
               className="inline-flex items-center gap-2 text-sm text-[#3b82f6] hover:text-[#ff4757] transition-colors font-bold uppercase tracking-wider bg-white px-4 py-2 rounded-lg shadow-sm"
             >
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <rect x="3" y="5" width="18" height="14" rx="2" />
                 <path d="M3 7l9 6 9-6" />
               </svg>
-              admin@skilltrack.gov.in
+              admin@skillparinam.gov.in
             </a>
           </div>
         </div>

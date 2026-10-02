@@ -496,7 +496,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           </h2>
           <p className="text-text-muted text-sm font-medium">
             Sign in to continue to your{" "}
-            <span className="text-[#ff4757] font-bold">SkillTrack</span> dashboard.
+            <span className="text-[#ff4757] font-bold">SkillParinam.AI</span> dashboard.
           </p>
         </div>
 
@@ -699,7 +699,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         </div>
 
         <footer className="mt-6 sm:mt-8 flex items-center justify-center gap-3 indus-label text-text-muted">
-          <span>© 2026 SkillTrack</span>
+          <span>© 2026 SkillParinam.AI</span>
           <span className="text-[#babecc]">•</span>
           <button type="button" className="hover:text-text transition-colors duration-200">Privacy</button>
           <span className="text-[#babecc]">•</span>

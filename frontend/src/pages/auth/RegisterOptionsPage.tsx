@@ -84,7 +84,7 @@ const RegisterOptionsPage = ({
       >
         Join the
         <br />
-        <span className="text-[#ff4757]">SkillTrack</span>
+        <span className="text-[#ff4757]">SkillParinam.AI</span>
         <br />
         ecosystem.
       </h1>

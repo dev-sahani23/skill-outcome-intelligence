@@ -35,13 +35,13 @@ const AuthBranding = () => {
           className="text-xl font-bold text-text tracking-tight"
           style={{ textShadow: "0 1px 0 rgba(255,255,255,0.8)" }}
         >
-          SkillTrack
+          SkillParinam.AI
         </h2>
         {/* Monospace subtitle with LED status */}
         <div className="flex items-center gap-2 mt-0.5">
           <span className="indus-led-green" aria-label="System online" />
           <p className="indus-label text-text-muted">
-            Skill Track Intelligence Layer
+            Outcome Intelligence Layer
           </p>
         </div>
       </div>
