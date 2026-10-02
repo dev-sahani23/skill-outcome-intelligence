@@ -25,6 +25,7 @@ export const startAssessment = async (req: Request, res: Response) => {
     const claimedProjects = req.body.claimedProjects || [];
     const claimedCourses = req.body.claimedCourses || [];
     const enrollmentId = req.body.enrollmentId;
+    const language: "en" | "hi" | "mr" = req.body.language ?? "en";
 
     // Create a new assessment record (append-only history)
     const assessment = await prisma.skillAssessment.create({
@@ -45,6 +46,7 @@ export const startAssessment = async (req: Request, res: Response) => {
       claimedCertifications,
       claimedProjects,
       claimedCourses,
+      language,
     });
 
     // Update the record with generated questions
