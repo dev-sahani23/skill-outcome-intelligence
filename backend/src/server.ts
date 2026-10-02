@@ -277,4 +277,25 @@ const startServer = async () => {
 };
 
 startServer();
-// Trigger restart
+
+// ─── Keep-alive: prevent Render free-tier spin-down ───────────────────────────
+// Render spins down instances after 15 min of inactivity on the free plan.
+// We self-ping every 10 min so the server is always warm.
+if (process.env.NODE_ENV === "production") {
+  const SELF_URL = process.env.RENDER_EXTERNAL_URL
+    ? `${process.env.RENDER_EXTERNAL_URL}/health`
+    : `http://localhost:${env.PORT}/health`;
+
+  const PING_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+
+  setInterval(async () => {
+    try {
+      const res = await fetch(SELF_URL);
+      console.log(`[keep-alive] ping → ${SELF_URL} (${res.status})`);
+    } catch (err) {
+      console.warn("[keep-alive] ping failed:", err);
+    }
+  }, PING_INTERVAL_MS);
+
+  console.log(`[keep-alive] Self-ping scheduled every ${PING_INTERVAL_MS / 60000} min → ${SELF_URL}`);
+}
