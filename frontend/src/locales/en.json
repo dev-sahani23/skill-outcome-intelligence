@@ -35,6 +35,8 @@
     },
     "step2": {
       "title": "Step 2: Answer Assessment",
+      "instruction": "Please answer the following verification questions based on your knowledge and experience.",
+      "answerPlaceholder": "Type your answer here...",
       "submitBtn": "Submit Answers",
       "analyzingBtn": "Analyzing Answers..."
     },

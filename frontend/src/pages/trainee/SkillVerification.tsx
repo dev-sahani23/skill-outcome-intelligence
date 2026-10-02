@@ -36,7 +36,7 @@ interface AnalysisResult {
 }
 
 export default function SkillVerification() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
@@ -68,6 +68,7 @@ export default function SkillVerification() {
         claimedCertifications: [],
         claimedProjects: [],
         claimedCourses: [],
+        language: (i18n.language?.startsWith("hi") ? "hi" : i18n.language?.startsWith("mr") ? "mr" : "en") as "en" | "hi" | "mr",
       };
 
       const data = await api.post("/trainees/skill-assessment/start", payload);
@@ -198,7 +199,7 @@ export default function SkillVerification() {
             <CardContent className="pt-8">
               <form onSubmit={handleSubmitAnswers}>
                 <p className="mb-6 font-medium text-text-muted text-sm bg-white p-4 rounded-xl shadow-sm border border-[#e2e8f0]">
-                  Please answer the following verification questions based on your knowledge and experience.
+                  {t('skillVerification.step2.instruction')}
                 </p>
 
                 <div className="space-y-6 mb-8">
@@ -213,7 +214,7 @@ export default function SkillVerification() {
                       <textarea
                         className="indus-input w-full min-h-30 rounded-xl px-4 py-4 resize-y"
                         rows={4}
-                        placeholder="Type your answer here..."
+                        placeholder={t('skillVerification.step2.answerPlaceholder')}
                         value={answers[q.id] || ""}
                         onChange={(e) => setAnswers({ ...answers, [q.id]: e.target.value })}
                         disabled={loading}
