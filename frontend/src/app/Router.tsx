@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import App from "./App";
@@ -56,34 +56,71 @@ const AnimatedRoutes = () => {
   );
 };
 
+// How long a cold start typically takes (used to animate the progress bar)
+const COLD_START_ESTIMATE_MS = 45_000;
+
 export default function AppRouter() {
   const [serverAwake, setServerAwake] = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const startedAt = useRef(Date.now());
 
+  // Poll /health until the server responds
   useEffect(() => {
+    const baseUrl = import.meta.env.VITE_API_URL || "/api";
+    const serverRoot = baseUrl.replace(/\/api$/, "") || baseUrl;
+
     const wake = async () => {
       try {
-        const baseUrl = import.meta.env.VITE_API_URL || "/api";
-        const serverRoot = baseUrl.replace(/\/api$/, "") || baseUrl;
         const response = await fetch(`${serverRoot}/health`);
         if (response.ok) {
           setServerAwake(true);
-        } else {
-          setTimeout(wake, 3000);
+          return;
         }
       } catch {
-        setTimeout(wake, 3000);
+        // server still sleeping — keep trying
       }
+      setTimeout(wake, 2000);
     };
     wake();
   }, []);
 
+  // Tick the elapsed counter every second while waiting
+  useEffect(() => {
+    if (serverAwake) return;
+    const id = setInterval(() => setElapsed(Math.floor((Date.now() - startedAt.current) / 1000)), 1000);
+    return () => clearInterval(id);
+  }, [serverAwake]);
+
   if (!serverAwake) {
+    const progress = Math.min((elapsed / (COLD_START_ESTIMATE_MS / 1000)) * 100, 95);
+
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white">
-        <div className="text-center">
-          <div className="animate-spin h-8 w-8 border-2 border-purple-500 border-t-transparent rounded-full mx-auto mb-4" />
-          <p className="text-gray-400">Starting server, please wait...</p>
-          <p className="text-gray-500 text-sm mt-1">This takes up to 60 seconds on first load</p>
+        <div className="text-center w-72">
+          {/* Spinner */}
+          <div className="relative w-14 h-14 mx-auto mb-6">
+            <div className="absolute inset-0 rounded-full border-2 border-purple-900" />
+            <div className="absolute inset-0 rounded-full border-2 border-purple-500 border-t-transparent animate-spin" />
+          </div>
+
+          <p className="text-white font-semibold text-base mb-1">Starting server…</p>
+          <p className="text-gray-500 text-sm mb-6">
+            {elapsed < 5
+              ? "Waking up the server"
+              : elapsed < 20
+              ? "Almost there, hold on"
+              : "Taking a bit longer than usual…"}
+          </p>
+
+          {/* Progress bar */}
+          <div className="w-full bg-gray-800 rounded-full h-1.5 overflow-hidden mb-3">
+            <div
+              className="h-full bg-purple-500 rounded-full transition-all duration-1000 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          <p className="text-gray-600 text-xs tabular-nums">{elapsed}s elapsed</p>
         </div>
       </div>
     );
