@@ -35,7 +35,7 @@ const AuthBranding = () => {
           className="text-xl font-bold text-text tracking-tight"
           style={{ textShadow: "0 1px 0 rgba(255,255,255,0.8)" }}
         >
-          SkillParinam.AI
+          SkillParinaam.AI
         </h2>
         {/* Monospace subtitle with LED status */}
         <div className="flex items-center gap-2 mt-0.5">

@@ -84,7 +84,7 @@ const OrganizationRegisterPage = ({ onBack }: RegistrationFormProps) => {
             <p className="font-bold text-text indus-label">To request access:</p>
             <ol className="list-decimal list-inside space-y-1 ml-1 text-sm">
               <li>Contact your departmental IT administrator</li>
-              <li>Request onboarding to the SkillParinam.AI platform</li>
+              <li>Request onboarding to the SkillParinaam.AI platform</li>
               <li>Your credentials will be provisioned and shared securely</li>
             </ol>
           </div>

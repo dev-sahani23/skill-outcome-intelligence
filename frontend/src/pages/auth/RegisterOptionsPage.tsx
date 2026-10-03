@@ -28,8 +28,8 @@ const registerOptions: RegisterOption[] = [
 ];
 
 const roleConfig: Record<RegistrationRole, { accentColor: string; badge: string }> = {
-  trainee:      { accentColor: "#3b82f6", badge: "TRN" },
-  provider:     { accentColor: "#a855f7", badge: "EDU" },
+  trainee: { accentColor: "#3b82f6", badge: "TRN" },
+  provider: { accentColor: "#a855f7", badge: "EDU" },
   organization: { accentColor: "#22c55e", badge: "GOV" },
 };
 
@@ -84,7 +84,7 @@ const RegisterOptionsPage = ({
       >
         Join the
         <br />
-        <span className="text-[#ff4757]">SkillParinam.AI</span>
+        <span className="text-[#ff4757]">SkillParinaam.AI</span>
         <br />
         ecosystem.
       </h1>

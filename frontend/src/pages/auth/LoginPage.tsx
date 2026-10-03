@@ -415,9 +415,8 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                 type="button"
                 disabled={resendCooldown > 0 || forgotPasswordLoading}
                 onClick={() => handleSendOtp()}
-                className={`indus-label transition-colors ${
-                  resendCooldown > 0 ? "text-text-muted cursor-not-allowed" : "text-[#ff4757] hover:text-[#d63847]"
-                }`}
+                className={`indus-label transition-colors ${resendCooldown > 0 ? "text-text-muted cursor-not-allowed" : "text-[#ff4757] hover:text-[#d63847]"
+                  }`}
               >
                 {resendCooldown > 0 ? `Resend OTP in ${resendCooldown}s` : "Resend OTP"}
               </button>
@@ -496,7 +495,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
           </h2>
           <p className="text-text-muted text-sm font-medium">
             Sign in to continue to your{" "}
-            <span className="text-[#ff4757] font-bold">SkillParinam.AI</span> dashboard.
+            <span className="text-[#ff4757] font-bold">SkillParinaam.AI</span> dashboard.
           </p>
         </div>
 
@@ -549,9 +548,9 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
                       <span className="text-sm font-bold text-text">{acc.shortRole}</span>
                     </div>
                     {isSelected && (
-                      <div 
-                        className="w-2 h-2 rounded-full absolute -top-1 -right-1" 
-                        style={{ backgroundColor: acc.accentColor, boxShadow: `0 0 8px ${acc.accentColor}` }} 
+                      <div
+                        className="w-2 h-2 rounded-full absolute -top-1 -right-1"
+                        style={{ backgroundColor: acc.accentColor, boxShadow: `0 0 8px ${acc.accentColor}` }}
                       />
                     )}
                   </div>
@@ -699,7 +698,7 @@ const LoginPage = ({ onNavigateToRegister }: LoginPageProps) => {
         </div>
 
         <footer className="mt-6 sm:mt-8 flex items-center justify-center gap-3 indus-label text-text-muted">
-          <span>© 2026 SkillParinam.AI</span>
+          <span>© 2026 SkillParinaam.AI</span>
           <span className="text-[#babecc]">•</span>
           <button type="button" className="hover:text-text transition-colors duration-200">Privacy</button>
           <span className="text-[#babecc]">•</span>

@@ -40,13 +40,15 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Health check
-app.get('/health', (req, res) => {
+const healthHandler = (req: any, res: any) => {
   res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
   });
-});
+};
+app.get('/health', healthHandler);
+app.get('/api/health', healthHandler);
 
 // Routes
 app.get('/webhook/whatsapp', (req: any, res: any) => {
@@ -88,7 +90,7 @@ app.post('/webhook/whatsapp', async (req: any, res: any) => {
     const normalizedSender = normalizePhoneNumber(senderPhone);
 
     const contact = await prisma.contact.findFirst({
-      where: { 
+      where: {
         OR: [
           { phone: normalizedSender },
           { phone: normalizedSender.replace('+91', '') },
@@ -191,7 +193,7 @@ app.post('/api/test/trigger-followup', async (req: any, res: any) => {
 app.get("/api/public/verify/:hash", async (req, res) => {
   try {
     const { hash } = req.params;
-    
+
     // Find enrollment by certificateId
     const enrollment = await prisma.enrollment.findFirst({
       where: { certificateId: hash, isCertified: true },
