@@ -1,5 +1,5 @@
 import { Worker, Job } from "bullmq";
-import { createRedisConnection } from "../lib/redis";
+import { bullmqConnection } from "../lib/redis";
 import { prisma } from "../lib/prisma";
 import { ResponseJobData } from "../queues/responseQueue";
 import { structureFollowUpResponse, classifyAttritionReason } from "../services/groqService";
@@ -117,7 +117,7 @@ export const responseWorker = new Worker<ResponseJobData>(
         // e. Create AttritionRecord
         if (parsedData.employmentStatus === "unemployed" && parsedData.reasonIfUnemployed) {
           const reasonEnum = await classifyAttritionReason(parsedData.reasonIfUnemployed);
-          
+
           await tx.attritionRecord.create({
             data: {
               traineeId,
@@ -149,7 +149,7 @@ export const responseWorker = new Worker<ResponseJobData>(
     }
   },
   {
-    connection: createRedisConnection(),
+    connection: bullmqConnection,
     concurrency: 3,
   }
 );

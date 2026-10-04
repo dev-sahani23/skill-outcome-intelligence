@@ -4,52 +4,44 @@ import { validateRequest } from "../../middleware/validate";
 import { requireAuth } from "../../middleware/auth";
 import { loginSchema, registerSchema, sendOtpSchema, verifyOtpSchema, changePasswordSchema, resetPasswordSchema } from "./auth.schema";
 import rateLimit, { ipKeyGenerator } from "express-rate-limit";
-import { RedisStore } from "rate-limit-redis";
-import { redisClient } from "../../lib/redis";
 import { normalizeEmail } from "../../utils/normalizeEmail";
 
+// In-memory store (default) — 0 Redis commands per request.
+// The OTP value itself is stored in Redis with a 5-attempt Lua guard in auth.service.ts,
+// so a Redis-backed rate limiter here would be redundant.
 const otpRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit to 100 requests per 15 minutes for testing
+  max: 5, // 5 OTP requests per 15 minutes per email
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
     const emailKey = req.body.email ? normalizeEmail(req.body.email) : undefined;
     return `ratelimit:send-otp:${emailKey || ipKeyGenerator(req.ip || "unknown")}`;
   },
-  store: new RedisStore({
-    sendCommand: (...args: string[]) => redisClient.call(args[0], ...args.slice(1)) as any,
-  }),
   message: { error: "Too many OTP requests from this email address, please try again after 15 minutes" },
 });
 
 const otpCooldownLimiter = rateLimit({
   windowMs: 30 * 1000, // 30 seconds
-  max: 100, // limit each phone to 100 OTP request per 30s for testing
+  max: 1, // 1 OTP per 30-second window (enforces true cooldown)
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
     const emailKey = req.body.email ? normalizeEmail(req.body.email) : undefined;
     return `ratelimit:send-otp-cooldown:${emailKey || ipKeyGenerator(req.ip || "unknown")}`;
   },
-  store: new RedisStore({
-    sendCommand: (...args: string[]) => redisClient.call(args[0], ...args.slice(1)) as any,
-  }),
   message: { error: "Please wait 30 seconds before requesting another OTP" },
 });
 
 const verifyOtpRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each phone to 100 verification attempts per windowMs
+  max: 10, // 10 verification attempts per 15-minute window
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
     const emailKey = req.body.email ? normalizeEmail(req.body.email) : undefined;
     return `ratelimit:verify-otp:${emailKey || ipKeyGenerator(req.ip || "unknown")}`;
   },
-  store: new RedisStore({
-    sendCommand: (...args: string[]) => redisClient.call(args[0], ...args.slice(1)) as any,
-  }),
   message: { error: "Too many verification attempts, please request a new OTP later", code: "OTP_ATTEMPTS_EXCEEDED" },
 });
 

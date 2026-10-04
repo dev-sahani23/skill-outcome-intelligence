@@ -1,6 +1,6 @@
 import { Worker, Job } from "bullmq";
-import { createRedisConnection } from "../lib/redis";
-import {prisma} from "../lib/prisma";
+import { bullmqConnection } from "../lib/redis";
+import { prisma } from "../lib/prisma";
 import { FollowUpJobData, followUpQueue } from "../queues/followUpQueue";
 import { sendFollowUpWhatsApp } from "../services/whatsappService";
 import { CascadeStage, ContactType } from "@prisma/client";
@@ -26,7 +26,7 @@ export const followUpWorker = new Worker<FollowUpJobData>(
       return;
     }
 
-    const currentContact = await prisma.contact.findUnique({ where: { id: contactId }});
+    const currentContact = await prisma.contact.findUnique({ where: { id: contactId } });
     if (!currentContact) return;
 
     // Consent Check (Final Guard)
@@ -127,7 +127,7 @@ export const followUpWorker = new Worker<FollowUpJobData>(
     }
   },
   {
-    connection: createRedisConnection(),
+    connection: bullmqConnection,
     concurrency: 5,
   }
 );

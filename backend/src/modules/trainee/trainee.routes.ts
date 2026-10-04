@@ -7,20 +7,18 @@ import { createTrainingRecord, getTrainingRecords } from "./trainingRecord.contr
 import { validateRequest } from "../../middleware/validate";
 import { startAssessmentSchema, submitAssessmentSchema } from "./skillAssessment.schema";
 import rateLimit from "express-rate-limit";
-import { RedisStore } from "rate-limit-redis";
-import { redisClient } from "../../lib/redis";
 
+// In-memory store (default) — 0 Redis commands per request.
+// Per-user assessment attempts are enforced here as abuse prevention;
+// in-memory is sufficient for a single-instance deployment.
 const assessmentRateLimiter = rateLimit({
   windowMs: 24 * 60 * 60 * 1000, // 24 hours
-  max: 3, // limit to 3 assessment attempts per 24 hours
+  max: 3, // 3 assessment attempts per 24 hours
   standardHeaders: true,
   legacyHeaders: false,
   keyGenerator: (req) => {
     return `ratelimit:skill-assessment:${req.user?.id || "anonymous"}`;
   },
-  store: new RedisStore({
-    sendCommand: (...args: string[]) => redisClient.call(args[0], ...args.slice(1)) as any,
-  }),
   message: { error: "Too many skill assessment attempts. Please try again tomorrow." },
 });
 const router = Router();
