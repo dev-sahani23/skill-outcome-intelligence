@@ -50,6 +50,61 @@ const healthHandler = (req: any, res: any) => {
 app.get('/health', healthHandler);
 app.get('/api/health', healthHandler);
 
+// Production-safe Redis command metrics
+app.get('/api/redis-stats', async (req: any, res: any) => {
+  const secret = process.env.REDIS_STATS_SECRET;
+
+  if (!secret) {
+    // If not configured, immediately 403 to fail-safe
+    return res.status(403).json({ error: 'Endpoint secured but unconfigured.' });
+  }
+
+  const providedSecret = req.headers['x-admin-secret'];
+
+  if (!providedSecret || typeof providedSecret !== 'string') {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  const crypto = require('crypto');
+
+  // Use constant-time comparison to prevent timing attacks
+  const secretBuffer = Buffer.from(secret);
+  const providedBuffer = Buffer.from(providedSecret);
+
+  let isMatch = false;
+  if (secretBuffer.length === providedBuffer.length) {
+    isMatch = crypto.timingSafeEqual(secretBuffer, providedBuffer);
+  }
+
+  if (!isMatch) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+
+  try {
+    const { redisClient } = require('./lib/redis');
+    const stats = await redisClient.info('commandstats');
+
+    // Parse the stats string into an object (e.g., cmdstat_ping: calls=10,usec=50,usec_per_call=5.00)
+    const metrics: Record<string, any> = {};
+    stats.split('\r\n').forEach((line: string) => {
+      if (line.startsWith('cmdstat_')) {
+        const [cmd, data] = line.split(':');
+        const [callsStr] = data.split(',');
+        const calls = parseInt(callsStr.split('=')[1], 10);
+        metrics[cmd.replace('cmdstat_', '')] = { calls };
+      }
+    });
+
+    res.status(200).json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      commands: metrics
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to retrieve Redis stats' });
+  }
+});
+
 // Routes
 app.get('/webhook/whatsapp', (req: any, res: any) => {
   const mode = req.query['hub.mode'];
