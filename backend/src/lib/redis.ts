@@ -33,25 +33,27 @@ redisClient.on('connect', () => {
   console.log('✅ Redis connected');
 });
 
-// Dev-only Redis Command Usage Tracker
-if (process.env.NODE_ENV !== "production") {
-  const originalSendCommand = Redis.prototype.sendCommand;
-  let commandCount = 0;
+// Safe Redis Command Usage Tracker (Bypasses Upstash INFO Censorship)
+export const globalCommandStats: Record<string, number> = {};
 
-  // Log command totals periodically
+const originalSendCommand = Redis.prototype.sendCommand;
+Redis.prototype.sendCommand = function (command: any) {
+  if (command && command.name) {
+    const cmdName = command.name.toLowerCase();
+    globalCommandStats[cmdName] = (globalCommandStats[cmdName] || 0) + 1;
+  }
+  return originalSendCommand.apply(this, arguments as any);
+};
+
+// Console log total commands executed every 10s only in Dev mode
+if (process.env.NODE_ENV !== "production") {
+  let lastTotal = 0;
   setInterval(() => {
-    if (commandCount > 0) {
-      console.log(`[Redis Dev Metrics] ${commandCount} commands executed in the last 10 seconds`);
-      commandCount = 0; // reset
+    const total = Object.values(globalCommandStats).reduce((a, b) => a + b, 0);
+    const delta = total - lastTotal;
+    if (delta > 0) {
+      console.log(`[Redis Dev Metrics] ${delta} commands executed in the last 10 seconds`);
+      lastTotal = total;
     }
   }, 10000);
-
-  Redis.prototype.sendCommand = function (command: any) {
-    if (command && command.name) {
-      commandCount++;
-      // Uncomment the line below for extremely verbose command-level tracing:
-      // console.log(`[Redis CMD] ${command.name.toUpperCase()}`);
-    }
-    return originalSendCommand.apply(this, arguments as any);
-  };
 }

@@ -81,24 +81,18 @@ app.get('/api/redis-stats', async (req: any, res: any) => {
   }
 
   try {
-    const { redisClient } = require('./lib/redis');
-    const stats = await redisClient.info('commandstats');
+    const { globalCommandStats } = require('./lib/redis');
 
-    // Parse the stats string into an object (e.g., cmdstat_ping: calls=10,usec=50,usec_per_call=5.00)
-    const metrics: Record<string, any> = {};
-    stats.split('\r\n').forEach((line: string) => {
-      if (line.startsWith('cmdstat_')) {
-        const [cmd, data] = line.split(':');
-        const [callsStr] = data.split(',');
-        const calls = parseInt(callsStr.split('=')[1], 10);
-        metrics[cmd.replace('cmdstat_', '')] = { calls };
-      }
-    });
+    // Format metrics correctly for simple output
+    const formattedStats: Record<string, { calls: number }> = {};
+    for (const [cmd, count] of Object.entries(globalCommandStats)) {
+      formattedStats[cmd as string] = { calls: count as number };
+    }
 
     res.status(200).json({
       status: 'ok',
       timestamp: new Date().toISOString(),
-      commands: metrics
+      commands: formattedStats
     });
   } catch (error) {
     res.status(500).json({ error: 'Failed to retrieve Redis stats' });
