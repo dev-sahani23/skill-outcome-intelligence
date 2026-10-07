@@ -129,6 +129,9 @@ export const followUpWorker = new Worker<FollowUpJobData>(
   {
     connection: bullmqConnection,
     concurrency: 5,
+    metrics: { maxDataPoints: 0 } as any, // disable internal metrics accumulation
+    stalledInterval: 300000,
+    maxStalledCount: 1,
   }
 );
 

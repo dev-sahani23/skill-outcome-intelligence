@@ -151,6 +151,9 @@ export const responseWorker = new Worker<ResponseJobData>(
   {
     connection: bullmqConnection,
     concurrency: 3,
+    metrics: { maxDataPoints: 0 } as any, // disable internal metrics accumulation
+    stalledInterval: 300000,
+    maxStalledCount: 1,
   }
 );
 
