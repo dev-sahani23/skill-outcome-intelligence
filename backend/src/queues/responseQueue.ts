@@ -1,5 +1,5 @@
 import { Queue } from "bullmq";
-import { bullmqConnection } from "../lib/redis";
+import { getQueueBackend, queueConnectionOptions } from "../lib/queueDB";
 
 export interface ResponseJobData {
   followUpId: string;
@@ -10,5 +10,5 @@ export interface ResponseJobData {
 }
 
 export const responseQueue = new Queue<ResponseJobData>("whatsapp-responses", {
-  connection: bullmqConnection,
-});
+  ...queueConnectionOptions,
+}, getQueueBackend() as any);

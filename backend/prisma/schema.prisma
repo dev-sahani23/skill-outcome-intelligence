@@ -693,3 +693,22 @@ model DistrictHistoricalData {
   @@map("district_historical_data")
 }
 
+// =============================================================================
+// REPLACEMENTS FOR REDIS EPHEMERAL DATA
+// =============================================================================
+
+model WhatsappProcessedMessage {
+  id        String   @id
+  expiresAt DateTime
+
+  @@map("whatsapp_processed_messages")
+}
+
+model OtpToken {
+  phone     String   @id // Or email, enforcing 1 OTP active at a time
+  code      String
+  attempts  Int      @default(0)
+  expiresAt DateTime
+
+  @@map("otp_tokens")
+}

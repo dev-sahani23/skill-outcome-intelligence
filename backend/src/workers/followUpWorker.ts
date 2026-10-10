@@ -1,5 +1,6 @@
 import { Worker, Job } from "bullmq";
-import { bullmqConnection } from "../lib/redis";
+import { getQueueBackend, queueConnectionOptions } from "../lib/queueDB";
+import { PostgresQueueBackend } from "bullmq";
 import { prisma } from "../lib/prisma";
 import { FollowUpJobData, followUpQueue } from "../queues/followUpQueue";
 import { sendFollowUpWhatsApp } from "../services/whatsappService";
@@ -12,7 +13,7 @@ function getCascadeStage(contactType: ContactType): CascadeStage {
   return 'PRIMARY_PENDING';
 }
 
-export const followUpWorker = new Worker<FollowUpJobData>(
+export const followUpWorker = new Worker<FollowUpJobData, any, string, PostgresQueueBackend>(
   "follow-ups",
   async (job: Job<FollowUpJobData>) => {
     const { followUpId, traineeId, stage, primaryPhone, traineeFirstName, attemptNumber, contactId } = job.data;
@@ -84,7 +85,7 @@ export const followUpWorker = new Worker<FollowUpJobData>(
     }
 
     if (response.errorType === 'rate_limit') {
-      await followUpQueue.add(job.name, job.data, { delay: 60000 });
+      await followUpQueue.add(job.name as any, job.data as any, { delay: 60000 });
       return;
     }
 
@@ -109,13 +110,13 @@ export const followUpWorker = new Worker<FollowUpJobData>(
 
       if (nextContact) {
         await followUpQueue.add(
-          job.name,
+          job.name as any,
           {
             ...job.data,
             primaryPhone: nextContact.phone,
             contactId: nextContact.id,
             attemptNumber: attemptNumber + 1,
-          },
+          } as any,
           { jobId: `${job.name}-${nextContact.id}-${attemptNumber + 1}` }
         );
       } else {
@@ -127,12 +128,13 @@ export const followUpWorker = new Worker<FollowUpJobData>(
     }
   },
   {
-    connection: bullmqConnection,
+    ...queueConnectionOptions,
     concurrency: 5,
     metrics: { maxDataPoints: 0 } as any, // disable internal metrics accumulation
     stalledInterval: 300000,
     maxStalledCount: 1,
-  }
+  },
+  getQueueBackend()
 );
 
 console.log("🚀 followUpWorker is running and listening for jobs");

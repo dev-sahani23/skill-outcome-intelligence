@@ -1,11 +1,12 @@
 import { Worker, Job } from "bullmq";
-import { bullmqConnection } from "../lib/redis";
+import { getQueueBackend, queueConnectionOptions } from "../lib/queueDB";
+import { PostgresQueueBackend } from "bullmq";
 import { prisma } from "../lib/prisma";
 import { ResponseJobData } from "../queues/responseQueue";
 import { structureFollowUpResponse, classifyAttritionReason } from "../services/groqService";
 import { OutcomeType, PlacementStatus } from "@prisma/client";
 
-export const responseWorker = new Worker<ResponseJobData>(
+export const responseWorker = new Worker<ResponseJobData, any, string, PostgresQueueBackend>(
   "whatsapp-responses",
   async (job: Job<ResponseJobData>) => {
     const { followUpId, traineeId, rawText, senderPhone, receivedAt } = job.data;
@@ -149,12 +150,13 @@ export const responseWorker = new Worker<ResponseJobData>(
     }
   },
   {
-    connection: bullmqConnection,
+    ...queueConnectionOptions,
     concurrency: 3,
     metrics: { maxDataPoints: 0 } as any, // disable internal metrics accumulation
     stalledInterval: 300000,
     maxStalledCount: 1,
-  }
+  },
+  getQueueBackend()
 );
 
 console.log("🚀 responseWorker is running and listening for jobs");

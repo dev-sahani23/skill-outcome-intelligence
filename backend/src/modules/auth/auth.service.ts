@@ -4,8 +4,6 @@ import { signToken, verifyToken } from "../../utils/jwt";
 import { RegisterInput, LoginInput, SendOtpInput, VerifyOtpInput, ChangePasswordInput, ResetPasswordInput } from "./auth.schema";
 import { sendOtpEmail } from "../../services/emailService";
 import { normalizeEmail } from "../../utils/normalizeEmail";
-import { redisClient } from "../../lib/redis";
-
 export const registerUser = async (input: RegisterInput) => {
   const normalizedEmail = normalizeEmail(input.email);
   const existingUser = await prisma.user.findUnique({
@@ -124,13 +122,16 @@ export const sendOtp = async (input: SendOtpInput) => {
 
   // Generate 6-digit OTP
   const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-  const otpKey = `otp:${normalizedEmail}`;
 
-  // Store OTP with 10 minute expiration using pipeline for atomicity
-  await redisClient.pipeline()
-    .hmset(otpKey, { code: otpCode, attempts: 0 })
-    .expire(otpKey, 10 * 60)
-    .exec();
+  // Store OTP with 10 minute expiration
+  const expireDate = new Date();
+  expireDate.setMinutes(expireDate.getMinutes() + 10);
+
+  await prisma.otpToken.upsert({
+    where: { phone: normalizedEmail },
+    update: { code: otpCode, attempts: 0, expiresAt: expireDate },
+    create: { phone: normalizedEmail, code: otpCode, attempts: 0, expiresAt: expireDate }
+  });
 
   const result = await sendOtpEmail(normalizedEmail, otpCode);
   if (!result.success) {
@@ -144,35 +145,32 @@ export const sendOtp = async (input: SendOtpInput) => {
 export const verifyOtp = async (input: VerifyOtpInput) => {
   const { otp } = input;
   const normalizedEmail = normalizeEmail(input.email);
-  const otpKey = `otp:${normalizedEmail}`;
 
-  const verifyScript = `
-    local exists = redis.call("EXISTS", KEYS[1])
-    if exists == 0 then return -1 end
-    local attempts = redis.call("HINCRBY", KEYS[1], "attempts", 1)
-    local code = redis.call("HGET", KEYS[1], "code")
-    return {attempts, code}
-  `;
+  const otpRecord = await prisma.otpToken.findUnique({
+    where: { phone: normalizedEmail }
+  });
 
-  const result = await redisClient.eval(verifyScript, 1, otpKey);
-
-  if (result === -1) {
+  if (!otpRecord || otpRecord.expiresAt < new Date()) {
     throw { statusCode: 400, message: "OTP expired or not requested" };
   }
 
-  const [attempts, code] = result as [number, string];
+  const attempts = otpRecord.attempts + 1;
 
   if (attempts > 5) {
-    await redisClient.del(otpKey);
+    await prisma.otpToken.delete({ where: { phone: normalizedEmail } });
     throw { statusCode: 429, message: "Too many failed attempts. Please request a new OTP.", errorCode: "OTP_ATTEMPTS_EXCEEDED" };
   }
 
-  if (code !== otp) {
+  if (otpRecord.code !== otp) {
+    await prisma.otpToken.update({
+      where: { phone: normalizedEmail },
+      data: { attempts }
+    });
     throw { statusCode: 400, message: "Invalid OTP" };
   }
 
-  // OTP is valid — delete it from Redis so it can't be reused
-  await redisClient.del(otpKey);
+  // OTP is valid — delete it from DB so it can't be reused
+  await prisma.otpToken.delete({ where: { phone: normalizedEmail } });
 
   // Return a short-lived reset token (15 minutes)
   const resetToken = signToken({ email: normalizedEmail, purpose: "reset_password" }, "15m");

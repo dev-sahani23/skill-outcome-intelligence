@@ -1,4 +1,3 @@
-import { redisClient } from "../lib/redis";
 import { prisma } from "../lib/prisma";
 import { responseQueue } from "../queues/responseQueue";
 import { normalizePhoneNumber } from "../services/whatsappService";
@@ -29,7 +28,7 @@ export async function startWhatsappPoller() {
       // Incoming messages are strictly pushed via Webhooks. 
       // But the user prompt says: "Create src/jobs/whatsappPoller.ts: Every 10 seconds, call the WhatsApp Cloud API to fetch recent messages: GET https://graph.facebook.com/v19.0/{PHONE_NUMBER_ID}/messages"
       // I will implement it exactly as the user requested.
-      
+
       const response = await fetch(url, {
         method: "GET",
         headers: {
@@ -49,22 +48,31 @@ export async function startWhatsappPoller() {
         if (message.type !== "text") continue;
 
         const messageId = message.id;
-        const processedKey = `processed:wamid:${messageId}`;
-        const alreadyProcessed = await redisClient.get(processedKey);
+
+        // Clean up expired tokens periodically (just deletes on arbitrary loop cycles)
+        if (Math.random() < 0.1) {
+          await prisma.whatsappProcessedMessage.deleteMany({
+            where: { expiresAt: { lt: new Date() } }
+          }).catch(() => { });
+        }
+
+        const alreadyProcessed = await prisma.whatsappProcessedMessage.findUnique({
+          where: { id: messageId }
+        });
 
         if (alreadyProcessed) continue;
 
         const senderPhone = "+" + message.from;
         const rawText = message.text?.body;
         // The API might return timestamp differently, using current time if not provided
-        const receivedAt = message.timestamp 
-          ? new Date(parseInt(message.timestamp) * 1000).toISOString() 
+        const receivedAt = message.timestamp
+          ? new Date(parseInt(message.timestamp) * 1000).toISOString()
           : new Date().toISOString();
 
         const normalizedSender = normalizePhoneNumber(senderPhone);
 
         const contact = await prisma.contact.findFirst({
-          where: { 
+          where: {
             OR: [
               { phone: normalizedSender },
               { phone: normalizedSender.replace('+91', '') },
@@ -85,7 +93,7 @@ export async function startWhatsappPoller() {
         });
 
         if (followUp) {
-          await responseQueue.add("process-response", {
+          await responseQueue.add("process-response" as any, {
             followUpId: followUp.id,
             traineeId: contact.traineeId,
             rawText,
@@ -93,8 +101,15 @@ export async function startWhatsappPoller() {
             receivedAt,
           });
 
-          // Mark as processed in Redis for 24 hours (86400 seconds)
-          await redisClient.set(processedKey, "1", "EX", 86400);
+          // Mark as processed in PG for 24 hours (86400 seconds)
+          const expireDate = new Date();
+          expireDate.setSeconds(expireDate.getSeconds() + 86400);
+
+          await prisma.whatsappProcessedMessage.upsert({
+            where: { id: messageId },
+            update: { expiresAt: expireDate },
+            create: { id: messageId, expiresAt: expireDate }
+          });
         }
       }
     } catch (error) {

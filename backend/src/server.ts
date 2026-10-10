@@ -50,54 +50,7 @@ const healthHandler = (req: any, res: any) => {
 app.get('/health', healthHandler);
 app.get('/api/health', healthHandler);
 
-// Production-safe Redis command metrics
-app.get('/api/redis-stats', async (req: any, res: any) => {
-  const secret = process.env.REDIS_STATS_SECRET;
-
-  if (!secret) {
-    // If not configured, immediately 403 to fail-safe
-    return res.status(403).json({ error: 'Endpoint secured but unconfigured.' });
-  }
-
-  const providedSecret = req.headers['x-admin-secret'];
-
-  if (!providedSecret || typeof providedSecret !== 'string') {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  const crypto = require('crypto');
-
-  // Use constant-time comparison to prevent timing attacks
-  const secretBuffer = Buffer.from(secret);
-  const providedBuffer = Buffer.from(providedSecret);
-
-  let isMatch = false;
-  if (secretBuffer.length === providedBuffer.length) {
-    isMatch = crypto.timingSafeEqual(secretBuffer, providedBuffer);
-  }
-
-  if (!isMatch) {
-    return res.status(401).json({ error: 'Unauthorized' });
-  }
-
-  try {
-    const { globalCommandStats } = require('./lib/redis');
-
-    // Format metrics correctly for simple output
-    const formattedStats: Record<string, { calls: number }> = {};
-    for (const [cmd, count] of Object.entries(globalCommandStats)) {
-      formattedStats[cmd as string] = { calls: count as number };
-    }
-
-    res.status(200).json({
-      status: 'ok',
-      timestamp: new Date().toISOString(),
-      commands: formattedStats
-    });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to retrieve Redis stats' });
-  }
-});
+// (Redis stats endpoint removed as Redis has been replaced with PostgreSQL)
 
 // Routes
 app.get('/webhook/whatsapp', (req: any, res: any) => {
@@ -280,7 +233,6 @@ app.use(errorHandler);
 if (process.env.NODE_ENV === 'production') {
   const required = [
     'DATABASE_URL',
-    'REDIS_URL',
     'JWT_SECRET',
     'GMAIL_USER',
     'GMAIL_APP_PASSWORD',

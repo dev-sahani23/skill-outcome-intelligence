@@ -1,0 +1,11 @@
+src/jobs/scheduleFollowUps.ts(66,11): error TS2345: Argument of type 'string' is not assignable to parameter of type 'ExtractNameType<DataTypeOrJob, DefaultNameType>'.
+src/jobs/whatsappPoller.ts(96,35): error TS2345: Argument of type 'string' is not assignable to parameter of type 'ExtractNameType<DataTypeOrJob, DefaultNameType>'.
+src/modules/admin/admin.controller.ts(267,9): error TS2345: Argument of type 'string' is not assignable to parameter of type 'ExtractNameType<DataTypeOrJob, DefaultNameType>'.
+src/queues/followUpQueue.ts(24,4): error TS2345: Argument of type 'BackendFactory<PostgresQueueBackend>' is not assignable to parameter of type 'BackendFactory<RedisQueueBackend>'.
+  Type 'PostgresQueueBackend' is missing the following properties from type 'RedisQueueBackend': name, version, moveToFinishedKeys, queue, and 43 more.
+src/queues/responseQueue.ts(14,4): error TS2345: Argument of type 'BackendFactory<PostgresQueueBackend>' is not assignable to parameter of type 'BackendFactory<RedisQueueBackend>'.
+  Type 'PostgresQueueBackend' is missing the following properties from type 'RedisQueueBackend': name, version, moveToFinishedKeys, queue, and 43 more.
+src/server.ts(123,29): error TS2345: Argument of type 'string' is not assignable to parameter of type 'ExtractNameType<DataTypeOrJob, DefaultNameType>'.
+src/server.ts(177,29): error TS2345: Argument of type 'string' is not assignable to parameter of type 'ExtractNameType<DataTypeOrJob, DefaultNameType>'.
+src/workers/followUpWorker.ts(88,31): error TS2345: Argument of type 'string' is not assignable to parameter of type 'ExtractNameType<DataTypeOrJob, DefaultNameType>'.
+src/workers/followUpWorker.ts(113,11): error TS2345: Argument of type 'string' is not assignable to parameter of type 'ExtractNameType<DataTypeOrJob, DefaultNameType>'.

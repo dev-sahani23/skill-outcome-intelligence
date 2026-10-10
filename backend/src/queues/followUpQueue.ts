@@ -1,5 +1,5 @@
 import { Queue } from "bullmq";
-import { bullmqConnection } from "../lib/redis";
+import { getQueueBackend, queueConnectionOptions } from "../lib/queueDB";
 import { FollowUpStage } from "@prisma/client";
 
 export interface FollowUpJobData {
@@ -13,7 +13,7 @@ export interface FollowUpJobData {
 }
 
 export const followUpQueue = new Queue<FollowUpJobData>("follow-ups", {
-  connection: bullmqConnection,
+  ...queueConnectionOptions,
   defaultJobOptions: {
     attempts: 3,
     backoff: {
@@ -21,4 +21,4 @@ export const followUpQueue = new Queue<FollowUpJobData>("follow-ups", {
       delay: 1000,
     },
   },
-});
+}, getQueueBackend() as any);
