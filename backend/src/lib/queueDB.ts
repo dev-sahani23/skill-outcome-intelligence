@@ -19,5 +19,8 @@ queuePool.on('connect', (client) => {
 export const getQueueBackend = () => createPostgresBackend;
 
 export const queueConnectionOptions = {
-    connection: queuePool // the pg pool instance
+    connection: {
+        pool: queuePool,
+        migrate: true
+    } as any // the pg pool instance and migration flag
 };
